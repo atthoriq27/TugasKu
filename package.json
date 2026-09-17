@@ -1,0 +1,27 @@
+{
+  "name": "tugasku",
+  "version": "1.0.0",
+  "description": "Aplikasi otomasi dan pemantauan tugas LMS MENTARI UNPAM",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "web": "node server.js",
+    "login": "node scan.js --login",
+    "scan": "node scan.js",
+    "scan:all": "node scan.js --all",
+    "scan:detail": "node scan.js --detail",
+    "scan:courses": "node scan.js --list-courses",
+    "test": "node test/run-all-tests.js",
+    "start": "node server.js",
+    "pipeline:preview": "node pipeline.js --preview",
+    "pipeline:dry-run": "node pipeline.js --dry-run",
+    "pipeline:live": "node pipeline.js --live",
+    "whatsapp:preview": "node whatsapp.js --preview",
+    "whatsapp:dry-run": "node whatsapp.js --dry-run",
+    "whatsapp:live": "node whatsapp.js --live",
+    "scheduler:dry-run": "node scheduler.js --dry-run"
+  },
+  "dependencies": {
+    "playwright": "^1.62.1"
+  }
+}

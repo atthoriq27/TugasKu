@@ -1,0 +1,14 @@
+{
+  "241011400001": {
+    "nim": "241011400001",
+    "nama": "CONTOH NAMA MAHASISWA 1",
+    "phone": "6281234567890",
+    "type": "UTAMA"
+  },
+  "241011400002": {
+    "nim": "241011400002",
+    "nama": "CONTOH NAMA MAHASISWA 2",
+    "phone": "6289876543210",
+    "type": "REVISI"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "mainGroup": {
+    "name": "Kelas TIF",
+    "whatsappGroupId": null
+  },
+  "courses": {
+    "20252-04TPLE003-22TIF0162": {
+      "name": "DATA MINING",
+      "whatsappGroupId": null
+    },
+    "20252-04TPLE003-22TIF0213": {
+      "name": "METODE NUMERIK",
+      "whatsappGroupId": null
+    }
+  }
+}

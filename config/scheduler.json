@@ -1,0 +1,24 @@
+{
+  "timezone": "Asia/Jakarta",
+  "jobs": {
+    "mentariScan": {
+      "enabled": true,
+      "interval_hours": 1
+    },
+    "studentReminder": {
+      "enabled": true,
+      "interval_hours": 2
+    },
+    "lecturerActivityUpdate": {
+      "enabled": true,
+      "interval_hours": 2
+    }
+  },
+  "retry": {
+    "maxAttempts": 3,
+    "delayMs": 30000
+  },
+  "scheduler": {
+    "checkIntervalMs": 60000
+  }
+}

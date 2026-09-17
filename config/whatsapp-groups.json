@@ -1,0 +1,40 @@
+{
+  "main": {
+    "name": "05TPLE003",
+    "groupId": null
+  },
+  "courses": {
+    "20261-05TPLE003-22TIF0243": {
+      "name": "Kecerdasan Buatan - 05TPLE003",
+      "groupId": null
+    },
+    "20261-05TPLE003-22TIF0252": {
+      "name": "Sistem Informasi Manajemen - 05TPLE003",
+      "groupId": null
+    },
+    "20261-05TPLE003-22TIF0262": {
+      "name": "Pengolahan Citra Digital - 05TPLE003",
+      "groupId": null
+    },
+    "20261-05TPLE003-22TIF0272": {
+      "name": "Teknik Riset Operasional - 05TPLE003",
+      "groupId": null
+    },
+    "20261-05TPLE003-22TIF0283": {
+      "name": "Pemrograman Web I - 05TPLE003",
+      "groupId": null
+    },
+    "20261-05TPLE003-22TIF0293": {
+      "name": "Metode Penelitian - 05TPLE003",
+      "groupId": null
+    },
+    "20261-05TPLE003-22TIF0302": {
+      "name": "Digital Entrepreneurship - 05TPLE003",
+      "groupId": null
+    },
+    "20261-05TPLE003-22TIF1013": {
+      "name": "Machine Learning - 05TPLE003",
+      "groupId": null
+    }
+  }
+}

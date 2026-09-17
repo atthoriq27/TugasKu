@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TugasKu — Pemantau MENTARI UNPAM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- TOPBAR / NAVBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="btn-menu-toggle" id="btnMenuToggle" aria-label="Toggle Sidebar">
+        <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="brand">
+        <div class="brand-logo">
+          <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <div class="brand-title-row">
+            <span class="brand-title">TugasKu</span>
+            <span class="brand-badge" id="headerClassBadge">05TPLE003</span>
+          </div>
+          <p class="brand-subtitle">Pemantau Posttest, Forum &amp; Tugas MENTARI Terintegrasi Kalender</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <!-- DEADLINE PILL -->
+      <div class="deadline-pill" id="deadlinePill">
+        <svg class="icon icon-sm text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <div class="deadline-text-col">
+          <span class="deadline-title" id="deadlineTitle">Batas Pekan 1</span>
+          <span class="deadline-countdown" id="deadlineCountdown">0 Hari 00h : 00m : 00s</span>
+          <span class="deadline-sub" id="deadlineSub">Deadline: Jumat, 23:59 WIB</span>
+        </div>
+      </div>
+
+      <!-- MENTARI STATUS -->
+      <div class="status-pill" id="statusPill">
+        <span class="status-indicator-dot online" id="statusDot"></span>
+        <div class="status-text-col">
+          <span class="status-label">MENTARI</span>
+          <span class="status-val online" id="statusValText">Online</span>
+        </div>
+      </div>
+
+      <!-- SETTINGS BUTTON -->
+      <button id="btnOpenSettings" class="btn btn-nav btn-ghost" title="Pengaturan Kelas, Pekan, Template WA &amp; Sistem">
+        <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span>Pengaturan</span>
+      </button>
+
+      <!-- PROFILE PILL -->
+      <div class="user-pill" id="userPill" title="Klik untuk membuka Rangkuman Tugas Pribadi (Status Saya)">
+        <span class="user-dot"></span>
+        <div class="user-info-col">
+          <span class="user-name" id="userName">ATTHORIQ</span>
+          <span class="user-class" id="headerUserClass">(05TPLE003)</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- RECONNECT BANNER (IF OFFLINE) -->
+  <div id="reconnectBanner" class="reconnect-banner hidden">
+    <div class="banner-content">
+      <svg class="icon icon-md text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div>
+        <strong>Sesi MENTARI Belum Terhubung:</strong>
+        <span>Jalankan <code>npm run login</code> di terminal untuk memperbarui sesi MENTARI Anda.</span>
+      </div>
+    </div>
+    <button id="btnBannerReconnect" class="btn btn-primary btn-sm">Login Ulang MENTARI</button>
+  </div>
+
+  <!-- APP WRAPPER: SIDEBAR + MAIN CONTENT -->
+  <div class="app-layout">
+    
+    <!-- LEFT SIDEBAR NAVIGATION -->
+    <aside class="sidebar" id="sidebar">
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="nav-item active" id="navDashboard">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- GROUP: MONITORING -->
+        <div class="nav-group-title">MONITORING</div>
+        <a href="#controls" class="nav-item" id="navJadwal">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>Jadwal &amp; Mata Kuliah</span>
+        </a>
+        <a href="#middlePanel" class="nav-item" id="navBelumPosttest" data-tab="posttest">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+          <span>Mahasiswa Belum Posttest</span>
+        </a>
+        <a href="#middlePanel" class="nav-item" id="navForumKurang" data-tab="forum">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>Forum Diskusi Kurang</span>
+        </a>
+        <a href="#middlePanel" class="nav-item" id="navBelumPenugasan" data-tab="assignment">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <span>Belum Penugasan Terstruktur</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" id="navStatusFordis">
+          <svg class="icon icon-sm text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>Status Fordis Dosen</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" id="navRangkumanPribadi">
+          <svg class="icon icon-sm text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+          <span>Rangkuman Pribadi</span>
+        </a>
+
+        <!-- GROUP: AKSI CEPAT -->
+        <div class="nav-group-title">AKSI CEPAT</div>
+        <a href="javascript:void(0)" class="nav-item" id="navKirimTele">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          <span>Kirim ke Telegram</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" id="navSalinDraft">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <span>Salin Teks Draft</span>
+        </a>
+
+        <!-- GROUP: DATA MAHASISWA -->
+        <div class="nav-group-title">DATA MAHASISWA</div>
+        <a href="#tableSection" class="nav-item" id="navDaftarMhs">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>Daftar Mahasiswa</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" id="navExportData">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Export Data</span>
+        </a>
+
+        <!-- GROUP: PENGATURAN -->
+        <div class="nav-group-title">PENGATURAN</div>
+        <a href="javascript:void(0)" class="nav-item" id="navPengaturanWA">
+          <svg class="icon icon-sm text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+          </svg>
+          <span>Kontak WhatsApp</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" id="navPengaturanBot">
+          <svg class="icon icon-sm text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/>
+          </svg>
+          <span>Bot Telegram</span>
+        </a>
+        <a href="javascript:void(0)" class="nav-item" id="navPengaturanJadwal">
+          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>Jadwal &amp; Sesi MENTARI</span>
+        </a>
+      </nav>
+
+      <!-- SIDEBAR BOTTOM WIDGET: INFO KELAS & MINI COUNTER -->
+      <div class="sidebar-widget">
+        <div class="widget-header">Info Kelas</div>
+        <div class="widget-info-list">
+          <div class="widget-info-row">
+            <span class="widget-label">Dosen</span>
+            <span class="widget-val" id="infoDosen">-</span>
+          </div>
+          <div class="widget-info-row">
+            <span class="widget-label">Hari</span>
+            <span class="widget-val" id="infoHari">Sabtu</span>
+          </div>
+          <div class="widget-info-row">
+            <span class="widget-label">Ruang</span>
+            <span class="widget-val" id="infoRuang">Ruang V.619 (Kelompok I)</span>
+          </div>
+          <div class="widget-info-row">
+            <span class="widget-label">Kelompok</span>
+            <span class="widget-val" id="infoKelompok">Kelompok I</span>
+          </div>
+          <div class="widget-info-row">
+            <span class="widget-label">Jumlah Mahasiswa Utama</span>
+            <span class="widget-val" id="infoTotalUtama">37</span>
+          </div>
+        </div>
+
+        <!-- DUAL MINI STATUS CARDS -->
+        <div class="sidebar-mini-stats">
+          <div class="mini-stat-card success">
+            <span class="mini-stat-num" id="numDonePost">0</span>
+            <span class="mini-stat-label">Sudah Posttest</span>
+          </div>
+          <div class="mini-stat-card danger">
+            <span class="mini-stat-num" id="numPendingPost">0</span>
+            <span class="mini-stat-label">Belum Posttest</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content" id="dashboard">
+
+      <!-- TOP VIEW SWITCHER (SEGMENTED TABS) -->
+      <div class="view-switcher-container">
+        <div class="view-switcher-bar" id="viewSwitcher" role="tablist">
+          <button class="view-tab-btn active" id="btnViewDashboard" data-view="dashboard" role="tab">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Dashboard Ringkasan</span>
+          </button>
+          <button class="view-tab-btn" id="btnViewSchedule" data-view="schedule" role="tab">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Jadwal &amp; Matkul</span>
+          </button>
+          <button class="view-tab-btn" id="btnViewMonitoring" data-view="monitoring" role="tab">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            <span>Monitoring Tugas</span>
+            <span class="view-tab-badge danger hidden" id="badgeMonitoringPending">0</span>
+          </button>
+          <button class="view-tab-btn" id="btnViewStudents" data-view="students" role="tab">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Data Mahasiswa</span>
+            <span class="view-tab-badge" id="badgeTotalStudents">37</span>
+          </button>
+          <button class="view-tab-btn" id="btnViewPersonalSummary" role="tab" style="color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>Rangkuman Pribadi</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. HORIZONTAL CONTROL & FILTER BAR -->
+      <section class="control-card" id="controls">
+        <div class="control-row-top">
+          <!-- PEKAN KULIAH -->
+          <div class="control-field">
+            <label for="selectWeek">Pekan Kuliah</label>
+            <div class="select-wrapper">
+              <select id="selectWeek" class="form-control">
+                <option value="1">Pekan 1 (31 Agt - 5 Sep 2026)</option>
+                <option value="2">Pekan 2 (7 - 12 Sep 2026)</option>
+                <option value="3">Pekan 3 (14 - 19 Sep 2026)</option>
+                <option value="4">Pekan 4 (21 - 26 Sep 2026)</option>
+                <option value="5">Pekan 5 (28 Sep - 3 Okt 2026)</option>
+                <option value="6">Pekan 6 (5 - 10 Okt 2026)</option>
+                <option value="7">Pekan 7 (12 - 17 Okt 2026)</option>
+                <option value="UTS">UTS (19 - 24 Okt 2026)</option>
+                <option value="8">Pekan 8 (26 - 31 Okt 2026)</option>
+                <option value="9">Pekan 9 (2 - 7 Nov 2026)</option>
+                <option value="10">Pekan 10 (9 - 14 Nov 2026)</option>
+                <option value="11">Pekan 11 (16 - 21 Nov 2026)</option>
+                <option value="12">Pekan 12 (23 - 28 Nov 2026)</option>
+                <option value="13">Pekan 13 (30 Nov - 5 Des 2026)</option>
+                <option value="14">Pekan 14 (7 - 12 Des 2026)</option>
+                <option value="UAS">UAS (14 - 19 Des 2026)</option>
+                <option value="15">Pekan 15 (21 - 26 Des 2026)</option>
+                <option value="16">Pekan 16 (21 - 26 Des 2026)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- MATA KULIAH -->
+          <div class="control-field flex-2">
+            <label for="selectCourse">Mata Kuliah</label>
+            <div class="select-wrapper">
+              <select id="selectCourse" class="form-control">
+                <!-- Populated via JS grouped by Kelompok -->
+              </select>
+            </div>
+          </div>
+
+          <!-- MODA PERKULIAHAN -->
+          <div class="control-field">
+            <label>Moda Perkuliahan</label>
+            <div class="badge-mode-box">
+              <span id="badgeMode" class="badge-mode-pill daring">DARING</span>
+            </div>
+          </div>
+
+          <!-- PERTEMUAN MENTARI -->
+          <div class="control-field">
+            <label for="selectSection">Pertemuan MENTARI</label>
+            <div class="select-wrapper">
+              <select id="selectSection" class="form-control">
+                <option value="PERTEMUAN_1">Pertemuan 1</option>
+                <option value="PERTEMUAN_2">Pertemuan 2</option>
+                <option value="PERTEMUAN_3">Pertemuan 3</option>
+                <option value="PERTEMUAN_4">Pertemuan 4</option>
+                <option value="PERTEMUAN_5">Pertemuan 5</option>
+                <option value="PERTEMUAN_6">Pertemuan 6</option>
+                <option value="PERTEMUAN_7">Pertemuan 7</option>
+                <option value="PERTEMUAN_8">Pertemuan 8</option>
+                <option value="PERTEMUAN_9">Pertemuan 9</option>
+                <option value="PERTEMUAN_10">Pertemuan 10</option>
+                <option value="PERTEMUAN_11">Pertemuan 11</option>
+                <option value="PERTEMUAN_12">Pertemuan 12</option>
+                <option value="PERTEMUAN_13">Pertemuan 13</option>
+                <option value="PERTEMUAN_14">Pertemuan 14</option>
+                <option value="PERTEMUAN_15">Pertemuan 15</option>
+                <option value="PERTEMUAN_16">Pertemuan 16</option>
+                <option value="PERTEMUAN_17">Pertemuan 17</option>
+                <option value="PERTEMUAN_18">Pertemuan 18</option>
+                <option value="PERTEMUAN_19">Pertemuan 19</option>
+                <option value="PERTEMUAN_20">Pertemuan 20</option>
+                <option value="PERTEMUAN_21">Pertemuan 21</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- ACTION BUTTONS -->
+          <div class="control-buttons">
+            <button id="btnScan" class="btn btn-primary">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <span id="scanBtnText">Cek Status</span>
+            </button>
+            <button id="btnScanAll" class="btn btn-outline-primary">
+              <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+              <span id="scanAllBtnText">Scan Seluruh Matkul Daring</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- INFO PILLS ROW -->
+        <div class="control-row-bottom">
+          <div class="info-meta-pill">
+            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Sabtu</span>
+          </div>
+          <div class="info-meta-pill">
+            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M3 7v14"/><path d="M21 7v14"/><path d="M6 3h12a3 3 0 0 1 3 3v1H3V6a3 3 0 0 1 3-3z"/></svg>
+            <span id="infoRuangPill">Ruang V.619</span>
+          </div>
+          <div class="info-meta-pill">
+            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            <span id="infoKelompokPill">Kelompok I</span>
+          </div>
+          <div class="info-meta-pill status-pill" id="pillStatusFordis">
+            <span id="dotFordis" class="status-indicator-dot dot-gray"></span>
+            <span id="labelStatusFordis">Fordis: Belum Dicek</span>
+          </div>
+          <div class="info-meta-pill status-pill" id="pillStatusAssignment">
+            <span id="dotAssignment" class="status-indicator-dot dot-gray"></span>
+            <span id="labelStatusAssignment">Penugasan: Belum Dicek</span>
+          </div>
+          <div class="info-meta-pill status-pill" id="pillStatusPosttest">
+            <span id="dotPosttest" class="status-indicator-dot dot-gray"></span>
+            <span id="labelStatusPosttest">Posttest: Belum Dicek</span>
+          </div>
+          <div class="info-meta-pill status-pill deadline-course-pill" id="pillCourseDeadline" style="cursor: pointer;" title="Klik untuk ubah deadline mata kuliah ini">
+            <span>⏰</span>
+            <span id="textCourseDeadline">Deadline: Jumat, 23:59 WIB</span>
+            <span class="edit-badge" style="font-size: 10px; background: rgba(255,255,255,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 3px;">Ubah ✏️</span>
+          </div>
+          <div class="info-meta-pill-group" id="meetingBtnGroup">
+            <!-- Dynamic Meeting Pills -->
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 1: DASHBOARD RINGKASAN & AKSI CEPAT -->
+      <div class="app-view active" id="viewDashboard">
+        
+        <!-- 2. RINGKASAN STATUS MATA KULIAH (5 METRIC CARDS ROW) -->
+        <section class="metrics-section">
+          <div class="section-title-row">
+            <div>
+              <h2 class="section-title">Ringkasan Status Perkuliahan</h2>
+              <p class="section-subtitle" style="margin: 0; font-size: 12px; color: var(--text-dim);">Klik kartu metrik untuk melihat rincian mahasiswa di tab Monitoring Tugas.</p>
+            </div>
+            <div class="last-scan-badge">
+              <span>Terakhir scan: <strong id="lastScanTime">10:15:32</strong></span>
+              <button class="btn-icon-refresh" id="btnRefreshScan" title="Scan Ulang">
+                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="metrics-grid">
+            <!-- CARD 1: POSTTEST -->
+            <div class="metric-card card-blue clickable-metric" id="metricCardPost" data-target-tab="posttest" title="Klik untuk buka daftar mahasiswa Belum Posttest">
+              <div class="metric-header">
+                <div class="metric-icon-box blue">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+                </div>
+                <span class="metric-title">Posttest</span>
+              </div>
+              <div class="metric-val-row">
+                <span class="metric-main-val" id="metricPostRatio">0 / 37</span>
+                <span class="metric-pct" id="metricPostPct">0%</span>
+              </div>
+              <div class="metric-sub" id="metricPostSub">Sudah mengerjakan</div>
+              <div class="progress-track">
+                <div class="progress-bar blue" id="progressPost" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- CARD 2: FORUM DISKUSI -->
+            <div class="metric-card card-yellow clickable-metric" id="metricCardForum" data-target-tab="forum" title="Klik untuk buka daftar mahasiswa Forum Kurang">
+              <div class="metric-header">
+                <div class="metric-icon-box yellow">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <span class="metric-title">Forum Diskusi</span>
+              </div>
+              <div class="metric-val-row">
+                <span class="metric-main-val" id="metricForumRatio">0 / 37</span>
+                <span class="metric-pct" id="metricForumPct">0%</span>
+              </div>
+              <div class="metric-sub" id="metricForumSub">Minimal 2x reply</div>
+              <div class="progress-track">
+                <div class="progress-bar yellow" id="progressForum" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- CARD 3: PENUGASAN TERSTRUKTUR -->
+            <div class="metric-card card-green clickable-metric" id="metricCardAsg" data-target-tab="assignment" title="Klik untuk buka daftar Penugasan Terstruktur">
+              <div class="metric-header">
+                <div class="metric-icon-box green">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                </div>
+                <span class="metric-title">Penugasan Terstruktur</span>
+              </div>
+              <div class="metric-val-row">
+                <span class="metric-main-val" id="metricAsgRatio">0 / 37</span>
+                <span class="metric-pct" id="metricAsgPct">0%</span>
+              </div>
+              <div class="metric-sub" id="metricAsgSub">Sudah mengumpulkan</div>
+              <div class="progress-track">
+                <div class="progress-bar green" id="progressAsg" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- CARD 4: MAHASISWA BERMASALAH -->
+            <div class="metric-card card-red clickable-metric" id="metricCardProblem" data-target-tab="posttest" title="Klik untuk lihat mahasiswa yang belum menyelesaikan">
+              <div class="metric-header">
+                <div class="metric-icon-box red">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="18" y1="8" x2="23" y2="13"/><line x1="23" y1="8" x2="18" y2="13"/></svg>
+                </div>
+                <span class="metric-title">Mahasiswa Bermasalah</span>
+              </div>
+              <div class="metric-val-row">
+                <span class="metric-main-val text-danger" id="metricProblemCount">0</span>
+              </div>
+              <div class="metric-sub" id="metricProblemSub">0% dari total utama</div>
+            </div>
+
+            <!-- CARD 5: TOTAL MAHASISWA UTAMA -->
+            <div class="metric-card card-purple clickable-metric" id="metricCardTotal" data-target-view="students" title="Klik untuk buka daftar mahasiswa lengkap">
+              <div class="metric-header">
+                <div class="metric-icon-box purple">
+                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <span class="metric-title">Total Mahasiswa Utama</span>
+              </div>
+              <div class="metric-val-row">
+                <span class="metric-main-val text-purple" id="metricTotalUtama">37</span>
+              </div>
+              <div class="metric-sub">(Tidak termasuk revisi)</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DASHBOARD 2-COLUMN SPLIT GRID -->
+        <section class="dashboard-split-grid">
+          
+          <!-- LEFT: DRAFT PENGINGAT (WHATSAPP & TELEGRAM) -->
+          <div class="draft-card">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Draft Pengingat</h3>
+                <p class="card-subtitle">Salin atau kirim draft pengingat ke grup.</p>
+              </div>
+              <!-- TOGGLE DENGAN NAMA / RINGKAS AWAL PEKAN -->
+              <div class="draft-names-toggle" id="draftNamesToggleGroup">
+                <button type="button" class="btn-toggle-names active" id="btnNamesOn" title="Tampilkan daftar nama mahasiswa lengkap dengan tag/nomor (cocok saat menjelang deadline)">👥 Dengan Nama</button>
+                <button type="button" class="btn-toggle-names" id="btnNamesOff" title="Sembunyikan daftar nama agar pesan ringkas &amp; tidak menimbun chat (cocok untuk update tugas awal pekan)">📋 Ringkas (Awal Pekan)</button>
+              </div>
+            </div>
+
+            <!-- DRAFT TABS -->
+            <div class="draft-tabs-header">
+              <button class="draft-tab-btn active" id="tabMatkulBtn" data-target="matkul">Grup Matkul</button>
+              <button class="draft-tab-btn" id="tabUtamaBtn" data-target="utama">Grup Utama (Semua)</button>
+              <button class="draft-tab-btn" id="tabTodayBtn" data-target="today" style="color: #f87171; font-weight: 600;">🚨 Deadline Hari Ini</button>
+            </div>
+
+            <!-- DRAFT CODE PREVIEW -->
+            <div class="draft-preview-box">
+              <pre id="waMessageContent">*Pilih mata kuliah dan klik Cek Status untuk memuat draf pesan...*</pre>
+            </div>
+
+            <!-- DRAFT FOOTER BUTTONS -->
+            <div class="draft-action-row">
+              <button id="btnCopyWa" class="btn btn-ghost">
+                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                <span>Salin Draft</span>
+              </button>
+              <button id="btnSendWaToTelegram" class="btn btn-primary">
+                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span>Kirim ke Telegram</span>
+              </button>
+              <button id="btnOpenWhatsAppDirect" class="btn btn-success">
+                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span>Kirim ke WhatsApp</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- RIGHT: QUICK HIGHLIGHTS & STATUS FORDIS -->
+          <div class="quick-overview-card" id="cardQuickHighlights">
+            <div class="card-header-flex">
+              <div>
+                <h3 class="card-title">Ringkasan Cepat &amp; Tindakan</h3>
+                <p class="card-subtitle">Status penting dan mahasiswa yang paling butuh diingatkan.</p>
+              </div>
+              <button class="btn btn-outline-primary btn-sm" id="btnQuickGoMonitoring" title="Buka tabel lengkap di tab Monitoring Tugas">
+                <span>Buka Monitoring</span>
+                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </button>
+            </div>
+
+            <!-- FORDIS MINI STATUS BANNER -->
+            <div class="quick-fordis-box" id="quickFordisBox">
+              <div class="quick-fordis-icon">💬</div>
+              <div class="quick-fordis-info">
+                <div class="quick-fordis-title" id="quickFordisTitle">Forum Diskusi Pertemuan</div>
+                <div class="quick-fordis-desc" id="quickFordisDesc">Pilih mata kuliah &amp; klik Cek Status untuk memuat status forum.</div>
+              </div>
+              <span class="badge-table-pill" id="quickFordisBadge">Belum Dicek</span>
+            </div>
+
+            <!-- QUICK FOLLOW-UP LIST -->
+            <div class="quick-followup-section">
+              <div class="quick-followup-header">
+                <span class="quick-followup-title">⚡ Mahasiswa Belum Selesai (Top Follow-Up)</span>
+                <span class="quick-followup-count" id="quickFollowupCount">0 Mahasiswa</span>
+              </div>
+              <div class="quick-followup-list" id="quickFollowupList">
+                <div class="quick-empty-state">Pilih mata kuliah &amp; klik Cek Status untuk memuat data.</div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </div>
+
+      <!-- VIEW 2: JADWAL & MATA KULIAH (DEDICATED FULL VIEW) -->
+      <div class="app-view hidden" id="viewSchedule">
+        <!-- SCHEDULE HEADER & SUMMARY CARDS -->
+        <section class="schedule-header-card">
+          <div class="view-header-row" style="padding: 0 0 16px 0;">
+            <div>
+              <h2 class="section-title">Jadwal &amp; Direktori Mata Kuliah</h2>
+              <p class="section-subtitle">Kelas 05TPLE003 • Shift E Reguler CS • Ruang V.619 (Sabtu) • Semester Ganjil 2026/2027</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-outline-primary btn-sm" id="btnSchedOpenSettings" title="Pengaturan Jadwal & Deadline">
+                <span>Pengaturan Jadwal &amp; Deadline</span> ⚙️
+              </button>
+            </div>
+          </div>
+
+          <!-- 3-STAT METRIC ROW FOR SCHEDULE -->
+          <div class="schedule-stats-grid">
+            <div class="sched-stat-card">
+              <div class="sched-stat-icon blue">📚</div>
+              <div class="sched-stat-info">
+                <span class="sched-stat-label">Total Beban Studi</span>
+                <span class="sched-stat-val">8 Mata Kuliah (20 SKS)</span>
+                <span class="sched-stat-sub">Kelompok I: 10 SKS • Kelompok II: 10 SKS</span>
+              </div>
+            </div>
+            <div class="sched-stat-card">
+              <div class="sched-stat-icon yellow">🔄</div>
+              <div class="sched-stat-info">
+                <span class="sched-stat-label">Pola Belajar Hybrid</span>
+                <span class="sched-stat-val" id="schedActiveModeSummary">Pekan 1: Kel I Luring • Kel II Daring</span>
+                <span class="sched-stat-sub">Pekan 1-7 (Kel I Luring) • Pekan 9-15 (Kel II Luring)</span>
+              </div>
+            </div>
+            <div class="sched-stat-card">
+              <div class="sched-stat-icon green">🏫</div>
+              <div class="sched-stat-info">
+                <span class="sched-stat-label">Lokasi &amp; Hari Kuliah</span>
+                <span class="sched-stat-val">Sabtu • Ruang V.619</span>
+                <span class="sched-stat-sub">Sinkronisasi MENTARI &amp; Sesi Kuliah</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PEKAN SELECTOR STRIP -->
+          <div class="schedule-week-strip">
+            <span class="sched-strip-title">Pilih Pekan:</span>
+            <div class="sched-week-pills" id="schedWeekPillsContainer">
+              <!-- Dynamically populated / styled week buttons -->
+            </div>
+          </div>
+        </section>
+
+        <!-- TWO GROUPS SPLIT CARDS (KELOMPOK I & KELOMPOK II) -->
+        <section class="schedule-groups-grid">
+          <!-- GROUP I -->
+          <div class="sched-group-box">
+            <div class="sched-group-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge-table-pill info" style="font-size: 11px; font-weight: 700;">KELOMPOK I ([E-1])</span>
+                <span class="sched-group-sks">10 SKS</span>
+              </div>
+              <span class="sched-group-period-badge" id="schedGroup1PeriodBadge">LURING - Ruang V.619</span>
+            </div>
+            <p class="sched-group-note">Pekan 1 - 7: Tatap Muka Luring di Kampus • Pekan 9 - 15: Kuliah Daring MENTARI</p>
+
+            <!-- GROUP 1 COURSE CARDS -->
+            <div class="sched-course-grid" id="schedGroup1Courses">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- GROUP II -->
+          <div class="sched-group-box">
+            <div class="sched-group-header">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge-table-pill warning" style="font-size: 11px; font-weight: 700;">KELOMPOK II ([E-2])</span>
+                <span class="sched-group-sks">10 SKS</span>
+              </div>
+              <span class="sched-group-period-badge" id="schedGroup2PeriodBadge">DARING - MENTARI</span>
+            </div>
+            <p class="sched-group-note">Pekan 1 - 7: Kuliah Daring MENTARI • Pekan 9 - 15: Tatap Muka Luring di Kampus</p>
+
+            <!-- GROUP 2 COURSE CARDS -->
+            <div class="sched-course-grid" id="schedGroup2Courses">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- SEMESTER TIMELINE MATRIX CARD -->
+        <section class="schedule-matrix-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">Matriks Jadwal Semester &amp; Skema Pertemuan</h3>
+              <p class="card-subtitle">Pedoman pembagian pekan luring/daring dan pemetaan jumlah pertemuan (2 SKS = 14 Pertemuan, 3 SKS = 21 Pertemuan).</p>
+            </div>
+          </div>
+          <div class="table-container" style="margin-top: 14px;">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th width="140">Fase Semester</th>
+                  <th width="180">Rentang Pekan</th>
+                  <th>Kelompok I ([E-1] - 10 SKS)</th>
+                  <th>Kelompok II ([E-2] - 10 SKS)</th>
+                  <th width="160">Pertemuan SKS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong style="color: #60a5fa;">Paruh Pertama</strong></td>
+                  <td>Pekan 1 s/d 7</td>
+                  <td><span class="badge-table-pill success">LURING (Ruang V.619)</span></td>
+                  <td><span class="badge-table-pill warning">DARING (MENTARI)</span></td>
+                  <td>2 SKS: P1-7 | 3 SKS: P1-10</td>
+                </tr>
+                <tr style="background: rgba(234, 179, 8, 0.05);">
+                  <td><strong style="color: #fbbf24;">Evaluasi Tengah</strong></td>
+                  <td>Pekan 8 (19-24 Okt 2026)</td>
+                  <td><span class="badge-table-pill warning">UTS (Ujian Tengah Semester)</span></td>
+                  <td><span class="badge-table-pill warning">UTS (Ujian Tengah Semester)</span></td>
+                  <td>Seluruh Mata Kuliah</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #a855f7;">Paruh Kedua</strong></td>
+                  <td>Pekan 9 s/d 15</td>
+                  <td><span class="badge-table-pill warning">DARING (MENTARI)</span></td>
+                  <td><span class="badge-table-pill success">LURING (Ruang V.619)</span></td>
+                  <td>2 SKS: P8-14 | 3 SKS: P11-21</td>
+                </tr>
+                <tr style="background: rgba(239, 68, 68, 0.05);">
+                  <td><strong style="color: #f87171;">Evaluasi Akhir</strong></td>
+                  <td>Pekan 16 (14-19 Des 2026)</td>
+                  <td><span class="badge-table-pill danger">UAS (Ujian Akhir Semester)</span></td>
+                  <td><span class="badge-table-pill danger">UAS (Ujian Akhir Semester)</span></td>
+                  <td>Seluruh Mata Kuliah</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- VIEW 3: MONITORING TUGAS MAHASISWA (FULL-WIDTH TABBED TABLE) -->
+      <div class="app-view hidden" id="viewMonitoring">
+        <section class="tabbed-table-card" id="middlePanel">
+          <div class="view-header-row">
+            <div>
+              <h2 class="section-title">Monitoring Tugas Mahasiswa</h2>
+              <p class="section-subtitle">Pantau status pengerjaan Posttest, Forum Diskusi (multi-topik), dan Penugasan Terstruktur per pertemuan.</p>
+            </div>
+          </div>
+
+          <!-- TABS BAR -->
+          <div class="table-tabs-bar">
+            <button class="table-tab-btn active" id="tabPendingPost" data-tab="posttest">
+              Belum Posttest (<span id="tabCountPost">0</span>)
+            </button>
+            <button class="table-tab-btn tab-success-style" id="tabDonePost" data-tab="done_posttest">
+              Sudah Posttest (<span id="tabCountDonePost">0</span>)
+            </button>
+            <button class="table-tab-btn" id="tabPendingForum" data-tab="forum">
+              Forum Kurang (<span id="tabCountForum">0</span>)
+            </button>
+            <button class="table-tab-btn tab-success-style" id="tabDoneForum" data-tab="done_forum">
+              Sudah Forum (<span id="tabCountDoneForum">0</span>)
+            </button>
+            <button class="table-tab-btn" id="tabPendingAsg" data-tab="assignment">
+              Belum Penugasan (<span id="tabCountAsg">0</span>)
+            </button>
+            <button class="table-tab-btn tab-warning-style" id="tabStatusFordisDosen" data-tab="status_fordis">
+              📢 Status Fordis Dosen
+            </button>
+          </div>
+
+          <!-- MULTI-TOPIC INFO BANNER & CHIPS -->
+          <div id="forumTopicsContainer" class="forum-topics-container hidden">
+            <div class="forum-topics-header">
+              <div class="forum-topics-header-left">
+                <span class="badge-table-pill info" id="forumTopicsCountBadge">2 Topik Dosen</span>
+                <span class="forum-topics-title" id="forumTopicsHeaderTitle">Topik Diskusi Pertemuan Ini:</span>
+              </div>
+              <span class="forum-topics-hint" id="forumTopicsHint">Dosen membuat beberapa topik. Mahasiswa disarankan merespons tiap topik agar nilai lengkap.</span>
+            </div>
+            <div class="forum-topics-list" id="forumTopicsList">
+              <!-- Dynamically populated topic chips -->
+            </div>
+          </div>
+
+          <!-- TAB CONTENT HEADER -->
+          <div class="tab-content-header">
+            <div class="tab-title-left">
+              <svg class="icon icon-sm text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span class="tab-title-text" id="middlePanelTitle">Mahasiswa yang belum menyelesaikan Posttest (Kuis)</span>
+            </div>
+            <a href="javascript:void(0)" class="tab-link-viewall" id="btnViewAllPending">
+              <span>Buka Data Mahasiswa</span>
+              <span id="viewAllCount">0</span>
+              <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+          </div>
+
+          <!-- PENDING TABLE -->
+          <div class="table-container monitoring-table-container">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th width="50">No</th>
+                  <th width="140">NIM</th>
+                  <th>Nama Mahasiswa</th>
+                  <th width="200">Nomor WA</th>
+                  <th width="160">Status</th>
+                </tr>
+              </thead>
+              <tbody id="middleTableBody">
+                <tr>
+                  <td colspan="5" class="text-center empty-cell">
+                    Pilih mata kuliah dan klik <strong>Cek Status</strong> untuk memuat data.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- VIEW 3: DATA MAHASISWA & EKSPOR -->
+      <div class="app-view hidden" id="viewStudents">
+        <section class="students-card" id="tableSection">
+          <div class="view-header-row">
+            <div>
+              <h2 class="section-title">Data Seluruh Mahasiswa</h2>
+              <p class="section-subtitle">Cari, filter status lengkap, hubungi via WhatsApp, dan ekspor data ke format CSV atau Google Sheets.</p>
+            </div>
+            <div class="export-btn-group">
+              <button id="btnExportCsv" class="btn btn-ghost btn-sm">
+                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Unduh CSV</span>
+              </button>
+              <button id="btnCopySheet" class="btn btn-sheet btn-sm">
+                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+                <span>Salin Google Sheets</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SEARCH INPUT -->
+          <div class="search-wrap">
+            <svg class="icon icon-sm search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="searchStudent" class="form-control-search" placeholder="Cari nama atau NIM mahasiswa..." autocomplete="off">
+            <button id="btnClearSearch" class="btn-clear-search hidden">&times;</button>
+          </div>
+
+          <!-- FILTER CHIPS -->
+          <div class="filter-chips-row">
+            <button class="chip active" data-filter="ALL">Semua (<span id="filterAllCount">0</span>)</button>
+            <button class="chip chip-danger" data-filter="PENDING_POST">Belum Posttest (<span id="filterPostCount">0</span>)</button>
+            <button class="chip chip-success" data-filter="DONE_POST">Sudah Posttest (<span id="filterDonePostCount">0</span>)</button>
+            <button class="chip chip-warning" data-filter="PENDING_FORUM">Forum Kurang (<span id="filterForumCount">0</span>)</button>
+            <button class="chip chip-success" data-filter="DONE_FORUM">Sudah Forum (<span id="filterDoneForumCount">0</span>)</button>
+            <button class="chip chip-info" data-filter="PENDING_ASG">Belum Tugas (<span id="filterAsgCount">0</span>)</button>
+            <button class="chip chip-success" data-filter="COMPLETE">Lengkap (<span id="filterCompleteCount">0</span>)</button>
+          </div>
+
+          <!-- TABLE -->
+          <div class="table-container small-table">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th width="40">No</th>
+                  <th width="120">NIM</th>
+                  <th>Nama Mahasiswa</th>
+                  <th width="90">Posttest</th>
+                  <th width="100">Forum</th>
+                  <th width="90">Tugas</th>
+                  <th width="80">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tableStudentsBody">
+                <tr>
+                  <td colspan="7" class="text-center empty-cell">
+                    Data belum dimuat. Silakan pilih mata kuliah dan klik Cek Status.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PAGINATION FOOTER -->
+          <div class="pagination-footer">
+            <div class="pagination-info" id="paginationInfo">Showing 1 to 10 of 37</div>
+            <div class="pagination-controls" id="paginationControls">
+              <!-- Rendered via JS -->
+            </div>
+            <div class="pagination-pagesize">
+              <span id="pageSizeLabel">10 / page</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+  </div>  <!-- UNIFIED SETTINGS MODAL -->
+  <div id="modalSettings" class="modal-overlay hidden">
+    <div class="modal-card modal-card-lg">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="header-icon-box settings">
+            <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </div>
+          <div>
+            <h3>Pengaturan Sistem &amp; Personalisasi Kelas</h3>
+            <p>Atur nama kelas, kalender pekan, format pesan pengingat WA, bot Telegram, kontak, dan sesi MENTARI.</p>
+          </div>
+        </div>
+        <button id="btnCloseSettings" class="btn-close-modal">&times;</button>
+      </div>
+
+      <!-- MODAL TABS NAVIGATION -->
+      <div class="modal-tabs">
+        <button type="button" class="modal-tab-btn active" id="tabBtnClassSettings" data-target="panelTabClassSettings">
+          <svg class="icon icon-xs text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Profil Kelas</span>
+        </button>
+        <button type="button" class="modal-tab-btn" id="tabBtnWeeksSettings" data-target="panelTabWeeksSettings">
+          <svg class="icon icon-xs text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Pekan &amp; Deadline</span>
+        </button>
+        <button type="button" class="modal-tab-btn" id="tabBtnTemplates" data-target="panelTabTemplates">
+          <svg class="icon icon-xs text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Format Template WA</span>
+        </button>
+        <button type="button" class="modal-tab-btn" id="tabBtnBot" data-target="panelTabBot">
+          <svg class="icon icon-xs text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
+          <span>Bot Telegram</span>
+        </button>
+        <button type="button" class="modal-tab-btn" id="tabBtnContacts" data-target="panelTabContacts">
+          <svg class="icon icon-xs text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <span>Kontak WhatsApp</span>
+        </button>
+        <button type="button" class="modal-tab-btn" id="tabBtnSchedule" data-target="panelTabSchedule">
+          <svg class="icon icon-xs text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span>Sesi MENTARI</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: PROFIL & KELAS -->
+      <div class="modal-tab-panel active" id="panelTabClassSettings">
+        <div class="modal-body">
+          <div class="settings-auto-detect-card">
+            <div class="auto-detect-info">
+              <strong>⚡ Deteksi Otomatis Kelas</strong>
+              <p>Tarik nama kelas, semester, dan daftar mata kuliah langsung dari akun MENTARI yang sedang login.</p>
+            </div>
+            <button type="button" id="btnAutoDetectClass" class="btn btn-primary btn-sm">
+              <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span id="txtAutoDetect">Deteksi dari MENTARI</span>
+            </button>
+          </div>
+
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;">
+            <div class="form-group">
+              <label for="inputClassName">Nama / Kode Kelas</label>
+              <input type="text" id="inputClassName" class="form-control" placeholder="Contoh: 05TPLE003">
+              <small class="form-hint" style="color: #64748b; font-size: 11px;">Digunakan pada judul rekap pesan WhatsApp dan dashboard.</small>
+            </div>
+            <div class="form-group">
+              <label for="inputSemesterCode">Kode Semester</label>
+              <input type="text" id="inputSemesterCode" class="form-control" placeholder="Contoh: 20261">
+              <small class="form-hint" style="color: #64748b; font-size: 11px;">Contoh: 20261 (Ganjil 2026/2027), 20262 (Genap).</small>
+            </div>
+          </div>
+
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label for="inputAcademicYear">Tahun Akademik</label>
+              <input type="text" id="inputAcademicYear" class="form-control" placeholder="Contoh: 2026/2027">
+            </div>
+            <div class="form-group">
+              <label for="inputStartDate">Tanggal Awal Semester (Pekan 1)</label>
+              <input type="date" id="inputStartDate" class="form-control" value="2026-08-31">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label for="inputUserCustomName" style="margin-bottom: 0;">Nama Tampilan Pengguna (Pojok Kanan Atas)</label>
+              <button type="button" id="btnUseMentariName" class="btn btn-ghost btn-xs" style="font-size: 10.5px; padding: 2px 6px; color: #38bdf8;">
+                ⚡ Pakai Nama MENTARI
+              </button>
+            </div>
+            <input type="text" id="inputUserCustomName" class="form-control" placeholder="Otomatis dari profil akun MENTARI (misal: ATTHORIQ)">
+            <small class="form-hint" style="color: #64748b; font-size: 11px;">Kosongkan jika ingin nama otomatis mengikuti akun MENTARI yang sedang login.</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnSaveClassProfile" class="btn btn-primary">Simpan Profil Kelas</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: PEKAN & DEADLINE -->
+      <div class="modal-tab-panel" id="panelTabWeeksSettings">
+        <div class="modal-body">
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label for="selectDeadlineDay">Hari Batas Deadline</label>
+              <select id="selectDeadlineDay" class="form-control">
+                <option value="Senin">Senin</option>
+                <option value="Selasa">Selasa</option>
+                <option value="Rabu">Rabu</option>
+                <option value="Kamis">Kamis</option>
+                <option value="Jumat" selected>Jumat</option>
+                <option value="Sabtu">Sabtu</option>
+                <option value="Minggu">Minggu</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="inputDeadlineTime">Jam Batas Deadline</label>
+              <input type="text" id="inputDeadlineTime" class="form-control" placeholder="23:59 WIB" value="23:59 WIB">
+            </div>
+          </div>
+
+          <div class="weeks-table-header" style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Sinkronisasi Label Pekan Pembelajaran</label>
+            <button type="button" id="btnRecalculateWeeks" class="btn btn-ghost btn-sm">Hitung Ulang dari Tanggal Awal</button>
+          </div>
+
+          <div class="table-container small-table" style="max-height: 220px; margin-top: 8px;">
+            <table class="modern-table">
+              <thead>
+                <tr>
+                  <th width="70">Pekan</th>
+                  <th>Label &amp; Rentang Tanggal</th>
+                </tr>
+              </thead>
+              <tbody id="tableWeeksSettingsBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="course-deadlines-section" style="margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <div>
+                <label style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">⏰ Custom Deadline Khusus Per Mata Kuliah</label>
+                <p style="font-size: 11px; color: #94a3b8; margin: 2px 0 0;">Atur jika ada mata kuliah tertentu yang deadline-nya berbeda dari default kelas.</p>
+              </div>
+              <button type="button" id="btnResetAllDeadlines" class="btn btn-ghost btn-xs" style="color: #f87171;" title="Kembalikan semua matkul ke default kelas">Reset Semua ke Default</button>
+            </div>
+
+            <div class="table-container small-table" style="max-height: 220px;">
+              <table class="modern-table">
+                <thead>
+                  <tr>
+                    <th>Mata Kuliah &amp; Dosen</th>
+                    <th width="130">Hari Deadline</th>
+                    <th width="130">Jam Deadline</th>
+                    <th width="110">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="tableCourseDeadlinesBody">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnSaveWeeksSettings" class="btn btn-primary">Simpan Pengaturan Pekan &amp; Deadline</button>
+        </div>
+      </div>
+
+      <!-- TAB 3: FORMAT TEMPLATE PESAN WA -->
+      <div class="modal-tab-panel" id="panelTabTemplates">
+        <div class="modal-body">
+          <div class="template-selector-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <label style="font-size: 12px; font-weight: 700; color: #cbd5e1;">Pilih Jenis Template:</label>
+              <select id="selectTemplateType" class="form-control" style="width: auto; padding: 4px 10px; font-size: 13px;">
+                <option value="grup_utama">📢 Rekap Seluruh Matkul (Grup Utama)</option>
+                <option value="grup_matkul">🎯 Draf Pengingat Per Matkul (Grup Matkul)</option>
+              </select>
+            </div>
+            <button type="button" id="btnResetTemplate" class="btn btn-ghost btn-sm" title="Kembalikan ke format baku default">Reset Format Baku</button>
+          </div>
+
+          <div class="chip-variable-container" style="background: rgba(30, 41, 59, 0.5); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 10px;">
+            <span class="chip-label" style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Klik tag untuk menyisipkan variabel:</span>
+            <div class="chip-tags-list" id="chipTagsList" style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <!-- Variable chips populated dynamically -->
+            </div>
+          </div>
+
+          <div class="template-editor-wrap">
+            <textarea id="txtTemplateEditor" class="form-control" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; height: 150px; resize: vertical; line-height: 1.5;"></textarea>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px; background: rgba(30, 41, 59, 0.45); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);">
+            <label for="selectMentionFormat" style="font-size: 12px; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 6px;">
+              🏷️ Format Sebutan Mahasiswa di Pesan WhatsApp:
+            </label>
+            <div class="select-wrapper">
+              <select id="selectMentionFormat" class="form-control" style="background: #1e293b; color: #f8fafc; font-size: 12.5px;">
+                <option value="phone_name">Nomor HP + Nama: @628xxx (Nama Mahasiswa) — (Link wa.me chat)</option>
+                <option value="name_only">Tag Nama Saja: @Nama Mahasiswa — (Mudah di-tag ulang manual di WA)</option>
+                <option value="clean_name">Nama Saja: Nama Mahasiswa — (Rapi &amp; tanpa simbol @)</option>
+              </select>
+            </div>
+            <small style="display: block; color: #94a3b8; font-size: 11px; margin-top: 6px; line-height: 1.4;">
+              💡 <em>Catatan: WhatsApp membatasi teks hasil paste dari clipboard agar tidak otomatis men-tag member secara massal. Jika ingin tag resmi berdering di WA, pilih "Tag Nama Saja" lalu di WhatsApp cukup hapus &amp; ketik ulang simbol <code>@</code> persis di depan nama teman.</em>
+            </small>
+          </div>
+
+          <div class="form-group" style="margin-top: 14px; background: rgba(30, 41, 59, 0.45); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);">
+            <label for="selectDraftIncludeNames" style="font-size: 12px; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 6px;">
+              👥 Format Default Pesan Grup Matkul:
+            </label>
+            <div class="select-wrapper">
+              <select id="selectDraftIncludeNames" class="form-control" style="background: #1e293b; color: #f8fafc; font-size: 12.5px;">
+                <option value="true">Dengan Nama Mahasiswa — (Lengkap dengan tag/nomor, cocok menjelang deadline)</option>
+                <option value="false">Ringkas / Tanpa Nama — (Hanya ringkasan jumlah, cocok untuk update tugas awal pekan)</option>
+              </select>
+            </div>
+            <small style="display: block; color: #94a3b8; font-size: 11px; margin-top: 6px; line-height: 1.4;">
+              💡 <em>Anda juga dapat beralih mode secara instan melalui tombol switcher di atas kotak Draft Pengingat kapan saja tanpa harus membuka pengaturan ini.</em>
+            </small>
+          </div>
+
+          <div class="template-live-preview-box" style="margin-top: 12px;">
+            <div class="preview-header" style="font-size: 11px; font-weight: 700; color: #34d399; text-transform: uppercase; margin-bottom: 6px;">
+              👁️ Live Preview Teks WhatsApp:
+            </div>
+            <pre id="templateLivePreviewContent" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 10px 12px; color: #f1f5f9; white-space: pre-wrap; max-height: 130px; overflow-y: auto; margin: 0;"></pre>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnSaveTemplates" class="btn btn-primary">Simpan Format Template</button>
+        </div>
+      </div>
+
+      <!-- TAB 1: BOT TELEGRAM -->
+      <div class="modal-tab-panel" id="panelTabBot">
+        <div class="modal-body">
+          <div class="bot-status-bar">
+            <div class="bot-status-left">
+              <span id="botStatusDot" class="bot-dot"></span>
+              <div>
+                <div class="bot-status-title" id="botStatusLabel">Mengecek status bot...</div>
+                <div class="bot-status-sub">Auto-scan terjadwal: Senin–Jumat, 09:00 &amp; 19:00 WIB</div>
+              </div>
+            </div>
+            <div class="bot-status-actions">
+              <button id="btnBotStart" class="btn btn-primary btn-sm">Aktifkan</button>
+              <button id="btnBotStop" class="btn btn-danger btn-sm" disabled>Matikan</button>
+            </div>
+          </div>
+
+          <div class="bot-trigger-box">
+            <div class="bot-trigger-title">Kirim Rekap Sekarang</div>
+            <div class="bot-trigger-row">
+              <button id="btnBotTrigger" class="btn btn-ghost btn-sm">
+                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span>Picu Scan &amp; Kirim ke Telegram</span>
+              </button>
+              <span class="bot-active-week">Pekan bot: <b id="botActiveWeekLabel">-</b></span>
+            </div>
+          </div>
+
+          <div class="tele-guide-box">
+            <strong>Panduan Buat Bot Telegram (sekali saja):</strong>
+            <ol>
+              <li>Chat <code>@BotFather</code> di Telegram &rarr; ketik <code>/newbot</code> &rarr; salin <b>Token Bot</b>.</li>
+              <li>Chat <code>@userinfobot</code> &rarr; salin <b>Chat ID</b> Anda (angka, misal: 987654321).</li>
+              <li>Masukkan Token &amp; Chat ID di bawah &rarr; Simpan &amp; Terapkan.</li>
+            </ol>
+          </div>
+
+          <div class="form-group">
+            <label for="teleBotToken">Telegram Bot Token</label>
+            <input type="password" id="teleBotToken" class="form-control" placeholder="Contoh: 1234567890:ABCdefGhIJKlmNoPQRstUVwxyZ">
+          </div>
+
+          <div class="form-group">
+            <label for="teleChatId">Chat ID Anda (dari @userinfobot)</label>
+            <input type="text" id="teleChatId" class="form-control" placeholder="Contoh: 987654321">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btnTestTelegram" class="btn btn-ghost">Tes Kirim Pesan</button>
+          <button id="btnSaveTelegram" class="btn btn-primary">Simpan &amp; Terapkan</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: KONTAK WHATSAPP -->
+      <div class="modal-tab-panel" id="panelTabContacts">
+        <div class="modal-body">
+          <!-- QUICK ADD FORM -->
+          <div class="contact-add-box">
+            <span style="font-size: 11px; font-weight: 700; color: #93c5fd; text-transform: uppercase;">+ Tambah Mahasiswa Baru</span>
+            <div class="contact-add-row">
+              <input type="text" id="newStudentNim" class="form-control" placeholder="NIM (misal: 241011400xxx)">
+              <input type="text" id="newStudentName" class="form-control" placeholder="Nama Mahasiswa">
+              <input type="text" id="newStudentPhone" class="form-control" placeholder="No WhatsApp (08xxx)">
+              <button type="button" id="btnAddNewStudent" class="btn btn-primary btn-sm">Tambah</button>
+            </div>
+          </div>
+
+          <div class="contacts-toolbar">
+            <input type="text" id="searchContactInput" class="form-control" placeholder="Cari nama atau NIM mahasiswa...">
+            <button id="btnAutoFormatAll" class="btn btn-ghost btn-sm" title="Ubah awalan 08xx jadi 628xx">Format 628xx</button>
+          </div>
+          <div class="contacts-list-wrap" id="contactsListContainer">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btnSaveContacts" class="btn btn-primary">Simpan Seluruh Kontak</button>
+        </div>
+      </div>
+
+      <!-- TAB 3: JADWAL & SESI MENTARI -->
+      <div class="modal-tab-panel" id="panelTabSchedule">
+        <div class="modal-body">
+          <div class="session-info-card">
+            <div class="session-status-row">
+              <div>
+                <strong>Status Sesi MENTARI:</strong>
+                <span id="sessionStatusDetail" class="badge-table-pill success">Online</span>
+              </div>
+              <button id="btnModalReconnect" class="btn btn-outline-info btn-sm">Perbarui Sesi (Login)</button>
+            </div>
+            <p class="session-desc">Sesi MENTARI disimpan aman secara lokal. Jika sesi kedaluwarsa, klik tombol di atas atau jalankan <code>npm run login</code> di terminal.</p>
+          </div>
+
+          <div class="schedule-matrix-card">
+            <h4>Matriks Perkuliahan Kelas 05TPLE003 (Reguler CS)</h4>
+            <div class="matrix-grid">
+              <div class="matrix-col">
+                <h5>Kelompok I [E-1]</h5>
+                <ul>
+                  <li>Pekan 1–7: Tatap Muka (Luring R. V.619)</li>
+                  <li>Pekan 8: UTS Luring</li>
+                  <li>Pekan 8–14: E-Learning Daring (MENTARI)</li>
+                  <li>UAS: Daring MENTARI</li>
+                </ul>
+              </div>
+              <div class="matrix-col">
+                <h5>Kelompok II [E-2]</h5>
+                <ul>
+                  <li>Pekan 1–7: E-Learning Daring (MENTARI)</li>
+                  <li>Pekan 8: UTS Daring MENTARI</li>
+                  <li>Pekan 8–14: Tatap Muka (Luring R. V.619)</li>
+                  <li>UAS: Luring R. V.619</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btnCloseSettingsFooter" class="btn btn-ghost">Tutup</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL STATUS FORDIS SEMUA MATKUL -->
+  <div id="modalStatusFordis" class="modal-overlay hidden">
+    <div class="modal-card modal-lg">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Status Pembukaan Forum Diskusi Dosen (Fordis)</h3>
+            <p class="modal-subtitle">Pantau mata kuliah mana yang topik diskusinya sudah dibuat atau belum dibuka dosen di MENTARI.</p>
+          </div>
+        </div>
+        <button id="btnCloseStatusFordis" class="btn-icon-close">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px 20px;">
+        <div class="fordis-summary-bar">
+          <div id="fordisSummaryText" style="color: #cbd5e1; font-weight: 500;">
+            Memuat status ketersediaan Forum Diskusi pekan ini...
+          </div>
+          <button id="btnRefreshFordisStatus" class="btn btn-primary btn-sm">
+            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+            <span id="txtRefreshFordis">Periksa Ulang Seluruh Matkul</span>
+          </button>
+        </div>
+
+        <div class="table-container small-table" style="min-height: 280px; max-height: 420px; margin-top: 14px;">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th width="40">No</th>
+                <th>Mata Kuliah &amp; Dosen</th>
+                <th width="70">SKS</th>
+                <th width="100">Moda</th>
+                <th width="190">Status Fordis Dosen</th>
+                <th width="150">Status Posttest</th>
+                <th width="100">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableFordisStatusBody">
+              <tr>
+                <td colspan="7" class="text-center empty-cell">
+                  Pilih "Periksa Ulang" untuk memindai status terbaru dari MENTARI.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btnCloseStatusFordisFooter" class="btn btn-ghost">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL RANGKUMAN TUGAS PRIBADI (STATUS SAYA) -->
+  <div id="modalPersonalSummary" class="modal-overlay hidden">
+    <div class="modal-card modal-lg" style="max-width: 960px;">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-icon-box" style="background: rgba(59, 130, 246, 0.18); color: #60a5fa;">
+            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">Rangkuman Tugas Pribadi (Status Saya)</h3>
+            <p class="modal-subtitle">Pantau status pengerjaan Fordis, Penugasan Terstruktur, dan Posttest Anda di seluruh mata kuliah aktif.</p>
+          </div>
+        </div>
+        <button id="btnClosePersonalSummary" class="btn-icon-close">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 18px 22px;">
+        <!-- CONTROLS & MAHASISWA SELECTOR -->
+        <div class="personal-controls-bar" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; background: rgba(15, 23, 42, 0.75); padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 16px;">
+          <div style="flex: 2; min-width: 260px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Pilih Akun Mahasiswa:</label>
+            <div class="select-wrapper">
+              <select id="selectPersonalStudent" class="form-control" style="background: #1e293b; color: #f8fafc; font-size: 13px; font-weight: 600; border-color: rgba(59, 130, 246, 0.4);">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+          </div>
+          <div style="flex: 1; min-width: 150px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Pekan Akademik:</label>
+            <div class="select-wrapper">
+              <select id="selectPersonalWeek" class="form-control" style="background: #1e293b; color: #f8fafc; font-size: 13px; font-weight: 600; border-color: rgba(59, 130, 246, 0.4);">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button id="btnRefreshPersonal" class="btn btn-primary btn-sm" title="Scan ulang seluruh mata kuliah">
+              <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Scan Ulang</span>
+            </button>
+            <button id="btnCopyPersonalSummary" class="btn btn-ghost btn-sm" title="Salin checklist status tugas pribadi">
+              <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>Salin Checklist</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- STAT MINI CARDS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px;">
+          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px 14px;">
+            <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">TOTAL MATKUL</div>
+            <div id="personalTotalCourses" style="font-size: 22px; font-weight: 700; color: #f8fafc; margin-top: 4px;">0</div>
+          </div>
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 14px;">
+            <div style="font-size: 11px; color: #34d399; font-weight: 600;">SELESAI LENGKAP</div>
+            <div id="personalDoneCourses" style="font-size: 22px; font-weight: 700; color: #10b981; margin-top: 4px;">0</div>
+          </div>
+          <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 12px 14px;">
+            <div style="font-size: 11px; color: #f87171; font-weight: 600;">PERLU DIKERJAKAN</div>
+            <div id="personalPendingCourses" style="font-size: 22px; font-weight: 700; color: #ef4444; margin-top: 4px;">0</div>
+          </div>
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px 14px;">
+            <div style="font-size: 11px; color: #fbbf24; font-weight: 600;">DEADLINE HARI INI</div>
+            <div id="personalTodayDeadlineCount" style="font-size: 22px; font-weight: 700; color: #f59e0b; margin-top: 4px;">0</div>
+          </div>
+        </div>
+
+        <!-- PERSONAL TABLE -->
+        <div class="table-container small-table" style="min-height: 260px; max-height: 420px; overflow-y: auto;">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th width="35">No</th>
+                <th>Mata Kuliah &amp; Dosen</th>
+                <th width="150">Deadline</th>
+                <th width="140">Forum Diskusi</th>
+                <th width="130">Penugasan</th>
+                <th width="120">Posttest</th>
+                <th width="120">Status Saya</th>
+                <th width="75">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tablePersonalBody">
+              <tr>
+                <td colspan="8" class="text-center empty-cell">
+                  Memuat data status tugas...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div id="personalSummaryFooterNote" style="font-size: 12px; color: #94a3b8;">
+          💡 <em>Pastikan Anda menyelesaikan Fordis (min 2x reply), Penugasan Terstruktur, dan Posttest sebelum deadline.</em>
+        </div>
+        <button id="btnClosePersonalSummaryFooter" class="btn btn-ghost">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL QUICK EDIT DEADLINE PER MATKUL -->
+  <div id="modalQuickDeadline" class="modal-overlay hidden">
+    <div class="modal-card modal-sm" style="max-width: 480px;">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-icon-box" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">⏰</div>
+          <div>
+            <h3 class="modal-title">Atur Deadline Mata Kuliah</h3>
+            <p class="modal-subtitle" id="quickDeadlineCourseName">Nama Mata Kuliah</p>
+          </div>
+        </div>
+        <button type="button" id="btnCloseQuickDeadline" class="btn-icon-close">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 18px 22px;">
+        <div class="form-group">
+          <label style="font-weight: 700; color: #f1f5f9; margin-bottom: 8px;">Pilihan Batas Waktu:</label>
+          <div style="display: flex; flex-direction: column; gap: 10px; background: rgba(15, 23, 42, 0.6); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.06);">
+            <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; color: #cbd5e1;">
+              <input type="radio" name="radioQuickDeadlineType" id="radioDeadlineDefault" value="default" checked>
+              <span>Ikuti Default Kelas (<strong id="quickDefaultDeadlineLabel" style="color: #38bdf8;">Jumat, 23:59 WIB</strong>)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; color: #cbd5e1;">
+              <input type="radio" name="radioQuickDeadlineType" id="radioDeadlineCustom" value="custom">
+              <span>Deadline Khusus untuk Matkul Ini:</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="quickCustomDeadlineFields" style="display: none; margin-top: 14px;">
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="quickDeadlineDay">Hari Batas</label>
+              <select id="quickDeadlineDay" class="form-control">
+                <option value="Senin">Senin</option>
+                <option value="Selasa">Selasa</option>
+                <option value="Rabu">Rabu</option>
+                <option value="Kamis">Kamis</option>
+                <option value="Jumat">Jumat</option>
+                <option value="Sabtu">Sabtu</option>
+                <option value="Minggu">Minggu</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="quickDeadlineTime">Jam Batas</label>
+              <input type="text" id="quickDeadlineTime" class="form-control" placeholder="23:59 WIB" value="23:59 WIB">
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px; margin-top: 10px; align-items: center;">
+            <span style="font-size: 10.5px; color: #64748b;">Preset:</span>
+            <button type="button" class="btn btn-ghost btn-xs btn-preset-deadline" data-day="Jumat" data-time="23:59 WIB">Jumat 23:59</button>
+            <button type="button" class="btn btn-ghost btn-xs btn-preset-deadline" data-day="Sabtu" data-time="23:59 WIB">Sabtu 23:59</button>
+            <button type="button" class="btn btn-ghost btn-xs btn-preset-deadline" data-day="Minggu" data-time="23:59 WIB">Minggu 23:59</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between;">
+        <button type="button" id="btnResetQuickDeadline" class="btn btn-ghost btn-sm" style="color: #f87171;">Kembalikan ke Default</button>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" id="btnCancelQuickDeadline" class="btn btn-ghost">Batal</button>
+          <button type="button" id="btnSaveQuickDeadline" class="btn btn-primary">Simpan Deadline</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast-popup hidden">
+    <svg class="icon icon-sm text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    <span id="toastMsg">Teks berhasil disalin.</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

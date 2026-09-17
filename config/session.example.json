@@ -1,0 +1,11 @@
+{
+  "token": "YOUR_MENTARI_JWT_TOKEN_HERE",
+  "cookies": [],
+  "user": {
+    "id": "user-uuid-here",
+    "username": "241011400000",
+    "fullname": "NAMA MAHASISWA",
+    "role": "MAHASISWA"
+  },
+  "updatedAt": "2026-09-01T00:00:00.000Z"
+}

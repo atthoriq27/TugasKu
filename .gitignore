@@ -1,0 +1,44 @@
+# =====================================================================
+# TUGASKU GITIGNORE SPECIFICATION
+# =====================================================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sensitive Environment & API Credentials
+.env
+.env.*
+!.env.example
+
+# Sensitive Authentication, Student Contacts & Session Data
+config/session.json
+config/telegram.json
+config/contacts.json
+data/
+*.session
+*.session.json
+.wa-session
+
+# Test Runtime Logs, Snapshots & Temp Data
+test-logs/
+test-scheduler-data/
+test-snapshots/
+test-whatsapp-data/
+*.log
+
+# Output & Build Files
+output/
+
+# Internal Tooling & Index Caches
+graphify-out/
+.codex/
+.vscode/
+.idea/
+
+# OS System Files
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,50 @@
+{
+  "class_name": "05TPLE003",
+  "user_custom_name": "",
+  "excluded_nims": [
+    "241011400196"
+  ],
+  "academic_year": "2026/2027",
+  "semester": "20261",
+  "deadline_day": "Jumat",
+  "deadline_time": "23:59 WIB",
+  "course_deadlines": {
+    "20261-05TPLE003-22TIF0262": {
+      "day": "Sabtu",
+      "time": "23:59 WIB"
+    },
+    "20261-05TPLE003-22TIF0302": {
+      "day": "Sabtu",
+      "time": "23:59 WIB"
+    },
+    "20261-05TPLE003-22TIF0272": {
+      "day": "Jumat",
+      "time": "23:59 WIB"
+    }
+  },
+  "semester_start_date": "2026-08-31",
+  "templates": {
+    "grup_utama": "*📢 REKAP TUGAS MENTARI*\n*Kelas {NAMA_KELAS}* • _{PEKAN}_\n\n{LIST_MATKUL_DARING}\n{LIST_FORDIS_BELUM_BUKA}\n⚠️ *Alur Absensi Valid:*\nFordis (min 2x) ➔ Posttest ➔ Kuesioner",
+    "grup_matkul": "> {NAMA_MATKUL}\n*{PERTEMUAN}* • *Deadline: {DEADLINE}*\n\n{DETAIL_TUGAS}\n\n⚠️ *Catatan Wajib:*\nFordis (2x) ➔ Posttest ➔ Kuesioner (absensi valid)"
+  },
+  "weeks": {
+    "1": "Pekan 1 (31 Agt - 5 Sep 2026)",
+    "2": "Pekan 2 (7 Sep - 12 Sep 2026)",
+    "3": "Pekan 3 (14 Sep - 19 Sep 2026)",
+    "4": "Pekan 4 (21 Sep - 26 Sep 2026)",
+    "5": "Pekan 5 (28 Sep - 3 Okt 2026)",
+    "6": "Pekan 6 (5 Okt - 10 Okt 2026)",
+    "7": "Pekan 7 (12 Okt - 17 Okt 2026)",
+    "8": "Pekan 8 (26 Okt - 31 Okt 2026)",
+    "9": "Pekan 9 (2 Nov - 7 Nov 2026)",
+    "10": "Pekan 10 (9 Nov - 14 Nov 2026)",
+    "11": "Pekan 11 (16 Nov - 21 Nov 2026)",
+    "12": "Pekan 12 (23 Nov - 28 Nov 2026)",
+    "13": "Pekan 13 (30 Nov - 5 Des 2026)",
+    "14": "Pekan 14 (7 Des - 12 Des 2026)",
+    "15": "Pekan 15 (14 Des - 19 Des 2026)",
+    "16": "Pekan 16 (28 Des 2026 - 2 Jan 2027)",
+    "UTS": "Pekan UTS (19 Okt - 24 Okt 2026)",
+    "UAS": "Pekan UAS (21 Des - 26 Des 2026)"
+  }
+}
