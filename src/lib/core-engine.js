@@ -43,9 +43,27 @@ export class TugasKuCoreEngine {
         statusPerMahasiswa: new Map()
       },
       questionnaire: {
-        available: !!questionnaireActivity
+        available: !!questionnaireActivity,
+        is_done: !!questionnaireActivity?.completion,
+        title: questionnaireActivity?.judul || "Kuesioner"
       }
     };
+
+    if (questionnaireActivity) {
+      if (!aktivitasData.questionnaire.is_done && typeof this.mentariClient?.getKuesioner === 'function') {
+        try {
+          const kuesionerRes = await this.mentariClient.getKuesioner(kodeCourse, kodeSection);
+          const list = Array.isArray(kuesionerRes?.kuesioner)
+            ? kuesionerRes.kuesioner
+            : (Array.isArray(kuesionerRes?.data?.kuesioner) ? kuesionerRes.data.kuesioner : []);
+          if (list.length > 0 && list.every(q => q.jawaban !== null && q.jawaban !== undefined)) {
+            aktivitasData.questionnaire.is_done = true;
+          }
+        } catch (kErr) {
+          // fallback to completion status
+        }
+      }
+    }
 
     // Fetch posttest data jika tersedia
     if (posttestActivity) {
@@ -213,7 +231,9 @@ export function buildPertemuanReport({ courseDetail, kodeSection, students, akti
           : null
       },
       questionnaire: {
-        available: aktivitasData.questionnaire.available
+        available: !!aktivitasData.questionnaire?.available,
+        is_done: !!aktivitasData.questionnaire?.is_done,
+        title: aktivitasData.questionnaire?.title || "Kuesioner"
       }
     },
     mahasiswa_detail: students.map((student) => {
@@ -247,6 +267,9 @@ export function buildPertemuanReport({ courseDetail, kodeSection, students, akti
         missing_topics: aktivitasData.forum.available ? multiTopicDetail.missing_topics : [],
         assignment_status: aktivitasData.assignment.available
           ? (aktivitasData.assignment.statusPerMahasiswa.get(student.nim) ?? (aktivitasData.assignment.is_private ? ASSIGNMENT_STATUS.PRIVAT_MENTARI : ASSIGNMENT_STATUS.BELUM_MENGUMPULKAN))
+          : 'NOT_AVAILABLE',
+        questionnaire_status: aktivitasData.questionnaire?.available
+          ? (aktivitasData.questionnaire.is_done ? 'SUDAH_MENGISI' : 'BELUM_MENGISI')
           : 'NOT_AVAILABLE'
       };
     })

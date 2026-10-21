@@ -1,10 +1,11 @@
 {
   "name": "tugasku",
-  "version": "1.0.0",
+  "version": "1.2.1",
   "description": "Aplikasi otomasi dan pemantauan tugas LMS MENTARI UNPAM",
   "type": "module",
-  "main": "src/index.js",
+  "main": "desktop/main.cjs",
   "scripts": {
+    "app": "electron desktop/main.cjs",
     "web": "node server.js",
     "login": "node scan.js --login",
     "scan": "node scan.js",
@@ -16,12 +17,63 @@
     "pipeline:preview": "node pipeline.js --preview",
     "pipeline:dry-run": "node pipeline.js --dry-run",
     "pipeline:live": "node pipeline.js --live",
-    "whatsapp:preview": "node whatsapp.js --preview",
-    "whatsapp:dry-run": "node whatsapp.js --dry-run",
-    "whatsapp:live": "node whatsapp.js --live",
-    "scheduler:dry-run": "node scheduler.js --dry-run"
+    "scheduler:dry-run": "node scheduler.js --dry-run",
+    "export:clean": "node src/scripts/export-clean.js",
+    "build:icon": "node src/scripts/generate-icon.js",
+    "dist": "electron-builder --win",
+    "dist:installer": "electron-builder --win nsis",
+    "dist:portable": "electron-builder --win portable"
   },
   "dependencies": {
     "playwright": "^1.62.1"
+  },
+  "devDependencies": {
+    "electron": "^40.10.2",
+    "electron-builder": "^26.15.3"
+  },
+  "author": "Arfii",
+  "build": {
+    "appId": "com.tugasku.desktop",
+    "productName": "TugasKu",
+    "asar": false,
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "package.json",
+      "server.js",
+      "desktop/**/*",
+      "public/**/*",
+      "src/**/*",
+      "config/class-settings.json",
+      "config/schedule.json",
+      "!**/*.map"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "desktop/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TugasKu",
+      "uninstallDisplayName": "TugasKu"
+    }
   }
 }

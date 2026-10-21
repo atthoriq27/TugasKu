@@ -1,0 +1,57 @@
+======================================================================
+                  PANDUAN INSTALASI & PENGGUNAAN TUGASKU
+======================================================================
+
+Sistem Pemantau Tugas LMS MENTARI UNPAM (Local Standalone).
+
+----------------------------------------------------------------------
+1. PRASYARAT SISTEM
+----------------------------------------------------------------------
+1. Node.js (Versi 18 LTS atau lebih baru)
+   - Verifikasi melalui Command Prompt / Terminal: node -v
+   - Installer resmi: https://nodejs.org
+
+2. Google Chrome
+   - Menggunakan Google Chrome yang terpasang di sistem operasi.
+   - Alternatif (jika tanpa Google Chrome terpasang):
+     Jalankan: npx playwright install chromium
+
+----------------------------------------------------------------------
+2. INSTALASI
+----------------------------------------------------------------------
+1. Ekstrak file TugasKu.zip ke direktori pilihan Anda.
+2. Buka Command Prompt / PowerShell di folder hasil ekstraksi.
+   (Windows: Shift + Klik Kanan di folder -> "Open in Terminal",
+    atau ketik 'cmd' di kolom alamat folder lalu tekan Enter).
+3. Pasang dependensi proyek:
+
+   npm install
+
+----------------------------------------------------------------------
+3. MENJALANKAN APLIKASI
+----------------------------------------------------------------------
+1. Di terminal folder proyek, jalankan:
+
+   npm run web
+
+2. Buka browser dan akses:
+   http://localhost:3000
+
+3. Autentikasi Sesi MENTARI:
+   - Klik tombol "Login Mentari" pada dashboard.
+   - Browser Chromium/Chrome akan terbuka otomatis. Masukkan NIM,
+     Password, dan Captcha akun MENTARI.
+   - Setelah login berhasil, jendela browser otomatis tertutup dan sesi
+     tersimpan di perangkat lokal.
+
+----------------------------------------------------------------------
+4. PEMECAHAN MASALAH (TROUBLESHOOTING)
+----------------------------------------------------------------------
+- Port 3000 sudah terpakai:
+  Matikan proses pada port 3000 (PowerShell):
+  Stop-Process -Id (Get-NetTCPConnection -LocalPort 3000).OwningProcess -Force
+
+- Browser Playwright/Chromium tidak terbuka:
+  Jalankan perintah instalasi browser Playwright:
+  npx playwright install chromium
+======================================================================

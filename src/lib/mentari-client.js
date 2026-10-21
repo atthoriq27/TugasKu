@@ -60,6 +60,10 @@ export class MentariClient {
   getAssignment(assignmentId) {
     return this.request(`/api/assignment/${encodeURIComponent(assignmentId)}`);
   }
+
+  getKuesioner(kodeCourse, sectionId) {
+    return this.request(`/api/kuesioner/${encodeURIComponent(kodeCourse)}/${encodeURIComponent(sectionId)}`);
+  }
 }
 
 export default MentariClient;

@@ -2,26 +2,50 @@
   "class_name": "05TPLE003",
   "user_custom_name": "",
   "excluded_nims": [
-    "241011400196"
+    "241011400196",
+    "999999999999"
   ],
   "academic_year": "2026/2027",
   "semester": "20261",
   "deadline_day": "Jumat",
   "deadline_time": "23:59 WIB",
   "course_deadlines": {
-    "20261-05TPLE003-22TIF0262": {
+    "20261-05TPLE003-22TIF0243": {
       "day": "Sabtu",
+      "time": "23:59 WIB",
+      "sks": 3,
+      "kelompok": "1"
+    },
+    "20261-05TPLE003-22TIF0252": {
+      "day": "Jumat",
       "time": "23:59 WIB"
     },
-    "20261-05TPLE003-22TIF0302": {
+    "20261-05TPLE003-22TIF0262": {
       "day": "Sabtu",
       "time": "23:59 WIB"
     },
     "20261-05TPLE003-22TIF0272": {
       "day": "Jumat",
       "time": "23:59 WIB"
+    },
+    "20261-05TPLE003-22TIF0283": {
+      "day": "Jumat",
+      "time": "23:59 WIB"
+    },
+    "20261-05TPLE003-22TIF0293": {
+      "day": "Jumat",
+      "time": "23:59 WIB"
+    },
+    "20261-05TPLE003-22TIF0302": {
+      "day": "Sabtu",
+      "time": "23:59 WIB"
+    },
+    "20261-05TPLE003-22TIF1013": {
+      "day": "Jumat",
+      "time": "23:59 WIB"
     }
   },
+  "mention_format": "phone_name",
   "semester_start_date": "2026-08-31",
   "templates": {
     "grup_utama": "*📢 REKAP TUGAS MENTARI*\n*Kelas {NAMA_KELAS}* • _{PEKAN}_\n\n{LIST_MATKUL_DARING}\n{LIST_FORDIS_BELUM_BUKA}\n⚠️ *Alur Absensi Valid:*\nFordis (min 2x) ➔ Posttest ➔ Kuesioner",
@@ -42,9 +66,7 @@
     "12": "Pekan 12 (23 Nov - 28 Nov 2026)",
     "13": "Pekan 13 (30 Nov - 5 Des 2026)",
     "14": "Pekan 14 (7 Des - 12 Des 2026)",
-    "15": "Pekan 15 (14 Des - 19 Des 2026)",
-    "16": "Pekan 16 (28 Des 2026 - 2 Jan 2027)",
     "UTS": "Pekan UTS (19 Okt - 24 Okt 2026)",
-    "UAS": "Pekan UAS (21 Des - 26 Des 2026)"
+    "UAS": "Pekan UAS (14 Des - 19 Des 2026)"
   }
 }

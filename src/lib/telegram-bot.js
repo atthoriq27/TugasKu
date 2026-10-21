@@ -281,9 +281,7 @@ export class TelegramBot {
       "12": "Pekan 12",
       "13": "Pekan 13",
       "14": "Pekan 14",
-      "15": "Pekan 15",
       "UAS": "Pekan UAS",
-      "16": "Pekan 16",
     };
     const weekLabel = WEEK_NAMES[weekVal] || `Pekan ${weekVal}`;
 

@@ -32,6 +32,10 @@ export class BrowserMentariClient {
   async getAssignment(assignmentId) {
     return this.session.fetchWithBrowser(`/api/assignment/${encodeURIComponent(assignmentId)}`);
   }
+
+  async getKuesioner(kodeCourse, sectionId) {
+    return this.session.fetchWithBrowser(`/api/kuesioner/${encodeURIComponent(kodeCourse)}/${encodeURIComponent(sectionId)}`);
+  }
 }
 
 export default BrowserMentariClient;

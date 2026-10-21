@@ -106,6 +106,28 @@ export class MentariBrowserSession {
     return sessionData;
   }
 
+  clearSession() {
+    try {
+      if (fs.existsSync(this.sessionFilePath)) {
+        fs.unlinkSync(this.sessionFilePath);
+      }
+      const envPath = path.join(__dirname, "../../.env");
+      if (fs.existsSync(envPath)) {
+        let content = fs.readFileSync(envPath, "utf-8");
+        content = content.replace(/MENTARI_TOKEN=[^\r\n]*/, "MENTARI_TOKEN=");
+        fs.writeFileSync(envPath, content, "utf-8");
+      }
+      if (fs.existsSync(this.sessionDir)) {
+        try {
+          fs.rmSync(this.sessionDir, { recursive: true, force: true });
+        } catch (e) {}
+      }
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   cleanupLocksAndProcesses() {
     try {
       if (fs.existsSync(this.sessionDir)) {
@@ -158,27 +180,48 @@ export class MentariBrowserSession {
 
     this.cleanupLocksAndProcesses();
 
+    const launchOpts = {
+      headless: false,
+      ignoreDefaultArgs: ["--enable-automation"],
+      args: [
+        "--window-position=0,0",
+        "--window-size=1024,768",
+        "--disable-blink-features=AutomationControlled",
+        "--no-sandbox"
+      ]
+    };
+
     try {
-      this.browserContext = await chromium.launchPersistentContext(this.sessionDir, {
-        headless: false,
-        args: [
-          "--window-position=0,0",
-          "--window-size=1024,768",
-          "--disable-blink-features=AutomationControlled"
-        ]
+      try {
+        this.browserContext = await chromium.launchPersistentContext(this.sessionDir, {
+          ...launchOpts,
+          channel: "chrome"
+        });
+      } catch (e) {
+        this.browserContext = await chromium.launchPersistentContext(this.sessionDir, launchOpts);
+      }
+      await this.browserContext.addInitScript(() => {
+        try {
+          Object.defineProperty(navigator, "webdriver", { get: () => undefined });
+        } catch (e) {}
       });
       return this.browserContext;
     } catch (err) {
       console.warn("Fallback to dedicated temporary context:", err.message);
       this.cleanupLocksAndProcesses();
       const fallbackDir = path.join(this.sessionDir, "_temp_" + Date.now());
-      this.browserContext = await chromium.launchPersistentContext(fallbackDir, {
-        headless: false,
-        args: [
-          "--window-position=0,0",
-          "--window-size=1024,768",
-          "--disable-blink-features=AutomationControlled"
-        ]
+      try {
+        this.browserContext = await chromium.launchPersistentContext(fallbackDir, {
+          ...launchOpts,
+          channel: "chrome"
+        });
+      } catch (e) {
+        this.browserContext = await chromium.launchPersistentContext(fallbackDir, launchOpts);
+      }
+      await this.browserContext.addInitScript(() => {
+        try {
+          Object.defineProperty(navigator, "webdriver", { get: () => undefined });
+        } catch (e) {}
       });
       return this.browserContext;
     }
@@ -234,10 +277,26 @@ export class MentariBrowserSession {
   }
 
   /**
-   * Launch dedicated Chromium browser for the user to login.
+   * Launch dedicated Chrome browser for the user to login.
+   * Always uses a fresh temp directory to avoid profile lock conflicts with the scanning browser.
    */
   async loginInteractively({ force = false } = {}) {
+    // Release the scanning browser first so its Chrome process frees the session dir
     await this.releaseBrowser();
+
+    // Kill any remaining Chrome/Chromium processes that might be holding the session dir lock
+    if (process.platform === "win32") {
+      try {
+        const { execSync } = await import("child_process");
+        execSync(
+          `powershell -Command "Get-Process chrome,chromium -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue"`,
+          { stdio: "ignore", timeout: 3000 }
+        );
+      } catch (e) {}
+      // Small delay to let OS release file handles
+      await new Promise(r => setTimeout(r, 800));
+    }
+
     this.cleanupLocksAndProcesses();
     this.resetWindowPlacement();
 
@@ -248,36 +307,72 @@ export class MentariBrowserSession {
       fs.mkdirSync(this.sessionDir, { recursive: true });
     }
 
+    // Always use a FRESH temp directory for the login browser window.
+    // This avoids Chrome "profile in use" errors when the main sessionDir
+    // is still locked by a previous browser context.
+    const loginDir = path.join(this.sessionDir, "_login_" + Date.now());
+    fs.mkdirSync(loginDir, { recursive: true });
+    console.log(`\n🌐 Membuka jendela login Chrome (profil: ${path.basename(loginDir)})...`);
+
     let capturedToken = null;
     let capturedUser = null;
     let isResolved = false;
 
     let context;
+    const loginLaunchOpts = {
+      headless: false,
+      ignoreDefaultArgs: ["--enable-automation"],
+      args: [
+        "--disable-blink-features=AutomationControlled",
+        "--no-sandbox",
+        "--window-position=100,80",
+        "--window-size=1280,850",
+        "--disable-session-crashed-bubble",
+        "--no-first-run",
+        "--no-default-browser-check"
+      ]
+    };
+
     try {
-      context = await chromium.launchPersistentContext(this.sessionDir, {
-        headless: false,
-        args: [
-          "--disable-blink-features=AutomationControlled",
-          "--window-position=100,80",
-          "--window-size=1280,850"
-        ]
-      });
+      try {
+        context = await chromium.launchPersistentContext(loginDir, {
+          ...loginLaunchOpts,
+          channel: "chrome"
+        });
+      } catch (e) {
+        console.warn("Chrome channel tidak tersedia, pakai Chromium bawaan Playwright:", e.message);
+        context = await chromium.launchPersistentContext(loginDir, loginLaunchOpts);
+      }
     } catch (launchErr) {
-      console.warn("Retrying login browser with clean directory:", launchErr.message);
-      this.cleanupLocksAndProcesses();
-      const cleanDir = path.join(this.sessionDir, "_login_" + Date.now());
-      context = await chromium.launchPersistentContext(cleanDir, {
-        headless: false,
-        args: [
-          "--disable-blink-features=AutomationControlled",
-          "--window-position=100,80",
-          "--window-size=1280,850"
-        ]
-      });
+      // Last resort: try a brand new directory
+      console.warn("Gagal membuka dengan loginDir, mencoba direktori baru:", launchErr.message);
+      const emergencyDir = path.join(this.sessionDir, "_login_emerg_" + Date.now());
+      try {
+        context = await chromium.launchPersistentContext(emergencyDir, {
+          ...loginLaunchOpts,
+          channel: "chrome"
+        });
+      } catch (e2) {
+        context = await chromium.launchPersistentContext(emergencyDir, loginLaunchOpts);
+      }
     }
+
+    await context.addInitScript(() => {
+      try {
+        Object.defineProperty(navigator, "webdriver", { get: () => undefined });
+      } catch (e) {}
+    });
 
     return new Promise(async (resolve, reject) => {
       const page = context.pages()[0] || await context.newPage();
+
+      const cleanupLoginDir = () => {
+        try {
+          if (fs.existsSync(loginDir)) {
+            fs.rmSync(loginDir, { recursive: true, force: true });
+          }
+        } catch (e) {}
+      };
 
       const finishLogin = async (token, source = "deteksi") => {
         if (isResolved) return;
@@ -293,9 +388,10 @@ export class MentariBrowserSession {
             } catch (e) {
               return false;
             }
-          }, token);
+          }, token).catch(() => false);
 
           if (!isWorking) {
+            console.log(`Token dari ${source} belum valid, menunggu login selesai...`);
             return;
           }
         } catch (e) {
@@ -305,19 +401,21 @@ export class MentariBrowserSession {
         isResolved = true;
 
         try {
-          const cookies = await context.cookies();
+          const cookies = await context.cookies().catch(() => []);
           this.saveSession({ token, cookies, user: capturedUser });
           console.log(`\n🎉 LOGIN BERHASIL TERVERIFIKASI (${source})!`);
           console.log("   Token dan sesi MENTARI telah otomatis tersimpan.");
-          console.log("   Browser akan ditutup dalam 2 detik...\n");
+          console.log("   Browser login akan ditutup dalam 2 detik...\n");
           
           setTimeout(async () => {
             try { await context.close(); } catch (e) {}
+            cleanupLoginDir();
             this.cleanupLocksAndProcesses();
             resolve(token);
           }, 2000);
         } catch (err) {
           try { await context.close(); } catch (e) {}
+          cleanupLoginDir();
           this.cleanupLocksAndProcesses();
           resolve(token);
         }
@@ -358,10 +456,7 @@ export class MentariBrowserSession {
       });
 
       try {
-        console.log("🌐 Membuka portal MENTARI UNPAM di jendela browser login...");
-        await context.clearCookies().catch(() => {});
-        
-        // Add init script to remove stale token so Next.js does not get stuck in redirect loops
+        // Remove stale token so Next.js does not get stuck in redirect loops
         await page.addInitScript(() => {
           try {
             localStorage.removeItem("token");
@@ -371,10 +466,10 @@ export class MentariBrowserSession {
 
         await page.goto("https://mentari.unpam.ac.id/login", { waitUntil: "domcontentloaded", timeout: 30000 });
 
-        // Auto-detect if login input fields are visible. If blank or blocked by Cloudflare, auto-refresh cleanly once!
+        // Auto-detect if login input fields are visible. If blocked by Cloudflare, auto-refresh once
         try {
           await page.waitForSelector('input[name="username"], input[type="text"], input[type="password"]', { 
-            timeout: 3000, 
+            timeout: 4000, 
             state: "visible" 
           });
         } catch (e) {
@@ -383,7 +478,7 @@ export class MentariBrowserSession {
             console.log("🔄 Memuat ulang halaman login MENTARI agar form langsung tampil...");
             await page.reload({ waitUntil: "domcontentloaded" }).catch(() => {});
             await page.waitForSelector('input[name="username"], input[type="text"], input[type="password"]', { 
-              timeout: 6000, 
+              timeout: 8000, 
               state: "visible" 
             }).catch(() => {});
           }
@@ -415,17 +510,20 @@ export class MentariBrowserSession {
           } catch (e) {}
         }, 1500);
 
+        // 10-minute timeout (generous for slow internet/Cloudflare challenge)
         setTimeout(() => {
           if (!isResolved) {
             clearInterval(checkInterval);
             context.close().catch(() => {});
+            cleanupLoginDir();
             this.cleanupLocksAndProcesses();
-            reject(new Error("Waktu tunggu login habis (5 menit). Silakan coba lagi."));
+            reject(new Error("Waktu tunggu login habis (10 menit). Silakan coba lagi."));
           }
-        }, 300000);
+        }, 600000);
 
       } catch (err) {
         context.close().catch(() => {});
+        cleanupLoginDir();
         this.cleanupLocksAndProcesses();
         reject(err);
       }
@@ -553,6 +651,38 @@ export class MentariBrowserSession {
       }
     }
   }
+
+  async testConnection() {
+    const session = this.getSession();
+    if (!session || !session.token) {
+      return {
+        success: false,
+        connected: false,
+        status: 401,
+        error: "Tidak ada token tersimpan. Silakan login atau masukkan token manual."
+      };
+    }
+
+    try {
+      const data = await this.fetchWithBrowser("/api/user-course?limit=1");
+      return {
+        success: true,
+        connected: true,
+        status: 200,
+        user: session.user || null,
+        message: "Koneksi ke MENTARI UNPAM berhasil dan token aktif!"
+      };
+    } catch (err) {
+      return {
+        success: false,
+        connected: false,
+        status: err.code === "SESSION_EXPIRED" ? 401 : 500,
+        error: err.message,
+        user: session.user || null
+      };
+    }
+  }
 }
 
 export default MentariBrowserSession;
+

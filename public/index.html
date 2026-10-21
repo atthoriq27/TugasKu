@@ -3,1489 +3,1393 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TugasKu — Pemantau MENTARI UNPAM</title>
+  <title>TugasKu — Dashboard LMS MENTARI UNPAM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="icon.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- TOPBAR / NAVBAR -->
-  <header class="topbar">
-    <div class="topbar-left">
-      <button class="btn-menu-toggle" id="btnMenuToggle" aria-label="Toggle Sidebar">
-        <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-      <div class="brand">
-        <div class="brand-logo">
-          <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-          </svg>
-        </div>
-        <div class="brand-info">
-          <div class="brand-title-row">
-            <span class="brand-title">TugasKu</span>
-            <span class="brand-badge" id="headerClassBadge">05TPLE003</span>
-          </div>
-          <p class="brand-subtitle">Pemantau Posttest, Forum &amp; Tugas MENTARI Terintegrasi Kalender</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="topbar-right">
-      <!-- DEADLINE PILL -->
-      <div class="deadline-pill" id="deadlinePill">
-        <svg class="icon icon-sm text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-        </svg>
-        <div class="deadline-text-col">
-          <span class="deadline-title" id="deadlineTitle">Batas Pekan 1</span>
-          <span class="deadline-countdown" id="deadlineCountdown">0 Hari 00h : 00m : 00s</span>
-          <span class="deadline-sub" id="deadlineSub">Deadline: Jumat, 23:59 WIB</span>
-        </div>
-      </div>
-
-      <!-- MENTARI STATUS -->
-      <div class="status-pill" id="statusPill">
-        <span class="status-indicator-dot online" id="statusDot"></span>
-        <div class="status-text-col">
-          <span class="status-label">MENTARI</span>
-          <span class="status-val online" id="statusValText">Online</span>
-        </div>
-      </div>
-
-      <!-- SETTINGS BUTTON -->
-      <button id="btnOpenSettings" class="btn btn-nav btn-ghost" title="Pengaturan Kelas, Pekan, Template WA &amp; Sistem">
-        <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-        </svg>
-        <span>Pengaturan</span>
-      </button>
-
-      <!-- PROFILE PILL -->
-      <div class="user-pill" id="userPill" title="Klik untuk membuka Rangkuman Tugas Pribadi (Status Saya)">
-        <span class="user-dot"></span>
-        <div class="user-info-col">
-          <span class="user-name" id="userName">ATTHORIQ</span>
-          <span class="user-class" id="headerUserClass">(05TPLE003)</span>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- RECONNECT BANNER (IF OFFLINE) -->
-  <div id="reconnectBanner" class="reconnect-banner hidden">
-    <div class="banner-content">
-      <svg class="icon icon-md text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-      </svg>
-      <div>
-        <strong>Sesi MENTARI Belum Terhubung:</strong>
-        <span>Jalankan <code>npm run login</code> di terminal untuk memperbarui sesi MENTARI Anda.</span>
-      </div>
-    </div>
-    <button id="btnBannerReconnect" class="btn btn-primary btn-sm">Login Ulang MENTARI</button>
-  </div>
-
-  <!-- APP WRAPPER: SIDEBAR + MAIN CONTENT -->
   <div class="app-layout">
     
-    <!-- LEFT SIDEBAR NAVIGATION -->
+    <!-- ── 1. SIDEBAR (220px Fixed Left) ────────────────────────────────────── -->
     <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="brand-box">
+          <div class="brand-icon">
+            <svg class="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="brand-name">TugasKu</span>
+              <span class="badge-app-version" id="btnVersionBadge" title="Klik untuk melihat catatan rilis / update fitur">v1.2.1</span>
+            </div>
+            <span class="brand-class" id="headerClassBadge">05TPLE003</span>
+          </div>
+        </div>
+      </div>
+
       <nav class="sidebar-nav">
-        <a href="#dashboard" class="nav-item active" id="navDashboard">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        <button type="button" class="nav-btn active" id="navDashboard" onclick="switchMainView('dashboard')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
           </svg>
           <span>Dashboard</span>
-        </a>
-
-        <!-- GROUP: MONITORING -->
-        <div class="nav-group-title">MONITORING</div>
-        <a href="#controls" class="nav-item" id="navJadwal">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </button>
+        <button type="button" class="nav-btn" id="navMonitoring" onclick="switchMainView('monitoring')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
-          <span>Jadwal &amp; Mata Kuliah</span>
-        </a>
-        <a href="#middlePanel" class="nav-item" id="navBelumPosttest" data-tab="posttest">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+          <span>Monitoring Tugas</span>
+        </button>
+        <button type="button" class="nav-btn" id="navJadwal" onclick="switchMainView('schedule')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
-          <span>Mahasiswa Belum Posttest</span>
-        </a>
-        <a href="#middlePanel" class="nav-item" id="navForumKurang" data-tab="forum">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          <span>Jadwal &amp; Matkul</span>
+        </button>
+        <button type="button" class="nav-btn" id="navDaftarMhs" onclick="switchMainView('students')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
           </svg>
-          <span>Forum Diskusi Kurang</span>
-        </a>
-        <a href="#middlePanel" class="nav-item" id="navBelumPenugasan" data-tab="assignment">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-          </svg>
-          <span>Belum Penugasan Terstruktur</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" id="navStatusFordis">
-          <svg class="icon icon-sm text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-          </svg>
-          <span>Status Fordis Dosen</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" id="navRangkumanPribadi">
-          <svg class="icon icon-sm text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <span>Data Mahasiswa</span>
+        </button>
+        <button type="button" class="nav-btn" id="navRangkumanPribadi" onclick="switchMainView('rangkuman')">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
           </svg>
           <span>Rangkuman Pribadi</span>
-        </a>
-
-        <!-- GROUP: AKSI CEPAT -->
-        <div class="nav-group-title">AKSI CEPAT</div>
-        <a href="javascript:void(0)" class="nav-item" id="navKirimTele">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-          </svg>
-          <span>Kirim ke Telegram</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" id="navSalinDraft">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-          </svg>
-          <span>Salin Teks Draft</span>
-        </a>
-
-        <!-- GROUP: DATA MAHASISWA -->
-        <div class="nav-group-title">DATA MAHASISWA</div>
-        <a href="#tableSection" class="nav-item" id="navDaftarMhs">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-          <span>Daftar Mahasiswa</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" id="navExportData">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          <span>Export Data</span>
-        </a>
-
-        <!-- GROUP: PENGATURAN -->
-        <div class="nav-group-title">PENGATURAN</div>
-        <a href="javascript:void(0)" class="nav-item" id="navPengaturanWA">
-          <svg class="icon icon-sm text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-          </svg>
-          <span>Kontak WhatsApp</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" id="navPengaturanBot">
-          <svg class="icon icon-sm text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/>
-          </svg>
-          <span>Bot Telegram</span>
-        </a>
-        <a href="javascript:void(0)" class="nav-item" id="navPengaturanJadwal">
-          <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
-          <span>Jadwal &amp; Sesi MENTARI</span>
-        </a>
+        </button>
       </nav>
 
-      <!-- SIDEBAR BOTTOM WIDGET: INFO KELAS & MINI COUNTER -->
-      <div class="sidebar-widget">
-        <div class="widget-header">Info Kelas</div>
-        <div class="widget-info-list">
-          <div class="widget-info-row">
-            <span class="widget-label">Dosen</span>
-            <span class="widget-val" id="infoDosen">-</span>
+      <div class="sidebar-footer">
+        <button type="button" class="btn-settings-footer" id="btnOpenSettings">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>Pengaturan</span>
+        </button>
+        <div class="sidebar-version-footer" id="btnOpenChangelog" title="Klik untuk melihat riwayat pembaruan TugasKu">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-weight: 600; color: #cbd5e1;">TugasKu v1.2.1</span>
+            <span class="version-dot-pulse"></span>
           </div>
-          <div class="widget-info-row">
-            <span class="widget-label">Hari</span>
-            <span class="widget-val" id="infoHari">Sabtu</span>
-          </div>
-          <div class="widget-info-row">
-            <span class="widget-label">Ruang</span>
-            <span class="widget-val" id="infoRuang">Ruang V.619 (Kelompok I)</span>
-          </div>
-          <div class="widget-info-row">
-            <span class="widget-label">Kelompok</span>
-            <span class="widget-val" id="infoKelompok">Kelompok I</span>
-          </div>
-          <div class="widget-info-row">
-            <span class="widget-label">Jumlah Mahasiswa Utama</span>
-            <span class="widget-val" id="infoTotalUtama">37</span>
-          </div>
-        </div>
-
-        <!-- DUAL MINI STATUS CARDS -->
-        <div class="sidebar-mini-stats">
-          <div class="mini-stat-card success">
-            <span class="mini-stat-num" id="numDonePost">0</span>
-            <span class="mini-stat-label">Sudah Posttest</span>
-          </div>
-          <div class="mini-stat-card danger">
-            <span class="mini-stat-num" id="numPendingPost">0</span>
-            <span class="mini-stat-label">Belum Posttest</span>
-          </div>
+          <span class="changelog-indicator">Catatan Rilis &bull; Apa yang baru</span>
         </div>
       </div>
     </aside>
 
-    <!-- MAIN CONTENT AREA -->
-    <main class="main-content" id="dashboard">
-
-      <!-- TOP VIEW SWITCHER (SEGMENTED TABS) -->
-      <div class="view-switcher-container">
-        <div class="view-switcher-bar" id="viewSwitcher" role="tablist">
-          <button class="view-tab-btn active" id="btnViewDashboard" data-view="dashboard" role="tab">
-            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Dashboard Ringkasan</span>
-          </button>
-          <button class="view-tab-btn" id="btnViewSchedule" data-view="schedule" role="tab">
-            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span>Jadwal &amp; Matkul</span>
-          </button>
-          <button class="view-tab-btn" id="btnViewMonitoring" data-view="monitoring" role="tab">
-            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            <span>Monitoring Tugas</span>
-            <span class="view-tab-badge danger hidden" id="badgeMonitoringPending">0</span>
-          </button>
-          <button class="view-tab-btn" id="btnViewStudents" data-view="students" role="tab">
-            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span>Data Mahasiswa</span>
-            <span class="view-tab-badge" id="badgeTotalStudents">37</span>
-          </button>
-          <button class="view-tab-btn" id="btnViewPersonalSummary" role="tab" style="color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35);">
-            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Rangkuman Pribadi</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- 1. HORIZONTAL CONTROL & FILTER BAR -->
-      <section class="control-card" id="controls">
-        <div class="control-row-top">
-          <!-- PEKAN KULIAH -->
-          <div class="control-field">
-            <label for="selectWeek">Pekan Kuliah</label>
-            <div class="select-wrapper">
-              <select id="selectWeek" class="form-control">
-                <option value="1">Pekan 1 (31 Agt - 5 Sep 2026)</option>
-                <option value="2">Pekan 2 (7 - 12 Sep 2026)</option>
-                <option value="3">Pekan 3 (14 - 19 Sep 2026)</option>
-                <option value="4">Pekan 4 (21 - 26 Sep 2026)</option>
-                <option value="5">Pekan 5 (28 Sep - 3 Okt 2026)</option>
-                <option value="6">Pekan 6 (5 - 10 Okt 2026)</option>
-                <option value="7">Pekan 7 (12 - 17 Okt 2026)</option>
-                <option value="UTS">UTS (19 - 24 Okt 2026)</option>
-                <option value="8">Pekan 8 (26 - 31 Okt 2026)</option>
-                <option value="9">Pekan 9 (2 - 7 Nov 2026)</option>
-                <option value="10">Pekan 10 (9 - 14 Nov 2026)</option>
-                <option value="11">Pekan 11 (16 - 21 Nov 2026)</option>
-                <option value="12">Pekan 12 (23 - 28 Nov 2026)</option>
-                <option value="13">Pekan 13 (30 Nov - 5 Des 2026)</option>
-                <option value="14">Pekan 14 (7 - 12 Des 2026)</option>
-                <option value="UAS">UAS (14 - 19 Des 2026)</option>
-                <option value="15">Pekan 15 (21 - 26 Des 2026)</option>
-                <option value="16">Pekan 16 (21 - 26 Des 2026)</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- MATA KULIAH -->
-          <div class="control-field flex-2">
-            <label for="selectCourse">Mata Kuliah</label>
-            <div class="select-wrapper">
-              <select id="selectCourse" class="form-control">
-                <!-- Populated via JS grouped by Kelompok -->
-              </select>
-            </div>
-          </div>
-
-          <!-- MODA PERKULIAHAN -->
-          <div class="control-field">
-            <label>Moda Perkuliahan</label>
-            <div class="badge-mode-box">
-              <span id="badgeMode" class="badge-mode-pill daring">DARING</span>
-            </div>
-          </div>
-
-          <!-- PERTEMUAN MENTARI -->
-          <div class="control-field">
-            <label for="selectSection">Pertemuan MENTARI</label>
-            <div class="select-wrapper">
-              <select id="selectSection" class="form-control">
-                <option value="PERTEMUAN_1">Pertemuan 1</option>
-                <option value="PERTEMUAN_2">Pertemuan 2</option>
-                <option value="PERTEMUAN_3">Pertemuan 3</option>
-                <option value="PERTEMUAN_4">Pertemuan 4</option>
-                <option value="PERTEMUAN_5">Pertemuan 5</option>
-                <option value="PERTEMUAN_6">Pertemuan 6</option>
-                <option value="PERTEMUAN_7">Pertemuan 7</option>
-                <option value="PERTEMUAN_8">Pertemuan 8</option>
-                <option value="PERTEMUAN_9">Pertemuan 9</option>
-                <option value="PERTEMUAN_10">Pertemuan 10</option>
-                <option value="PERTEMUAN_11">Pertemuan 11</option>
-                <option value="PERTEMUAN_12">Pertemuan 12</option>
-                <option value="PERTEMUAN_13">Pertemuan 13</option>
-                <option value="PERTEMUAN_14">Pertemuan 14</option>
-                <option value="PERTEMUAN_15">Pertemuan 15</option>
-                <option value="PERTEMUAN_16">Pertemuan 16</option>
-                <option value="PERTEMUAN_17">Pertemuan 17</option>
-                <option value="PERTEMUAN_18">Pertemuan 18</option>
-                <option value="PERTEMUAN_19">Pertemuan 19</option>
-                <option value="PERTEMUAN_20">Pertemuan 20</option>
-                <option value="PERTEMUAN_21">Pertemuan 21</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- ACTION BUTTONS -->
-          <div class="control-buttons">
-            <button id="btnScan" class="btn btn-primary">
-              <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-              </svg>
-              <span id="scanBtnText">Cek Status</span>
-            </button>
-            <button id="btnScanAll" class="btn btn-outline-primary">
-              <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-              </svg>
-              <span id="scanAllBtnText">Scan Seluruh Matkul Daring</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- INFO PILLS ROW -->
-        <div class="control-row-bottom">
-          <div class="info-meta-pill">
-            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span>Sabtu</span>
-          </div>
-          <div class="info-meta-pill">
-            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M3 7v14"/><path d="M21 7v14"/><path d="M6 3h12a3 3 0 0 1 3 3v1H3V6a3 3 0 0 1 3-3z"/></svg>
-            <span id="infoRuangPill">Ruang V.619</span>
-          </div>
-          <div class="info-meta-pill">
-            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-            <span id="infoKelompokPill">Kelompok I</span>
-          </div>
-          <div class="info-meta-pill status-pill" id="pillStatusFordis">
-            <span id="dotFordis" class="status-indicator-dot dot-gray"></span>
-            <span id="labelStatusFordis">Fordis: Belum Dicek</span>
-          </div>
-          <div class="info-meta-pill status-pill" id="pillStatusAssignment">
-            <span id="dotAssignment" class="status-indicator-dot dot-gray"></span>
-            <span id="labelStatusAssignment">Penugasan: Belum Dicek</span>
-          </div>
-          <div class="info-meta-pill status-pill" id="pillStatusPosttest">
-            <span id="dotPosttest" class="status-indicator-dot dot-gray"></span>
-            <span id="labelStatusPosttest">Posttest: Belum Dicek</span>
-          </div>
-          <div class="info-meta-pill status-pill deadline-course-pill" id="pillCourseDeadline" style="cursor: pointer;" title="Klik untuk ubah deadline mata kuliah ini">
-            <span>⏰</span>
-            <span id="textCourseDeadline">Deadline: Jumat, 23:59 WIB</span>
-            <span class="edit-badge" style="font-size: 10px; background: rgba(255,255,255,0.12); padding: 1px 5px; border-radius: 4px; margin-left: 3px;">Ubah ✏️</span>
-          </div>
-          <div class="info-meta-pill-group" id="meetingBtnGroup">
-            <!-- Dynamic Meeting Pills -->
-          </div>
-        </div>
-      </section>
-
-      <!-- VIEW 1: DASHBOARD RINGKASAN & AKSI CEPAT -->
-      <div class="app-view active" id="viewDashboard">
+    <!-- ── 2. MAIN VIEWPORT ────────────────────────────────────────────────── -->
+    <div class="main-viewport">
+      
+      <!-- TOPBAR (56px) -->
+      <header class="topbar">
+        <h1 class="topbar-title" id="pageTitleText">Dashboard</h1>
         
-        <!-- 2. RINGKASAN STATUS MATA KULIAH (5 METRIC CARDS ROW) -->
-        <section class="metrics-section">
-          <div class="section-title-row">
-            <div>
-              <h2 class="section-title">Ringkasan Status Perkuliahan</h2>
-              <p class="section-subtitle" style="margin: 0; font-size: 12px; color: var(--text-dim);">Klik kartu metrik untuk melihat rincian mahasiswa di tab Monitoring Tugas.</p>
-            </div>
-            <div class="last-scan-badge">
-              <span>Terakhir scan: <strong id="lastScanTime">10:15:32</strong></span>
-              <button class="btn-icon-refresh" id="btnRefreshScan" title="Scan Ulang">
-                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-              </button>
-            </div>
-          </div>
-
-          <div class="metrics-grid">
-            <!-- CARD 1: POSTTEST -->
-            <div class="metric-card card-blue clickable-metric" id="metricCardPost" data-target-tab="posttest" title="Klik untuk buka daftar mahasiswa Belum Posttest">
-              <div class="metric-header">
-                <div class="metric-icon-box blue">
-                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
-                </div>
-                <span class="metric-title">Posttest</span>
-              </div>
-              <div class="metric-val-row">
-                <span class="metric-main-val" id="metricPostRatio">0 / 37</span>
-                <span class="metric-pct" id="metricPostPct">0%</span>
-              </div>
-              <div class="metric-sub" id="metricPostSub">Sudah mengerjakan</div>
-              <div class="progress-track">
-                <div class="progress-bar blue" id="progressPost" style="width: 0%;"></div>
-              </div>
-            </div>
-
-            <!-- CARD 2: FORUM DISKUSI -->
-            <div class="metric-card card-yellow clickable-metric" id="metricCardForum" data-target-tab="forum" title="Klik untuk buka daftar mahasiswa Forum Kurang">
-              <div class="metric-header">
-                <div class="metric-icon-box yellow">
-                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                </div>
-                <span class="metric-title">Forum Diskusi</span>
-              </div>
-              <div class="metric-val-row">
-                <span class="metric-main-val" id="metricForumRatio">0 / 37</span>
-                <span class="metric-pct" id="metricForumPct">0%</span>
-              </div>
-              <div class="metric-sub" id="metricForumSub">Minimal 2x reply</div>
-              <div class="progress-track">
-                <div class="progress-bar yellow" id="progressForum" style="width: 0%;"></div>
-              </div>
-            </div>
-
-            <!-- CARD 3: PENUGASAN TERSTRUKTUR -->
-            <div class="metric-card card-green clickable-metric" id="metricCardAsg" data-target-tab="assignment" title="Klik untuk buka daftar Penugasan Terstruktur">
-              <div class="metric-header">
-                <div class="metric-icon-box green">
-                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                </div>
-                <span class="metric-title">Penugasan Terstruktur</span>
-              </div>
-              <div class="metric-val-row">
-                <span class="metric-main-val" id="metricAsgRatio">0 / 37</span>
-                <span class="metric-pct" id="metricAsgPct">0%</span>
-              </div>
-              <div class="metric-sub" id="metricAsgSub">Sudah mengumpulkan</div>
-              <div class="progress-track">
-                <div class="progress-bar green" id="progressAsg" style="width: 0%;"></div>
-              </div>
-            </div>
-
-            <!-- CARD 4: MAHASISWA BERMASALAH -->
-            <div class="metric-card card-red clickable-metric" id="metricCardProblem" data-target-tab="posttest" title="Klik untuk lihat mahasiswa yang belum menyelesaikan">
-              <div class="metric-header">
-                <div class="metric-icon-box red">
-                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="18" y1="8" x2="23" y2="13"/><line x1="23" y1="8" x2="18" y2="13"/></svg>
-                </div>
-                <span class="metric-title">Mahasiswa Bermasalah</span>
-              </div>
-              <div class="metric-val-row">
-                <span class="metric-main-val text-danger" id="metricProblemCount">0</span>
-              </div>
-              <div class="metric-sub" id="metricProblemSub">0% dari total utama</div>
-            </div>
-
-            <!-- CARD 5: TOTAL MAHASISWA UTAMA -->
-            <div class="metric-card card-purple clickable-metric" id="metricCardTotal" data-target-view="students" title="Klik untuk buka daftar mahasiswa lengkap">
-              <div class="metric-header">
-                <div class="metric-icon-box purple">
-                  <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                </div>
-                <span class="metric-title">Total Mahasiswa Utama</span>
-              </div>
-              <div class="metric-val-row">
-                <span class="metric-main-val text-purple" id="metricTotalUtama">37</span>
-              </div>
-              <div class="metric-sub">(Tidak termasuk revisi)</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- DASHBOARD 2-COLUMN SPLIT GRID -->
-        <section class="dashboard-split-grid">
-          
-          <!-- LEFT: DRAFT PENGINGAT (WHATSAPP & TELEGRAM) -->
-          <div class="draft-card">
-            <div class="card-header-flex">
-              <div>
-                <h3 class="card-title">Draft Pengingat</h3>
-                <p class="card-subtitle">Salin atau kirim draft pengingat ke grup.</p>
-              </div>
-              <!-- TOGGLE DENGAN NAMA / RINGKAS AWAL PEKAN -->
-              <div class="draft-names-toggle" id="draftNamesToggleGroup">
-                <button type="button" class="btn-toggle-names active" id="btnNamesOn" title="Tampilkan daftar nama mahasiswa lengkap dengan tag/nomor (cocok saat menjelang deadline)">👥 Dengan Nama</button>
-                <button type="button" class="btn-toggle-names" id="btnNamesOff" title="Sembunyikan daftar nama agar pesan ringkas &amp; tidak menimbun chat (cocok untuk update tugas awal pekan)">📋 Ringkas (Awal Pekan)</button>
-              </div>
-            </div>
-
-            <!-- DRAFT TABS -->
-            <div class="draft-tabs-header">
-              <button class="draft-tab-btn active" id="tabMatkulBtn" data-target="matkul">Grup Matkul</button>
-              <button class="draft-tab-btn" id="tabUtamaBtn" data-target="utama">Grup Utama (Semua)</button>
-              <button class="draft-tab-btn" id="tabTodayBtn" data-target="today" style="color: #f87171; font-weight: 600;">🚨 Deadline Hari Ini</button>
-            </div>
-
-            <!-- DRAFT CODE PREVIEW -->
-            <div class="draft-preview-box">
-              <pre id="waMessageContent">*Pilih mata kuliah dan klik Cek Status untuk memuat draf pesan...*</pre>
-            </div>
-
-            <!-- DRAFT FOOTER BUTTONS -->
-            <div class="draft-action-row">
-              <button id="btnCopyWa" class="btn btn-ghost">
-                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                <span>Salin Draft</span>
-              </button>
-              <button id="btnSendWaToTelegram" class="btn btn-primary">
-                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                <span>Kirim ke Telegram</span>
-              </button>
-              <button id="btnOpenWhatsAppDirect" class="btn btn-success">
-                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                <span>Kirim ke WhatsApp</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- RIGHT: QUICK HIGHLIGHTS & STATUS FORDIS -->
-          <div class="quick-overview-card" id="cardQuickHighlights">
-            <div class="card-header-flex">
-              <div>
-                <h3 class="card-title">Ringkasan Cepat &amp; Tindakan</h3>
-                <p class="card-subtitle">Status penting dan mahasiswa yang paling butuh diingatkan.</p>
-              </div>
-              <button class="btn btn-outline-primary btn-sm" id="btnQuickGoMonitoring" title="Buka tabel lengkap di tab Monitoring Tugas">
-                <span>Buka Monitoring</span>
-                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </button>
-            </div>
-
-            <!-- FORDIS MINI STATUS BANNER -->
-            <div class="quick-fordis-box" id="quickFordisBox">
-              <div class="quick-fordis-icon">💬</div>
-              <div class="quick-fordis-info">
-                <div class="quick-fordis-title" id="quickFordisTitle">Forum Diskusi Pertemuan</div>
-                <div class="quick-fordis-desc" id="quickFordisDesc">Pilih mata kuliah &amp; klik Cek Status untuk memuat status forum.</div>
-              </div>
-              <span class="badge-table-pill" id="quickFordisBadge">Belum Dicek</span>
-            </div>
-
-            <!-- QUICK FOLLOW-UP LIST -->
-            <div class="quick-followup-section">
-              <div class="quick-followup-header">
-                <span class="quick-followup-title">⚡ Mahasiswa Belum Selesai (Top Follow-Up)</span>
-                <span class="quick-followup-count" id="quickFollowupCount">0 Mahasiswa</span>
-              </div>
-              <div class="quick-followup-list" id="quickFollowupList">
-                <div class="quick-empty-state">Pilih mata kuliah &amp; klik Cek Status untuk memuat data.</div>
-              </div>
-            </div>
-          </div>
-
-        </section>
-      </div>
-
-      <!-- VIEW 2: JADWAL & MATA KULIAH (DEDICATED FULL VIEW) -->
-      <div class="app-view hidden" id="viewSchedule">
-        <!-- SCHEDULE HEADER & SUMMARY CARDS -->
-        <section class="schedule-header-card">
-          <div class="view-header-row" style="padding: 0 0 16px 0;">
-            <div>
-              <h2 class="section-title">Jadwal &amp; Direktori Mata Kuliah</h2>
-              <p class="section-subtitle">Kelas 05TPLE003 • Shift E Reguler CS • Ruang V.619 (Sabtu) • Semester Ganjil 2026/2027</p>
-            </div>
-            <div style="display: flex; gap: 8px;">
-              <button class="btn btn-outline-primary btn-sm" id="btnSchedOpenSettings" title="Pengaturan Jadwal & Deadline">
-                <span>Pengaturan Jadwal &amp; Deadline</span> ⚙️
-              </button>
-            </div>
-          </div>
-
-          <!-- 3-STAT METRIC ROW FOR SCHEDULE -->
-          <div class="schedule-stats-grid">
-            <div class="sched-stat-card">
-              <div class="sched-stat-icon blue">📚</div>
-              <div class="sched-stat-info">
-                <span class="sched-stat-label">Total Beban Studi</span>
-                <span class="sched-stat-val">8 Mata Kuliah (20 SKS)</span>
-                <span class="sched-stat-sub">Kelompok I: 10 SKS • Kelompok II: 10 SKS</span>
-              </div>
-            </div>
-            <div class="sched-stat-card">
-              <div class="sched-stat-icon yellow">🔄</div>
-              <div class="sched-stat-info">
-                <span class="sched-stat-label">Pola Belajar Hybrid</span>
-                <span class="sched-stat-val" id="schedActiveModeSummary">Pekan 1: Kel I Luring • Kel II Daring</span>
-                <span class="sched-stat-sub">Pekan 1-7 (Kel I Luring) • Pekan 9-15 (Kel II Luring)</span>
-              </div>
-            </div>
-            <div class="sched-stat-card">
-              <div class="sched-stat-icon green">🏫</div>
-              <div class="sched-stat-info">
-                <span class="sched-stat-label">Lokasi &amp; Hari Kuliah</span>
-                <span class="sched-stat-val">Sabtu • Ruang V.619</span>
-                <span class="sched-stat-sub">Sinkronisasi MENTARI &amp; Sesi Kuliah</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- PEKAN SELECTOR STRIP -->
-          <div class="schedule-week-strip">
-            <span class="sched-strip-title">Pilih Pekan:</span>
-            <div class="sched-week-pills" id="schedWeekPillsContainer">
-              <!-- Dynamically populated / styled week buttons -->
-            </div>
-          </div>
-        </section>
-
-        <!-- TWO GROUPS SPLIT CARDS (KELOMPOK I & KELOMPOK II) -->
-        <section class="schedule-groups-grid">
-          <!-- GROUP I -->
-          <div class="sched-group-box">
-            <div class="sched-group-header">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="badge-table-pill info" style="font-size: 11px; font-weight: 700;">KELOMPOK I ([E-1])</span>
-                <span class="sched-group-sks">10 SKS</span>
-              </div>
-              <span class="sched-group-period-badge" id="schedGroup1PeriodBadge">LURING - Ruang V.619</span>
-            </div>
-            <p class="sched-group-note">Pekan 1 - 7: Tatap Muka Luring di Kampus • Pekan 9 - 15: Kuliah Daring MENTARI</p>
-
-            <!-- GROUP 1 COURSE CARDS -->
-            <div class="sched-course-grid" id="schedGroup1Courses">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-
-          <!-- GROUP II -->
-          <div class="sched-group-box">
-            <div class="sched-group-header">
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="badge-table-pill warning" style="font-size: 11px; font-weight: 700;">KELOMPOK II ([E-2])</span>
-                <span class="sched-group-sks">10 SKS</span>
-              </div>
-              <span class="sched-group-period-badge" id="schedGroup2PeriodBadge">DARING - MENTARI</span>
-            </div>
-            <p class="sched-group-note">Pekan 1 - 7: Kuliah Daring MENTARI • Pekan 9 - 15: Tatap Muka Luring di Kampus</p>
-
-            <!-- GROUP 2 COURSE CARDS -->
-            <div class="sched-course-grid" id="schedGroup2Courses">
-              <!-- Rendered via JS -->
-            </div>
-          </div>
-        </section>
-
-        <!-- SEMESTER TIMELINE MATRIX CARD -->
-        <section class="schedule-matrix-card">
-          <div class="card-header-flex">
-            <div>
-              <h3 class="card-title">Matriks Jadwal Semester &amp; Skema Pertemuan</h3>
-              <p class="card-subtitle">Pedoman pembagian pekan luring/daring dan pemetaan jumlah pertemuan (2 SKS = 14 Pertemuan, 3 SKS = 21 Pertemuan).</p>
-            </div>
-          </div>
-          <div class="table-container" style="margin-top: 14px;">
-            <table class="modern-table">
-              <thead>
-                <tr>
-                  <th width="140">Fase Semester</th>
-                  <th width="180">Rentang Pekan</th>
-                  <th>Kelompok I ([E-1] - 10 SKS)</th>
-                  <th>Kelompok II ([E-2] - 10 SKS)</th>
-                  <th width="160">Pertemuan SKS</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><strong style="color: #60a5fa;">Paruh Pertama</strong></td>
-                  <td>Pekan 1 s/d 7</td>
-                  <td><span class="badge-table-pill success">LURING (Ruang V.619)</span></td>
-                  <td><span class="badge-table-pill warning">DARING (MENTARI)</span></td>
-                  <td>2 SKS: P1-7 | 3 SKS: P1-10</td>
-                </tr>
-                <tr style="background: rgba(234, 179, 8, 0.05);">
-                  <td><strong style="color: #fbbf24;">Evaluasi Tengah</strong></td>
-                  <td>Pekan 8 (19-24 Okt 2026)</td>
-                  <td><span class="badge-table-pill warning">UTS (Ujian Tengah Semester)</span></td>
-                  <td><span class="badge-table-pill warning">UTS (Ujian Tengah Semester)</span></td>
-                  <td>Seluruh Mata Kuliah</td>
-                </tr>
-                <tr>
-                  <td><strong style="color: #a855f7;">Paruh Kedua</strong></td>
-                  <td>Pekan 9 s/d 15</td>
-                  <td><span class="badge-table-pill warning">DARING (MENTARI)</span></td>
-                  <td><span class="badge-table-pill success">LURING (Ruang V.619)</span></td>
-                  <td>2 SKS: P8-14 | 3 SKS: P11-21</td>
-                </tr>
-                <tr style="background: rgba(239, 68, 68, 0.05);">
-                  <td><strong style="color: #f87171;">Evaluasi Akhir</strong></td>
-                  <td>Pekan 16 (14-19 Des 2026)</td>
-                  <td><span class="badge-table-pill danger">UAS (Ujian Akhir Semester)</span></td>
-                  <td><span class="badge-table-pill danger">UAS (Ujian Akhir Semester)</span></td>
-                  <td>Seluruh Mata Kuliah</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- VIEW 3: MONITORING TUGAS MAHASISWA (FULL-WIDTH TABBED TABLE) -->
-      <div class="app-view hidden" id="viewMonitoring">
-        <section class="tabbed-table-card" id="middlePanel">
-          <div class="view-header-row">
-            <div>
-              <h2 class="section-title">Monitoring Tugas Mahasiswa</h2>
-              <p class="section-subtitle">Pantau status pengerjaan Posttest, Forum Diskusi (multi-topik), dan Penugasan Terstruktur per pertemuan.</p>
-            </div>
-          </div>
-
-          <!-- TABS BAR -->
-          <div class="table-tabs-bar">
-            <button class="table-tab-btn active" id="tabPendingPost" data-tab="posttest">
-              Belum Posttest (<span id="tabCountPost">0</span>)
-            </button>
-            <button class="table-tab-btn tab-success-style" id="tabDonePost" data-tab="done_posttest">
-              Sudah Posttest (<span id="tabCountDonePost">0</span>)
-            </button>
-            <button class="table-tab-btn" id="tabPendingForum" data-tab="forum">
-              Forum Kurang (<span id="tabCountForum">0</span>)
-            </button>
-            <button class="table-tab-btn tab-success-style" id="tabDoneForum" data-tab="done_forum">
-              Sudah Forum (<span id="tabCountDoneForum">0</span>)
-            </button>
-            <button class="table-tab-btn" id="tabPendingAsg" data-tab="assignment">
-              Belum Penugasan (<span id="tabCountAsg">0</span>)
-            </button>
-            <button class="table-tab-btn tab-warning-style" id="tabStatusFordisDosen" data-tab="status_fordis">
-              📢 Status Fordis Dosen
-            </button>
-          </div>
-
-          <!-- MULTI-TOPIC INFO BANNER & CHIPS -->
-          <div id="forumTopicsContainer" class="forum-topics-container hidden">
-            <div class="forum-topics-header">
-              <div class="forum-topics-header-left">
-                <span class="badge-table-pill info" id="forumTopicsCountBadge">2 Topik Dosen</span>
-                <span class="forum-topics-title" id="forumTopicsHeaderTitle">Topik Diskusi Pertemuan Ini:</span>
-              </div>
-              <span class="forum-topics-hint" id="forumTopicsHint">Dosen membuat beberapa topik. Mahasiswa disarankan merespons tiap topik agar nilai lengkap.</span>
-            </div>
-            <div class="forum-topics-list" id="forumTopicsList">
-              <!-- Dynamically populated topic chips -->
-            </div>
-          </div>
-
-          <!-- TAB CONTENT HEADER -->
-          <div class="tab-content-header">
-            <div class="tab-title-left">
-              <svg class="icon icon-sm text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              <span class="tab-title-text" id="middlePanelTitle">Mahasiswa yang belum menyelesaikan Posttest (Kuis)</span>
-            </div>
-            <a href="javascript:void(0)" class="tab-link-viewall" id="btnViewAllPending">
-              <span>Buka Data Mahasiswa</span>
-              <span id="viewAllCount">0</span>
-              <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            </a>
-          </div>
-
-          <!-- PENDING TABLE -->
-          <div class="table-container monitoring-table-container">
-            <table class="modern-table">
-              <thead>
-                <tr>
-                  <th width="50">No</th>
-                  <th width="140">NIM</th>
-                  <th>Nama Mahasiswa</th>
-                  <th width="200">Nomor WA</th>
-                  <th width="160">Status</th>
-                </tr>
-              </thead>
-              <tbody id="middleTableBody">
-                <tr>
-                  <td colspan="5" class="text-center empty-cell">
-                    Pilih mata kuliah dan klik <strong>Cek Status</strong> untuk memuat data.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <!-- VIEW 3: DATA MAHASISWA & EKSPOR -->
-      <div class="app-view hidden" id="viewStudents">
-        <section class="students-card" id="tableSection">
-          <div class="view-header-row">
-            <div>
-              <h2 class="section-title">Data Seluruh Mahasiswa</h2>
-              <p class="section-subtitle">Cari, filter status lengkap, hubungi via WhatsApp, dan ekspor data ke format CSV atau Google Sheets.</p>
-            </div>
-            <div class="export-btn-group">
-              <button id="btnExportCsv" class="btn btn-ghost btn-sm">
-                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>Unduh CSV</span>
-              </button>
-              <button id="btnCopySheet" class="btn btn-sheet btn-sm">
-                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
-                <span>Salin Google Sheets</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- SEARCH INPUT -->
-          <div class="search-wrap">
-            <svg class="icon icon-sm search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="searchStudent" class="form-control-search" placeholder="Cari nama atau NIM mahasiswa..." autocomplete="off">
-            <button id="btnClearSearch" class="btn-clear-search hidden">&times;</button>
-          </div>
-
-          <!-- FILTER CHIPS -->
-          <div class="filter-chips-row">
-            <button class="chip active" data-filter="ALL">Semua (<span id="filterAllCount">0</span>)</button>
-            <button class="chip chip-danger" data-filter="PENDING_POST">Belum Posttest (<span id="filterPostCount">0</span>)</button>
-            <button class="chip chip-success" data-filter="DONE_POST">Sudah Posttest (<span id="filterDonePostCount">0</span>)</button>
-            <button class="chip chip-warning" data-filter="PENDING_FORUM">Forum Kurang (<span id="filterForumCount">0</span>)</button>
-            <button class="chip chip-success" data-filter="DONE_FORUM">Sudah Forum (<span id="filterDoneForumCount">0</span>)</button>
-            <button class="chip chip-info" data-filter="PENDING_ASG">Belum Tugas (<span id="filterAsgCount">0</span>)</button>
-            <button class="chip chip-success" data-filter="COMPLETE">Lengkap (<span id="filterCompleteCount">0</span>)</button>
-          </div>
-
-          <!-- TABLE -->
-          <div class="table-container small-table">
-            <table class="modern-table">
-              <thead>
-                <tr>
-                  <th width="40">No</th>
-                  <th width="120">NIM</th>
-                  <th>Nama Mahasiswa</th>
-                  <th width="90">Posttest</th>
-                  <th width="100">Forum</th>
-                  <th width="90">Tugas</th>
-                  <th width="80">Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="tableStudentsBody">
-                <tr>
-                  <td colspan="7" class="text-center empty-cell">
-                    Data belum dimuat. Silakan pilih mata kuliah dan klik Cek Status.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- PAGINATION FOOTER -->
-          <div class="pagination-footer">
-            <div class="pagination-info" id="paginationInfo">Showing 1 to 10 of 37</div>
-            <div class="pagination-controls" id="paginationControls">
-              <!-- Rendered via JS -->
-            </div>
-            <div class="pagination-pagesize">
-              <span id="pageSizeLabel">10 / page</span>
-            </div>
-          </div>
-        </section>
-      </div>
-
-    </main>
-  </div>  <!-- UNIFIED SETTINGS MODAL -->
-  <div id="modalSettings" class="modal-overlay hidden">
-    <div class="modal-card modal-card-lg">
-      <div class="modal-header">
-        <div class="modal-header-left">
-          <div class="header-icon-box settings">
-            <svg class="icon icon-md" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        <div class="topbar-right">
+          <!-- Countdown pill -->
+          <div class="topbar-pill countdown-pill" id="topbarCountdownPill">
+            <svg class="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
             </svg>
-          </div>
-          <div>
-            <h3>Pengaturan Sistem &amp; Personalisasi Kelas</h3>
-            <p>Atur nama kelas, kalender pekan, format pesan pengingat WA, bot Telegram, kontak, dan sesi MENTARI.</p>
-          </div>
-        </div>
-        <button id="btnCloseSettings" class="btn-close-modal">&times;</button>
-      </div>
-
-      <!-- MODAL TABS NAVIGATION -->
-      <div class="modal-tabs">
-        <button type="button" class="modal-tab-btn active" id="tabBtnClassSettings" data-target="panelTabClassSettings">
-          <svg class="icon icon-xs text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Profil Kelas</span>
-        </button>
-        <button type="button" class="modal-tab-btn" id="tabBtnWeeksSettings" data-target="panelTabWeeksSettings">
-          <svg class="icon icon-xs text-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          <span>Pekan &amp; Deadline</span>
-        </button>
-        <button type="button" class="modal-tab-btn" id="tabBtnTemplates" data-target="panelTabTemplates">
-          <svg class="icon icon-xs text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          <span>Format Template WA</span>
-        </button>
-        <button type="button" class="modal-tab-btn" id="tabBtnBot" data-target="panelTabBot">
-          <svg class="icon icon-xs text-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/></svg>
-          <span>Bot Telegram</span>
-        </button>
-        <button type="button" class="modal-tab-btn" id="tabBtnContacts" data-target="panelTabContacts">
-          <svg class="icon icon-xs text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          <span>Kontak WhatsApp</span>
-        </button>
-        <button type="button" class="modal-tab-btn" id="tabBtnSchedule" data-target="panelTabSchedule">
-          <svg class="icon icon-xs text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          <span>Sesi MENTARI</span>
-        </button>
-      </div>
-
-      <!-- TAB 1: PROFIL & KELAS -->
-      <div class="modal-tab-panel active" id="panelTabClassSettings">
-        <div class="modal-body">
-          <div class="settings-auto-detect-card">
-            <div class="auto-detect-info">
-              <strong>⚡ Deteksi Otomatis Kelas</strong>
-              <p>Tarik nama kelas, semester, dan daftar mata kuliah langsung dari akun MENTARI yang sedang login.</p>
-            </div>
-            <button type="button" id="btnAutoDetectClass" class="btn btn-primary btn-sm">
-              <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-              <span id="txtAutoDetect">Deteksi dari MENTARI</span>
-            </button>
+            <span id="topbarCountdownText">BATAS PEKAN 3 · <span id="deadlineCountdown">1 Hari 01h : 14m : 47s</span> · Deadline: Jumat, 23:59 WIB</span>
           </div>
 
-          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px;">
-            <div class="form-group">
-              <label for="inputClassName">Nama / Kode Kelas</label>
-              <input type="text" id="inputClassName" class="form-control" placeholder="Contoh: 05TPLE003">
-              <small class="form-hint" style="color: #64748b; font-size: 11px;">Digunakan pada judul rekap pesan WhatsApp dan dashboard.</small>
-            </div>
-            <div class="form-group">
-              <label for="inputSemesterCode">Kode Semester</label>
-              <input type="text" id="inputSemesterCode" class="form-control" placeholder="Contoh: 20261">
-              <small class="form-hint" style="color: #64748b; font-size: 11px;">Contoh: 20261 (Ganjil 2026/2027), 20262 (Genap).</small>
-            </div>
+          <!-- MENTARI Status pill -->
+          <div class="topbar-pill status-pill" id="statusPill">
+            <span class="status-dot-emerald" id="statusDot"></span>
+            <span id="statusValText">MENTARI Online</span>
           </div>
 
-          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-            <div class="form-group">
-              <label for="inputAcademicYear">Tahun Akademik</label>
-              <input type="text" id="inputAcademicYear" class="form-control" placeholder="Contoh: 2026/2027">
-            </div>
-            <div class="form-group">
-              <label for="inputStartDate">Tanggal Awal Semester (Pekan 1)</label>
-              <input type="date" id="inputStartDate" class="form-control" value="2026-08-31">
-            </div>
-          </div>
-
-          <div class="form-group" style="margin-top: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <label for="inputUserCustomName" style="margin-bottom: 0;">Nama Tampilan Pengguna (Pojok Kanan Atas)</label>
-              <button type="button" id="btnUseMentariName" class="btn btn-ghost btn-xs" style="font-size: 10.5px; padding: 2px 6px; color: #38bdf8;">
-                ⚡ Pakai Nama MENTARI
-              </button>
-            </div>
-            <input type="text" id="inputUserCustomName" class="form-control" placeholder="Otomatis dari profil akun MENTARI (misal: ATTHORIQ)">
-            <small class="form-hint" style="color: #64748b; font-size: 11px;">Kosongkan jika ingin nama otomatis mengikuti akun MENTARI yang sedang login.</small>
+          <!-- Profile Avatar circle -->
+          <div class="user-avatar-circle" id="userPill" title="Profil Komti">
+            <span id="userAvatarText">M</span>
+            <span id="userName" class="hidden">Mahasiswa</span>
+            <span id="headerUserClass" class="hidden">(Kelas)</span>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" id="btnSaveClassProfile" class="btn btn-primary">Simpan Profil Kelas</button>
+      </header>
+
+      <!-- GLOBAL FILTER BAR (Sleek Single Line Under Topbar) -->
+      <div class="filter-bar">
+        <div class="filter-select-wrapper pekan-wrapper">
+          <select id="selectWeek" class="filter-select">
+            <option value="1">Pekan 1 (31 Agt - 5 Sep 2026)</option>
+            <option value="2">Pekan 2 (7 Sep - 12 Sep 2026)</option>
+            <option value="3" selected>Pekan 3 (14 Sep - 19 Sep 2026)</option>
+            <option value="4">Pekan 4 (21 Sep - 26 Sep 2026)</option>
+            <option value="5">Pekan 5 (28 Sep - 3 Okt 2026)</option>
+            <option value="6">Pekan 6 (5 Okt - 10 Okt 2026)</option>
+            <option value="7">Pekan 7 (12 Okt - 17 Okt 2026)</option>
+            <option value="UTS">Pekan UTS (19 Okt - 24 Okt 2026)</option>
+            <option value="8">Pekan 8 (26 Okt - 31 Okt 2026)</option>
+            <option value="9">Pekan 9 (2 Nov - 7 Nov 2026)</option>
+            <option value="10">Pekan 10 (9 Nov - 14 Nov 2026)</option>
+            <option value="11">Pekan 11 (16 Nov - 21 Nov 2026)</option>
+            <option value="12">Pekan 12 (23 Nov - 28 Nov 2026)</option>
+            <option value="13">Pekan 13 (30 Nov - 5 Des 2026)</option>
+            <option value="14">Pekan 14 (7 Des - 12 Des 2026)</option>
+            <option value="UAS">Pekan UAS (14 Des - 19 Des 2026)</option>
+          </select>
         </div>
+
+        <div class="filter-select-wrapper course-wrapper">
+          <select id="selectCourse" class="filter-select">
+            <!-- Populated with Course options -->
+          </select>
+        </div>
+
+        <div class="filter-select-wrapper section-wrapper">
+          <select id="selectSection" class="filter-select">
+            <!-- Populated dynamically with Pertemuan based on SKS and Pekan -->
+          </select>
+        </div>
+
+        <span class="badge-mode-pill" id="badgeMode">DARING</span>
+        <span class="dosen-name-inline" id="infoDosen">Galuh Saputri, S.Kom., M.Kom.</span>
+
+        <button type="button" class="btn-cek-status" id="btnScan">
+          <svg class="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+            <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          <span id="scanBtnText">Cek Status</span>
+        </button>
       </div>
 
-      <!-- TAB 2: PEKAN & DEADLINE -->
-      <div class="modal-tab-panel" id="panelTabWeeksSettings">
-        <div class="modal-body">
-          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-            <div class="form-group">
-              <label for="selectDeadlineDay">Hari Batas Deadline</label>
-              <select id="selectDeadlineDay" class="form-control">
-                <option value="Senin">Senin</option>
-                <option value="Selasa">Selasa</option>
-                <option value="Rabu">Rabu</option>
-                <option value="Kamis">Kamis</option>
-                <option value="Jumat" selected>Jumat</option>
-                <option value="Sabtu">Sabtu</option>
-                <option value="Minggu">Minggu</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="inputDeadlineTime">Jam Batas Deadline</label>
-              <input type="text" id="inputDeadlineTime" class="form-control" placeholder="23:59 WIB" value="23:59 WIB">
-            </div>
-          </div>
+      <!-- MAIN SCROLLABLE CONTENT -->
+      <main class="page-scroll">
 
-          <div class="weeks-table-header" style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
-            <label style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Sinkronisasi Label Pekan Pembelajaran</label>
-            <button type="button" id="btnRecalculateWeeks" class="btn btn-ghost btn-sm">Hitung Ulang dari Tanggal Awal</button>
-          </div>
-
-          <div class="table-container small-table" style="max-height: 220px; margin-top: 8px;">
-            <table class="modern-table">
-              <thead>
-                <tr>
-                  <th width="70">Pekan</th>
-                  <th>Label &amp; Rentang Tanggal</th>
-                </tr>
-              </thead>
-              <tbody id="tableWeeksSettingsBody">
-                <!-- Populated via JS -->
-              </tbody>
-            </table>
-          </div>
-
-          <div class="course-deadlines-section" style="margin-top: 18px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- VIEW 1: DASHBOARD VIEW                                              -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div id="viewDashboard" class="view-panel">
+          
+          <!-- ROW 1: RINGKASAN STATUS PERKULIAHAN -->
+          <section class="dashboard-section">
+            <div class="section-header-flex">
               <div>
-                <label style="font-size: 12px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">⏰ Custom Deadline Khusus Per Mata Kuliah</label>
-                <p style="font-size: 11px; color: #94a3b8; margin: 2px 0 0;">Atur jika ada mata kuliah tertentu yang deadline-nya berbeda dari default kelas.</p>
+                <h2 class="section-title">Ringkasan Status Perkuliahan</h2>
+                <p class="section-subtitle">Klik kartu untuk melihat detail di Monitoring Tugas</p>
               </div>
-              <button type="button" id="btnResetAllDeadlines" class="btn btn-ghost btn-xs" style="color: #f87171;" title="Kembalikan semua matkul ke default kelas">Reset Semua ke Default</button>
+              <span class="last-scan-mono">Terakhir scan: <span id="lastScanTime">10:15:32</span></span>
             </div>
 
-            <div class="table-container small-table" style="max-height: 220px;">
-              <table class="modern-table">
-                <thead>
+            <div class="metrics-grid">
+              <!-- Posttest -->
+              <div class="metric-card" id="metricCardPost" onclick="switchMainView('monitoring', 'posttest')">
+                <div class="metric-header">
+                  <span class="m-dot dot-sky"></span>
+                  <span class="m-label">Posttest</span>
+                </div>
+                <div class="m-val val-sky" id="metricPostRatio">0/37</div>
+                <div class="m-sub" id="metricPostSub">Sudah mengerjakan</div>
+              </div>
+
+              <!-- Forum Diskusi -->
+              <div class="metric-card" id="metricCardForum" onclick="switchMainView('monitoring', 'forum')">
+                <div class="metric-header">
+                  <span class="m-dot dot-amber"></span>
+                  <span class="m-label">Forum Diskusi</span>
+                </div>
+                <div class="m-val val-amber" id="metricForumRatio">0/37</div>
+                <div class="m-sub" id="metricForumSub">Minimal 2x reply</div>
+              </div>
+
+              <!-- Penugasan Terstruktur -->
+              <div class="metric-card" id="metricCardAsg" onclick="switchMainView('monitoring', 'assignment')">
+                <div class="metric-header">
+                  <span class="m-dot dot-emerald"></span>
+                  <span class="m-label">Penugasan Terstruktur</span>
+                </div>
+                <div class="m-val val-emerald" id="metricAsgRatio">0/37</div>
+                <div class="m-sub" id="metricAsgSub">Sudah mengumpulkan</div>
+              </div>
+
+              <!-- Mahasiswa Bermasalah -->
+              <div class="metric-card" id="metricCardProblem" onclick="switchMainView('monitoring', 'posttest')">
+                <div class="metric-header">
+                  <span class="m-dot dot-red"></span>
+                  <span class="m-label">Mahasiswa Bermasalah</span>
+                </div>
+                <div class="m-val val-red" id="metricProblemCount">0</div>
+                <div class="m-sub" id="metricProblemSub">0% dari total utama</div>
+              </div>
+
+              <!-- Total Mahasiswa -->
+              <div class="metric-card" id="metricCardTotal" onclick="switchMainView('students')">
+                <div class="metric-header">
+                  <span class="m-dot dot-slate"></span>
+                  <span class="m-label">Total Mahasiswa</span>
+                </div>
+                <div class="m-val val-slate" id="metricTotalUtama">37</div>
+                <div class="m-sub">+1 revisi</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ROW 2: PERLU TINDAK LANJUT + STATUS FORDIS DOSEN -->
+          <section class="middle-split-grid">
+            <!-- Left: Perlu Tindak Lanjut -->
+            <div class="card-box pending-students-box">
+              <div class="card-box-header">
+                <div>
+                  <h3 class="box-title">Perlu Tindak Lanjut</h3>
+                  <p class="box-subtitle"><span id="quickFollowupCount">0 mahasiswa</span> belum menyelesaikan semua kewajiban</p>
+                </div>
+                <button type="button" class="btn-link-action" onclick="switchMainView('monitoring')">Monitoring &rarr;</button>
+              </div>
+
+              <div class="quick-followup-list" id="quickFollowupList">
+                <!-- Students populated by app.js -->
+                <div class="empty-state-hint">Pilih mata kuliah &amp; klik Cek Status untuk memuat data.</div>
+              </div>
+            </div>
+
+            <!-- Right: Status Fordis Dosen (8 Courses Mini List) -->
+            <div class="card-box fordis-mini-box">
+              <div class="card-box-header">
+                <h3 class="box-title">Status Fordis Dosen</h3>
+              </div>
+
+              <div class="fordis-mini-list" id="miniFordisGrid">
+                <div class="fordis-mini-row" onclick="selectAndMonitorCourse('20261-05TPLE003-22T1F0243')">
+                  <span class="f-code">KB</span>
+                  <span class="f-name">Kecerdasan Buatan</span>
+                  <span class="pill-badge pill-green">&#10003; Buka</span>
+                </div>
+                <div class="fordis-mini-row" onclick="selectAndMonitorCourse('20261-05TPLE003-22T1F0252')">
+                  <span class="f-code">SIM</span>
+                  <span class="f-name">Sistem Informasi Manajemen</span>
+                  <span class="pill-badge pill-green">&#10003; Buka</span>
+                </div>
+                <div class="fordis-mini-row" onclick="selectAndMonitorCourse('20261-05TPLE003-22T1F0262')">
+                  <span class="f-code">PCD</span>
+                  <span class="f-name">Pengolahan Citra Digital</span>
+                  <span class="pill-badge pill-green">&#10003; Buka</span>
+                </div>
+                <div class="fordis-mini-row" onclick="selectAndMonitorCourse('20261-05TPLE003-22T1F0270')">
+                  <span class="f-code">ML</span>
+                  <span class="f-name">Machine Learning</span>
+                  <span class="pill-badge pill-gray">Luring</span>
+                </div>
+                <div class="fordis-mini-row" onclick="selectAndMonitorCourse('20261-05TPLE003-22T1F0272')">
+                  <span class="f-code">TRO</span>
+                  <span class="f-name">Teknik Riset Operasional</span>
+                  <span class="pill-badge pill-green">&#10003; Buka</span>
+                </div>
+                <div class="fordis-mini-row" onclick="selectAndMonitorCourse('20261-05TPLE003-22T1F0280')">
+                  <span class="f-code">PWI</span>
+                  <span class="f-name">Pemrograman Web I</span>
+                  <span class="pill-badge pill-green">&#10003; Buka</span>
+                </div>
+                <div class="fordis-mini-row" onclick="selectAndMonitorCourse('20261-05TPLE003-22T1F0288')">
+                  <span class="f-code">MP</span>
+                  <span class="f-name">Metode Penelitian</span>
+                  <span class="pill-badge pill-green">&#10003; Buka</span>
+                </div>
+                <div class="fordis-mini-row" onclick="selectAndMonitorCourse('20261-05TPLE003-22T1F0296')">
+                  <span class="f-code">DE</span>
+                  <span class="f-name">Digital Entrepreneurship</span>
+                  <span class="pill-badge pill-amber">Belum</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ROW 3: DRAFT PENGINGAT WHATSAPP (Full Width Studio) -->
+          <section class="card-box draft-studio-box">
+            <div class="card-box-header">
+              <div>
+                <h3 class="box-title">Draft Pengingat WhatsApp</h3>
+                <p class="box-subtitle">Preview pesan siap salin ke grup kelas. Pilih jenis pesan lalu salin atau buka langsung di WhatsApp.</p>
+              </div>
+
+              <div class="draft-toggles-header" id="draftTogglesHeader">
+                <div class="toggle-switch-wrapper" id="draftNamesToggleGroup" title="Tampilkan rincian nama mahasiswa atau ringkasan angka saja">
+                  <span class="toggle-label">Tampilkan nama</span>
+                  <button type="button" class="btn-switch active" id="btnToggleNamesSwitch" aria-label="Toggle tampilkan nama">
+                    <span class="switch-ball"></span>
+                  </button>
+                </div>
+                <div class="toggle-switch-wrapper" id="draftPhoneToggleGroup" title="Sertakan atau sembunyikan nomor HP / tag WhatsApp">
+                  <span class="toggle-label">Nomor HP</span>
+                  <button type="button" class="btn-switch active" id="btnTogglePhoneSwitch" aria-label="Toggle nomor HP">
+                    <span class="switch-ball"></span>
+                  </button>
+                </div>
+                <div class="toggle-switch-wrapper" id="draftNumberingToggleGroup" title="Gunakan nomor urut (1, 2, 3) atau tanda bullet/strip">
+                  <span class="toggle-label">Nomor urut</span>
+                  <button type="button" class="btn-switch active" id="btnToggleNumberingSwitch" aria-label="Toggle nomor urut">
+                    <span class="switch-ball"></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="draft-studio-grid">
+              <!-- Left: Jenis Pesan & Action Buttons (260px) -->
+              <div class="draft-controls-col">
+                <div>
+                  <div class="field-label-sm">JENIS PESAN</div>
+                  <div class="draft-types-stack">
+                    <button type="button" class="draft-type-card" id="tabMatkulBtn">
+                      <span class="dt-icon">📚</span>
+                      <div class="dt-text">
+                        <span class="dt-name">Grup Matkul</span>
+                        <span class="dt-desc">Rekap per mata kuliah tertentu</span>
+                      </div>
+                    </button>
+
+                    <button type="button" class="draft-type-card active" id="tabUtamaBtn">
+                      <span class="dt-icon">📢</span>
+                      <div class="dt-text">
+                        <span class="dt-name">Grup Utama</span>
+                        <span class="dt-desc">Rekap seluruh matkul daring</span>
+                      </div>
+                    </button>
+
+                    <button type="button" class="draft-type-card" id="tabTodayBtn">
+                      <span class="dt-icon">🚨</span>
+                      <div class="dt-text">
+                        <span class="dt-name" style="color: #f87171;">Deadline Hari Ini</span>
+                        <span class="dt-desc">Peringatan batas waktu</span>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="draft-actions-stack">
+                  <button type="button" class="btn-action-copy" id="btnCopyWa">
+                    <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                      <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                    </svg>
+                    <span id="copyBtnText">Salin Teks</span>
+                  </button>
+
+                  <div class="draft-social-row">
+                    <button type="button" class="btn-social btn-wa" id="btnOpenWhatsAppDirect">
+                      <svg class="icon-sm" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                      </svg>
+                      <span>WhatsApp</span>
+                    </button>
+
+                    <button type="button" class="btn-social btn-tg" id="btnSendWaToTelegram">
+                      <svg class="icon-sm" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                      </svg>
+                      <span>Telegram</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: WhatsApp Dark Chat Simulation (#0a1014 / #005c4b) -->
+              <div class="wa-chat-simulator">
+                <div class="wa-chat-header">
+                  <div class="wa-avatar-icon">
+                    <svg class="icon-sm" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div class="wa-group-title">Grup Kelas 05TPLE003</div>
+                    <div class="wa-group-members">38 anggota</div>
+                  </div>
+                </div>
+
+                <div class="wa-chat-body">
+                  <div class="wa-bubble-wrap">
+                    <div class="wa-speech-bubble">
+                      <pre id="waMessageContent">*Pilih mata kuliah dan klik Cek Status untuk melihat draf...*</pre>
+                      <div class="wa-bubble-time">10:15 <span class="wa-ticks">&#10003;&#10003;</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- VIEW 2: MONITORING TUGAS VIEW                                       -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div id="viewMonitoring" class="view-panel hidden">
+          <div class="card-box monitoring-card-container">
+            <!-- Header -->
+            <div class="monitoring-header">
+              <div class="flex-between gap-4 mb-3">
+                <div>
+                  <h2 class="box-title">Monitoring Tugas Mahasiswa</h2>
+                  <p class="box-subtitle">Pantau status Posttest, Forum Diskusi (multi-topik), dan Penugasan per pertemuan</p>
+                </div>
+                <div class="monitoring-header-controls">
+                  <div class="select-wrapper" style="width: 140px;">
+                    <select id="selectSectionMon" class="filter-select">
+                      <!-- Synchronized dynamically with selectSection -->
+                    </select>
+                  </div>
+                  <input type="text" id="searchStudent" class="figma-input" placeholder="Cari nama / NIM..." style="width: 175px;">
+                </div>
+              </div>
+
+              <!-- Matkul info pills -->
+              <div class="mon-info-pills">
+                <span id="infoHari">Sabtu</span><span class="dot-sep">&middot;</span>
+                <span id="infoRuang">Ruang V.619</span><span class="dot-sep">&middot;</span>
+                <span id="infoKelompok">Kelompok 1</span><span class="dot-sep">&middot;</span>
+                <span class="pill-badge pill-green" id="pillStatusFordis">Fordis: Sudah Dibuka (Aktif)</span>
+                <span class="pill-badge pill-green" id="pillStatusPosttest">Posttest: Sudah Dibuka</span>
+              </div>
+
+              <!-- Underline Tabs -->
+              <div class="mon-tabs-row">
+                <button type="button" class="mon-tab-btn" id="tabAllMon">
+                  Semua <span id="tabCountAll">(0)</span>
+                </button>
+                <button type="button" class="mon-tab-btn active" id="tabPendingPost">
+                  Belum Posttest <span id="tabCountPost">(0)</span>
+                </button>
+                <button type="button" class="mon-tab-btn" id="tabDonePost">
+                  Sudah Posttest <span id="tabCountDonePost">(0)</span>
+                </button>
+                <button type="button" class="mon-tab-btn" id="tabPendingForum">
+                  Forum Kurang <span id="tabCountForum">(0)</span>
+                </button>
+                <button type="button" class="mon-tab-btn" id="tabDoneForum">
+                  Sudah Forum <span id="tabCountDoneForum">(0)</span>
+                </button>
+                <button type="button" class="mon-tab-btn" id="tabPendingAsg">
+                  Belum Penugasan <span id="tabCountAsg" class="hidden"></span>
+                </button>
+                <button type="button" class="mon-tab-btn" id="tabCompleteMon">
+                  Lengkap <span id="tabCountComplete">(0)</span>
+                </button>
+                <button type="button" class="mon-tab-btn fordis-modal-tab" id="tabStatusFordisDosen">
+                  Status Fordis Dosen
+                </button>
+              </div>
+            </div>
+
+            <!-- Multi-topic banner container -->
+            <div id="forumTopicsContainer" class="forum-topics-banner hidden">
+              <span class="pill-badge pill-green" id="forumTopicsCountBadge">2 Topik Dosen</span>
+              <span class="text-slate-400" id="forumTopicsHeaderTitle">Terdeteksi Topik Diskusi dari Dosen:</span>
+              <div id="forumTopicsList" class="topics-items-flex"></div>
+            </div>
+
+            <!-- Privacy Notice for Penugasan -->
+            <div id="tabPrivacyNotice" class="privacy-notice-box hidden">
+              <div class="lock-icon">🔒</div>
+              <h3 class="notice-title">Privasi File Penugasan MENTARI Aktif</h3>
+              <p class="notice-desc">
+                Portal MENTARI membatasi hak akses file tugas antar mahasiswa (hanya mengizinkan melihat file kiriman sendiri).
+                TugasKu tidak menampilkan daftar nama mahasiswa agar tidak terjadi salah tuduh, dan menyediakan pengingat ramah &amp; elegan pada draf WhatsApp grup.
+              </p>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+              <table class="figma-table">
+                <thead id="middleTableHead">
                   <tr>
-                    <th>Mata Kuliah &amp; Dosen</th>
-                    <th width="130">Hari Deadline</th>
-                    <th width="130">Jam Deadline</th>
-                    <th width="110">Status</th>
+                    <th style="width: 40px;">NO</th>
+                    <th style="width: 135px;">NIM</th>
+                    <th>NAMA MAHASISWA</th>
+                    <th style="width: 185px;">NOMOR WA</th>
+                    <th style="width: 170px; text-align: right;">STATUS</th>
                   </tr>
                 </thead>
-                <tbody id="tableCourseDeadlinesBody">
-                  <!-- Populated via JS -->
+                <tbody id="middleTableBody">
+                  <!-- Populated by app.js -->
                 </tbody>
               </table>
             </div>
+
+            <!-- Table Footer -->
+            <div class="monitoring-footer">
+              <span id="viewAllCount" class="text-muted-xs">0 mahasiswa</span>
+              <span class="text-muted-xs">Fordis (min 2x) &rarr; Posttest &rarr; Kuesioner = Absensi Valid</span>
+            </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" id="btnSaveWeeksSettings" class="btn btn-primary">Simpan Pengaturan Pekan &amp; Deadline</button>
-        </div>
-      </div>
 
-      <!-- TAB 3: FORMAT TEMPLATE PESAN WA -->
-      <div class="modal-tab-panel" id="panelTabTemplates">
-        <div class="modal-body">
-          <div class="template-selector-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <label style="font-size: 12px; font-weight: 700; color: #cbd5e1;">Pilih Jenis Template:</label>
-              <select id="selectTemplateType" class="form-control" style="width: auto; padding: 4px 10px; font-size: 13px;">
-                <option value="grup_utama">📢 Rekap Seluruh Matkul (Grup Utama)</option>
-                <option value="grup_matkul">🎯 Draf Pengingat Per Matkul (Grup Matkul)</option>
-              </select>
-            </div>
-            <button type="button" id="btnResetTemplate" class="btn btn-ghost btn-sm" title="Kembalikan ke format baku default">Reset Format Baku</button>
-          </div>
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- VIEW 3: JADWAL & DIRECTORY VIEW                                     -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div id="viewSchedule" class="view-panel hidden">
+          <div class="space-y-5">
+            <div class="card-box p-5">
+              <div class="flex-between mb-4">
+                <div>
+                  <h2 class="box-title">Jadwal &amp; Direktori Mata Kuliah</h2>
+                  <p class="box-subtitle">Kelas 05TPLE003 · Shift E Reguler CS · Ruang V.619 (Sabtu) · Semester Ganjil 2026/2027</p>
+                </div>
+                <button type="button" class="btn-settings-inline" id="btnSchedOpenSettings">
+                  ⚙️ Pengaturan Jadwal &amp; Deadline
+                </button>
+              </div>
 
-          <div class="chip-variable-container" style="background: rgba(30, 41, 59, 0.5); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 10px;">
-            <span class="chip-label" style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 6px;">Klik tag untuk menyisipkan variabel:</span>
-            <div class="chip-tags-list" id="chipTagsList" style="display: flex; flex-wrap: wrap; gap: 6px;">
-              <!-- Variable chips populated dynamically -->
-            </div>
-          </div>
+              <!-- 3 Stats cards -->
+              <div class="grid-3-stats mb-4">
+                <div class="stat-box-inner">
+                  <div class="stat-inner-label">TOTAL BEBAN STUDI</div>
+                  <div class="stat-inner-val">8 Mata Kuliah (20 SKS)</div>
+                  <div class="stat-inner-sub">Kelompok I: 10 SKS · Kelompok II: 10 SKS</div>
+                </div>
+                <div class="stat-box-inner">
+                  <div class="stat-inner-label">POLA BELAJAR HYBRID</div>
+                  <div class="stat-inner-val" id="schedActiveModeSummary">Pekan 3: Kel I LURING · Kel II DARING</div>
+                  <div class="stat-inner-sub">Rotasi setiap 7 pekan</div>
+                </div>
+                <div class="stat-box-inner">
+                  <div class="stat-inner-label">LOKASI &amp; HARI KULIAH</div>
+                  <div class="stat-inner-val">Sabtu · Ruang V.619</div>
+                  <div class="stat-inner-sub">Sinkronisasi MENTARI &amp; Sesi Kuliah</div>
+                </div>
+              </div>
 
-          <div class="template-editor-wrap">
-            <textarea id="txtTemplateEditor" class="form-control" style="font-family: 'JetBrains Mono', monospace; font-size: 12px; height: 150px; resize: vertical; line-height: 1.5;"></textarea>
-          </div>
-
-          <div class="form-group" style="margin-top: 14px; background: rgba(30, 41, 59, 0.45); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);">
-            <label for="selectMentionFormat" style="font-size: 12px; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 6px;">
-              🏷️ Format Sebutan Mahasiswa di Pesan WhatsApp:
-            </label>
-            <div class="select-wrapper">
-              <select id="selectMentionFormat" class="form-control" style="background: #1e293b; color: #f8fafc; font-size: 12.5px;">
-                <option value="phone_name">Nomor HP + Nama: @628xxx (Nama Mahasiswa) — (Link wa.me chat)</option>
-                <option value="name_only">Tag Nama Saja: @Nama Mahasiswa — (Mudah di-tag ulang manual di WA)</option>
-                <option value="clean_name">Nama Saja: Nama Mahasiswa — (Rapi &amp; tanpa simbol @)</option>
-              </select>
-            </div>
-            <small style="display: block; color: #94a3b8; font-size: 11px; margin-top: 6px; line-height: 1.4;">
-              💡 <em>Catatan: WhatsApp membatasi teks hasil paste dari clipboard agar tidak otomatis men-tag member secara massal. Jika ingin tag resmi berdering di WA, pilih "Tag Nama Saja" lalu di WhatsApp cukup hapus &amp; ketik ulang simbol <code>@</code> persis di depan nama teman.</em>
-            </small>
-          </div>
-
-          <div class="form-group" style="margin-top: 14px; background: rgba(30, 41, 59, 0.45); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.08);">
-            <label for="selectDraftIncludeNames" style="font-size: 12px; font-weight: 700; color: #38bdf8; display: block; margin-bottom: 6px;">
-              👥 Format Default Pesan Grup Matkul:
-            </label>
-            <div class="select-wrapper">
-              <select id="selectDraftIncludeNames" class="form-control" style="background: #1e293b; color: #f8fafc; font-size: 12.5px;">
-                <option value="true">Dengan Nama Mahasiswa — (Lengkap dengan tag/nomor, cocok menjelang deadline)</option>
-                <option value="false">Ringkas / Tanpa Nama — (Hanya ringkasan jumlah, cocok untuk update tugas awal pekan)</option>
-              </select>
-            </div>
-            <small style="display: block; color: #94a3b8; font-size: 11px; margin-top: 6px; line-height: 1.4;">
-              💡 <em>Anda juga dapat beralih mode secara instan melalui tombol switcher di atas kotak Draft Pengingat kapan saja tanpa harus membuka pengaturan ini.</em>
-            </small>
-          </div>
-
-          <div class="template-live-preview-box" style="margin-top: 12px;">
-            <div class="preview-header" style="font-size: 11px; font-weight: 700; color: #34d399; text-transform: uppercase; margin-bottom: 6px;">
-              👁️ Live Preview Teks WhatsApp:
-            </div>
-            <pre id="templateLivePreviewContent" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 10px 12px; color: #f1f5f9; white-space: pre-wrap; max-height: 130px; overflow-y: auto; margin: 0;"></pre>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" id="btnSaveTemplates" class="btn btn-primary">Simpan Format Template</button>
-        </div>
-      </div>
-
-      <!-- TAB 1: BOT TELEGRAM -->
-      <div class="modal-tab-panel" id="panelTabBot">
-        <div class="modal-body">
-          <div class="bot-status-bar">
-            <div class="bot-status-left">
-              <span id="botStatusDot" class="bot-dot"></span>
-              <div>
-                <div class="bot-status-title" id="botStatusLabel">Mengecek status bot...</div>
-                <div class="bot-status-sub">Auto-scan terjadwal: Senin–Jumat, 09:00 &amp; 19:00 WIB</div>
+              <!-- Pekan Strip -->
+              <div class="pekan-strip-wrap">
+                <span class="pekan-strip-label">Pilih Pekan:</span>
+                <div class="pekan-pills-row" id="schedWeekPillsContainer">
+                  <!-- Generated by app.js -->
+                </div>
               </div>
             </div>
-            <div class="bot-status-actions">
-              <button id="btnBotStart" class="btn btn-primary btn-sm">Aktifkan</button>
-              <button id="btnBotStop" class="btn btn-danger btn-sm" disabled>Matikan</button>
-            </div>
-          </div>
 
-          <div class="bot-trigger-box">
-            <div class="bot-trigger-title">Kirim Rekap Sekarang</div>
-            <div class="bot-trigger-row">
-              <button id="btnBotTrigger" class="btn btn-ghost btn-sm">
-                <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span>Picu Scan &amp; Kirim ke Telegram</span>
-              </button>
-              <span class="bot-active-week">Pekan bot: <b id="botActiveWeekLabel">-</b></span>
-            </div>
-          </div>
-
-          <div class="tele-guide-box">
-            <strong>Panduan Buat Bot Telegram (sekali saja):</strong>
-            <ol>
-              <li>Chat <code>@BotFather</code> di Telegram &rarr; ketik <code>/newbot</code> &rarr; salin <b>Token Bot</b>.</li>
-              <li>Chat <code>@userinfobot</code> &rarr; salin <b>Chat ID</b> Anda (angka, misal: 987654321).</li>
-              <li>Masukkan Token &amp; Chat ID di bawah &rarr; Simpan &amp; Terapkan.</li>
-            </ol>
-          </div>
-
-          <div class="form-group">
-            <label for="teleBotToken">Telegram Bot Token</label>
-            <input type="password" id="teleBotToken" class="form-control" placeholder="Contoh: 1234567890:ABCdefGhIJKlmNoPQRstUVwxyZ">
-          </div>
-
-          <div class="form-group">
-            <label for="teleChatId">Chat ID Anda (dari @userinfobot)</label>
-            <input type="text" id="teleChatId" class="form-control" placeholder="Contoh: 987654321">
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button id="btnTestTelegram" class="btn btn-ghost">Tes Kirim Pesan</button>
-          <button id="btnSaveTelegram" class="btn btn-primary">Simpan &amp; Terapkan</button>
-        </div>
-      </div>
-
-      <!-- TAB 2: KONTAK WHATSAPP -->
-      <div class="modal-tab-panel" id="panelTabContacts">
-        <div class="modal-body">
-          <!-- QUICK ADD FORM -->
-          <div class="contact-add-box">
-            <span style="font-size: 11px; font-weight: 700; color: #93c5fd; text-transform: uppercase;">+ Tambah Mahasiswa Baru</span>
-            <div class="contact-add-row">
-              <input type="text" id="newStudentNim" class="form-control" placeholder="NIM (misal: 241011400xxx)">
-              <input type="text" id="newStudentName" class="form-control" placeholder="Nama Mahasiswa">
-              <input type="text" id="newStudentPhone" class="form-control" placeholder="No WhatsApp (08xxx)">
-              <button type="button" id="btnAddNewStudent" class="btn btn-primary btn-sm">Tambah</button>
-            </div>
-          </div>
-
-          <div class="contacts-toolbar">
-            <input type="text" id="searchContactInput" class="form-control" placeholder="Cari nama atau NIM mahasiswa...">
-            <button id="btnAutoFormatAll" class="btn btn-ghost btn-sm" title="Ubah awalan 08xx jadi 628xx">Format 628xx</button>
-          </div>
-          <div class="contacts-list-wrap" id="contactsListContainer">
-            <!-- Populated via JS -->
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button id="btnSaveContacts" class="btn btn-primary">Simpan Seluruh Kontak</button>
-        </div>
-      </div>
-
-      <!-- TAB 3: JADWAL & SESI MENTARI -->
-      <div class="modal-tab-panel" id="panelTabSchedule">
-        <div class="modal-body">
-          <div class="session-info-card">
-            <div class="session-status-row">
-              <div>
-                <strong>Status Sesi MENTARI:</strong>
-                <span id="sessionStatusDetail" class="badge-table-pill success">Online</span>
+            <!-- Two-column kelompok -->
+            <div class="grid-2-kelompok">
+              <!-- Kelompok 1 -->
+              <div class="card-box kelompok-box">
+                <div class="kelompok-header">
+                  <div>
+                    <span class="kel-title">KELOMPOK 1 ([E-1])</span>
+                    <span class="kel-sks">10 SKS</span>
+                  </div>
+                  <span class="pill-badge pill-gray" id="schedGroup1PeriodBadge">LURING (MENTARI)</span>
+                </div>
+                <div class="courses-stack" id="schedGroup1Courses">
+                  <!-- Populated by app.js -->
+                </div>
               </div>
-              <button id="btnModalReconnect" class="btn btn-outline-info btn-sm">Perbarui Sesi (Login)</button>
-            </div>
-            <p class="session-desc">Sesi MENTARI disimpan aman secara lokal. Jika sesi kedaluwarsa, klik tombol di atas atau jalankan <code>npm run login</code> di terminal.</p>
-          </div>
 
-          <div class="schedule-matrix-card">
-            <h4>Matriks Perkuliahan Kelas 05TPLE003 (Reguler CS)</h4>
-            <div class="matrix-grid">
-              <div class="matrix-col">
-                <h5>Kelompok I [E-1]</h5>
-                <ul>
-                  <li>Pekan 1–7: Tatap Muka (Luring R. V.619)</li>
-                  <li>Pekan 8: UTS Luring</li>
-                  <li>Pekan 8–14: E-Learning Daring (MENTARI)</li>
-                  <li>UAS: Daring MENTARI</li>
-                </ul>
-              </div>
-              <div class="matrix-col">
-                <h5>Kelompok II [E-2]</h5>
-                <ul>
-                  <li>Pekan 1–7: E-Learning Daring (MENTARI)</li>
-                  <li>Pekan 8: UTS Daring MENTARI</li>
-                  <li>Pekan 8–14: Tatap Muka (Luring R. V.619)</li>
-                  <li>UAS: Luring R. V.619</li>
-                </ul>
+              <!-- Kelompok 2 -->
+              <div class="card-box kelompok-box">
+                <div class="kelompok-header">
+                  <div>
+                    <span class="kel-title">KELOMPOK 2 ([E-2])</span>
+                    <span class="kel-sks">10 SKS</span>
+                  </div>
+                  <span class="pill-badge pill-sky" id="schedGroup2PeriodBadge">DARING (MENTARI)</span>
+                </div>
+                <div class="courses-stack" id="schedGroup2Courses">
+                  <!-- Populated by app.js -->
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button id="btnCloseSettingsFooter" class="btn btn-ghost">Tutup</button>
-        </div>
-      </div>
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- VIEW 4: DATA MAHASISWA VIEW                                         -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div id="viewStudents" class="view-panel hidden">
+          <div class="card-box students-card-container">
+            <div class="students-header mb-4">
+              <!-- Top Row: Title + Main Action Buttons -->
+              <div class="flex-between" style="flex-wrap: wrap; gap: 14px; align-items: center; margin-bottom: 16px;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <h2 class="box-title" style="margin: 0;">Data Mahasiswa</h2>
+                    <span class="badge-table-pill info" id="badgeTotalStudentsCount" style="font-size: 11px; font-weight: 600;">37 Mahasiswa</span>
+                  </div>
+                  <p class="box-subtitle" style="margin-top: 4px;">Daftar kontak &amp; data induk mahasiswa kelas 05TPLE003</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                  <button type="button" class="btn-figma-primary" id="btnOpenAddStudent" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; background: #6366f1; color: #ffffff; border: none; transition: background 0.15s; height: 36px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <span>Tambah Mahasiswa</span>
+                  </button>
+                  <button type="button" class="btn-export" id="btnExportCsv" title="Unduh CSV" style="height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>CSV</span>
+                  </button>
+                  <button type="button" class="btn-export" id="btnCopySheet" title="Salin Google Sheets" style="height: 36px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    <span>Sheets</span>
+                  </button>
+                </div>
+              </div>
 
+              <!-- Dedicated Filter & Search Bar Row -->
+              <div class="students-toolbar" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: rgba(15, 23, 42, 0.5); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.06);">
+                <div style="position: relative; width: 100%; max-width: 340px;">
+                  <svg style="position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: #64748b; pointer-events: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  <input type="text" id="searchMasterStudent" class="figma-input" placeholder="Cari nama, NIM, atau No. WA..." style="width: 100%; padding-left: 36px !important; height: 34px; font-size: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #f8fafc;">
+                </div>
+                <div class="text-muted-xs" style="font-size: 11.5px; color: #94a3b8;">
+                  💡 Klik status <span style="color: #818cf8; font-weight: 600;">Utama</span> / <span style="color: #fbbf24; font-weight: 600;">Revisi</span> untuk mengubah jenis mahasiswa
+                </div>
+              </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-responsive">
+              <table class="figma-table">
+                <thead>
+                  <tr>
+                    <th style="width: 45px; text-align: center;">NO</th>
+                    <th style="width: 145px;">NIM</th>
+                    <th>NAMA MAHASISWA</th>
+                    <th style="width: 100px; text-align: center;">STATUS</th>
+                    <th style="width: 200px;">NOMOR WHATSAPP</th>
+                    <th style="width: 140px; text-align: right;">AKSI</th>
+                  </tr>
+                </thead>
+                <tbody id="tableStudentsBody">
+                  <!-- Populated by app.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pagination-footer">
+              <span id="paginationInfo" class="text-muted-xs">Menampilkan 1-10 dari 37 mahasiswa</span>
+              <div class="pagination-btns" id="paginationControls"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- VIEW 5: RANGKUMAN PRIBADI VIEW                                      -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div id="viewRangkuman" class="view-panel hidden">
+          <div class="space-y-5">
+            <div class="card-box p-5">
+              <div class="flex-between mb-4">
+                <div>
+                  <h2 class="box-title">Rangkuman Tugas Pribadi (Status Saya)</h2>
+                  <p class="box-subtitle">Pantau status pengerjaan Fordis, Penugasan, Posttest, dan Kuesioner di seluruh mata kuliah aktif</p>
+                </div>
+                <div class="flex-center gap-2">
+                  <div class="select-wrapper" style="width: 130px;">
+                    <select id="selectPersonalWeek" class="filter-select">
+                      <option value="1">Pekan 1</option>
+                      <option value="2">Pekan 2</option>
+                      <option value="3" selected>Pekan 3</option>
+                      <option value="4">Pekan 4</option>
+                      <option value="5">Pekan 5</option>
+                      <option value="6">Pekan 6</option>
+                      <option value="7">Pekan 7</option>
+                      <option value="UTS">Pekan UTS</option>
+                      <option value="8">Pekan 8</option>
+                      <option value="9">Pekan 9</option>
+                      <option value="10">Pekan 10</option>
+                      <option value="11">Pekan 11</option>
+                      <option value="12">Pekan 12</option>
+                      <option value="13">Pekan 13</option>
+                      <option value="14">Pekan 14</option>
+                      <option value="UAS">Pekan UAS</option>
+                    </select>
+                  </div>
+                  <button type="button" class="btn-rescan-personal" id="btnRefreshPersonal">
+                    <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    <span>Scan Ulang</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Profile Box -->
+              <div class="personal-profile-strip mb-4">
+                <div class="avatar-ar" id="modalAvatarBadge">M</div>
+                <div>
+                  <div class="prof-name"><span id="userDisplayNameBadge">Profil Mahasiswa</span> ★</div>
+                  <div class="prof-nim" id="userNimBadge">-</div>
+                </div>
+              </div>
+
+              <!-- 4 Stats Cards -->
+              <div class="grid-4-stats">
+                <div class="stat-card-pribadi">
+                  <div class="sc-label">TOTAL MATKUL</div>
+                  <div class="sc-val text-slate-200" id="personalTotalCourses">8</div>
+                </div>
+                <div class="stat-card-pribadi">
+                  <div class="sc-label">SELESAI LENGKAP</div>
+                  <div class="sc-val text-emerald-400" id="personalDoneCourses">7</div>
+                </div>
+                <div class="stat-card-pribadi">
+                  <div class="sc-label">PERLU DIKERJAKAN</div>
+                  <div class="sc-val text-red-400" id="personalPendingCourses">1</div>
+                </div>
+                <div class="stat-card-pribadi">
+                  <div class="sc-label">DEADLINE HARI INI</div>
+                  <div class="sc-val text-amber-400" id="personalTodayDeadlineCount">0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Table of courses for personal -->
+            <div class="card-box overflow-hidden">
+              <div class="table-responsive">
+                <table class="figma-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 45px;">NO</th>
+                      <th>MATA KULIAH &amp; DOSEN</th>
+                      <th style="text-align: center; width: 130px;">DEADLINE</th>
+                      <th style="text-align: center; width: 140px;">FORUM DISKUSI</th>
+                      <th style="text-align: center; width: 120px;">PENUGASAN</th>
+                      <th style="text-align: center; width: 120px;">POSTTEST</th>
+                      <th style="text-align: center; width: 120px;">KUESIONER</th>
+                      <th style="text-align: center; width: 140px;">STATUS SAYA</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tablePersonalBody">
+                    <!-- Populated by app.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
     </div>
   </div>
 
-  <!-- MODAL STATUS FORDIS SEMUA MATKUL -->
-  <div id="modalStatusFordis" class="modal-overlay hidden">
-    <div class="modal-card modal-lg">
+  <!-- ── 3. MODAL STATUS FORDIS DOSEN ──────────────────────────────────────── -->
+  <div id="modalStatusFordis" class="modal-backdrop hidden">
+    <div class="modal-dialog max-w-4xl">
       <div class="modal-header">
-        <div class="modal-header-left">
-          <div class="modal-icon-box" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
-            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          </div>
-          <div>
-            <h3 class="modal-title">Status Pembukaan Forum Diskusi Dosen (Fordis)</h3>
-            <p class="modal-subtitle">Pantau mata kuliah mana yang topik diskusinya sudah dibuat atau belum dibuka dosen di MENTARI.</p>
-          </div>
+        <div>
+          <h2 class="modal-title">Status Pembukaan Forum Diskusi Dosen (Fordis)</h2>
+          <p class="modal-subtitle">Pantau mata kuliah mana yang topik diskusinya sudah dibuat atau belum dibuka dosen di MENTARI.</p>
         </div>
-        <button id="btnCloseStatusFordis" class="btn-icon-close">&times;</button>
+        <button type="button" class="btn-modal-close" id="btnCloseStatusFordis">&times;</button>
       </div>
-
-      <div class="modal-body" style="padding: 16px 20px;">
-        <div class="fordis-summary-bar">
-          <div id="fordisSummaryText" style="color: #cbd5e1; font-weight: 500;">
-            Memuat status ketersediaan Forum Diskusi pekan ini...
-          </div>
-          <button id="btnRefreshFordisStatus" class="btn btn-primary btn-sm">
-            <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+      <div class="modal-body">
+        <div class="flex-between p-3 bg-sub mb-4 rounded-lg border-sub">
+          <span class="text-sm text-slate-300" id="fordisSummaryText">Memeriksa ketersediaan topik forum dosen...</span>
+          <button type="button" class="btn-rescan-personal" id="btnRefreshFordisStatus">
             <span id="txtRefreshFordis">Periksa Ulang Seluruh Matkul</span>
           </button>
         </div>
 
-        <div class="table-container small-table" style="min-height: 280px; max-height: 420px; margin-top: 14px;">
-          <table class="modern-table">
+        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+          <table class="figma-table">
             <thead>
               <tr>
-                <th width="40">No</th>
-                <th>Mata Kuliah &amp; Dosen</th>
-                <th width="70">SKS</th>
-                <th width="100">Moda</th>
-                <th width="190">Status Fordis Dosen</th>
-                <th width="150">Status Posttest</th>
-                <th width="100">Aksi</th>
+                <th style="width: 35px;">NO</th>
+                <th>MATA KULIAH</th>
+                <th style="width: 70px; text-align: center;">SKS</th>
+                <th style="width: 110px; text-align: center;">MODA</th>
+                <th style="width: 140px; text-align: center;">FORDIS DOSEN</th>
+                <th style="width: 130px; text-align: center;">POSTTEST</th>
+                <th style="width: 100px; text-align: right;">AKSI</th>
               </tr>
             </thead>
             <tbody id="tableFordisStatusBody">
-              <tr>
-                <td colspan="7" class="text-center empty-cell">
-                  Pilih "Periksa Ulang" untuk memindai status terbaru dari MENTARI.
-                </td>
-              </tr>
+              <!-- Populated by app.js -->
             </tbody>
           </table>
         </div>
       </div>
-
       <div class="modal-footer">
-        <button id="btnCloseStatusFordisFooter" class="btn btn-ghost">Tutup</button>
+        <button type="button" class="btn-subtle" id="btnCloseStatusFordisFooter">Tutup</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL RANGKUMAN TUGAS PRIBADI (STATUS SAYA) -->
-  <div id="modalPersonalSummary" class="modal-overlay hidden">
-    <div class="modal-card modal-lg" style="max-width: 960px;">
+  <!-- ── MODAL TAMBAH MAHASISWA ─────────────────────────────────────────── -->
+  <div id="modalAddStudent" class="modal-backdrop hidden">
+    <div class="modal-dialog max-w-md">
       <div class="modal-header">
-        <div class="modal-header-left">
-          <div class="modal-icon-box" style="background: rgba(59, 130, 246, 0.18); color: #60a5fa;">
-            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <div class="flex-center gap-3">
+          <div class="settings-modal-icon">👤</div>
+          <div>
+            <h2 class="modal-title">Tambah Mahasiswa Baru</h2>
+            <p class="modal-subtitle">Daftarkan mahasiswa ke database kelas 05TPLE003</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" id="btnCloseAddStudent">&times;</button>
+      </div>
+      <div class="modal-body p-5 space-y-4">
+        <div>
+          <label class="form-label font-medium mb-1 block">NIM Mahasiswa *</label>
+          <input type="text" id="addStudentNim" class="figma-input w-full" placeholder="Contoh: 241011400123" required>
+        </div>
+        <div>
+          <label class="form-label font-medium mb-1 block">Nama Lengkap Mahasiswa *</label>
+          <input type="text" id="addStudentName" class="figma-input w-full" placeholder="Contoh: AHMAD MAULANA" required>
+        </div>
+        <div>
+          <label class="form-label font-medium mb-1 block">Nomor WhatsApp / HP</label>
+          <input type="text" id="addStudentPhone" class="figma-input w-full" placeholder="Contoh: 081234567890">
+          <span class="text-muted-xs" style="font-size: 11px; color: #64748b; margin-top: 4px; display: block;">Format otomatis disesuaikan ke awalan 628xx</span>
+        </div>
+        <div>
+          <label class="form-label font-medium mb-1 block">Tipe Status Keanggotaan</label>
+          <select id="addStudentType" class="figma-input w-full">
+            <option value="UTAMA">Mahasiswa Utama (Angkatan 2024 / Reguler)</option>
+            <option value="REVISI">Mahasiswa Revisi / Mengulang</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer flex justify-end gap-2 p-4 border-t border-slate-800">
+        <button type="button" class="btn-subtle" id="btnCancelAddStudent">Batal</button>
+        <button type="button" class="btn-figma-primary" id="btnSaveNewStudent" style="padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; background: #6366f1; color: #fff; border: none; cursor: pointer;">Simpan Mahasiswa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL EDIT MAHASISWA ───────────────────────────────────────────── -->
+  <div id="modalEditStudent" class="modal-backdrop hidden">
+    <div class="modal-dialog max-w-md">
+      <div class="modal-header">
+        <div class="flex-center gap-3">
+          <div class="settings-modal-icon">✏️</div>
+          <div>
+            <h2 class="modal-title">Edit Data Mahasiswa</h2>
+            <p class="modal-subtitle">Perbarui data nama, WhatsApp, atau status mahasiswa</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" id="btnCloseEditStudent">&times;</button>
+      </div>
+      <div class="modal-body p-5 space-y-4">
+        <div>
+          <label class="form-label font-medium mb-1 block">NIM Mahasiswa</label>
+          <input type="text" id="editStudentNim" class="figma-input w-full font-mono" readonly style="opacity: 0.7; background: rgba(15,23,42,0.6); cursor: not-allowed;">
+          <span class="text-muted-xs" style="font-size: 11px; color: #64748b; margin-top: 4px; display: block;">NIM adalah nomor identitas unik mahasiswa.</span>
+        </div>
+        <div>
+          <label class="form-label font-medium mb-1 block">Nama Lengkap Mahasiswa *</label>
+          <input type="text" id="editStudentName" class="figma-input w-full" placeholder="Nama Mahasiswa" required>
+        </div>
+        <div>
+          <label class="form-label font-medium mb-1 block">Nomor WhatsApp / HP</label>
+          <input type="text" id="editStudentPhone" class="figma-input w-full font-mono" placeholder="Contoh: 081234567890">
+          <span class="text-muted-xs" style="font-size: 11px; color: #64748b; margin-top: 4px; display: block;">Format otomatis disesuaikan ke awalan 628xx</span>
+        </div>
+        <div>
+          <label class="form-label font-medium mb-1 block">Tipe Status Keanggotaan</label>
+          <select id="editStudentType" class="figma-input w-full">
+            <option value="UTAMA">Mahasiswa Utama (Angkatan 2024 / Reguler)</option>
+            <option value="REVISI">Mahasiswa Revisi / Mengulang</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer flex justify-end gap-2 p-4 border-t border-slate-800">
+        <button type="button" class="btn-subtle" id="btnCancelEditStudent">Batal</button>
+        <button type="button" class="btn-figma-primary" id="btnSaveEditStudent" style="padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; background: #6366f1; color: #fff; border: none; cursor: pointer;">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. MODAL UNIFIED SETTINGS ─────────────────────────────────────────── -->
+  <div id="modalSettings" class="modal-backdrop hidden">
+    <div class="modal-dialog modal-dialog-settings">
+      <div class="modal-header">
+        <div class="flex-center gap-3">
+          <div class="settings-modal-icon">⚙️</div>
+          <div>
+            <h2 class="modal-title">Pengaturan Sistem &amp; Personalisasi Kelas</h2>
+            <p class="modal-subtitle">Atur nama kelas, deadline matkul, kalender pekan, format pesan, bot Telegram, dan sesi MENTARI</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" id="btnCloseSettings">&times;</button>
+      </div>
+
+      <!-- Settings Nav Tabs -->
+      <div class="settings-tabs-strip">
+        <button type="button" class="settings-tab-btn active" id="tabBtnClassSettings">Profil Kelas</button>
+        <button type="button" class="settings-tab-btn" id="tabBtnDeadlineSettings">Pengaturan Matkul</button>
+        <button type="button" class="settings-tab-btn" id="tabBtnWeeksSettings">Kalender Pekan</button>
+        <button type="button" class="settings-tab-btn" id="tabBtnTemplates">Format Template WA</button>
+        <button type="button" class="settings-tab-btn" id="tabBtnBot">Bot Telegram</button>
+        <button type="button" class="settings-tab-btn" id="tabBtnSchedule">Sesi MENTARI</button>
+      </div>
+
+      <div class="modal-body settings-body-scroll">
+        <!-- TAB 1: PROFIL KELAS -->
+        <div id="panelTabClassSettings" class="settings-panel active">
+          <div class="auto-detect-box mb-4">
+            <div>
+              <div class="text-sm font-semibold text-white">⚡ Deteksi Otomatis Kelas</div>
+              <div class="text-xs text-slate-400 mt-0.5">Tarik nama kelas, semester, dan daftar mata kuliah dari akun MENTARI yang sedang login</div>
+            </div>
+            <button type="button" class="btn-cek-status" id="btnAutoDetectClass">
+              <span id="txtAutoDetect">Deteksi dari MENTARI</span>
+            </button>
+          </div>
+
+          <div class="settings-section-card mb-4">
+            <div class="settings-section-title">Konfigurasi Kelas &amp; Kalender Akademik</div>
+            <div class="grid-2-form">
+              <div>
+                <label class="form-label">Nama / Kode Kelas</label>
+                <input type="text" id="inputClassName" class="figma-input" value="05TPLE003">
+                <span class="field-hint">Digunakan pada judul rekap WhatsApp &amp; dashboard.</span>
+              </div>
+              <div>
+                <label class="form-label">Kode Semester</label>
+                <input type="text" id="inputSemesterCode" class="figma-input" value="20261">
+                <span class="field-hint">Contoh: 20261 (Ganjil 2026/2027), 20262 (Genap).</span>
+              </div>
+              <div>
+                <label class="form-label">Tahun Akademik</label>
+                <input type="text" id="inputAcademicYear" class="figma-input" value="2026/2027">
+                <span class="field-hint">Tahun ajaran aktif perkuliahan (misal: 2026/2027).</span>
+              </div>
+              <div>
+                <label class="form-label">Tanggal Awal Semester (Pekan 1)</label>
+                <input type="date" id="inputStartDate" class="figma-input" value="2026-08-31">
+                <span class="field-hint">Tanggal patokan awal hitungan kalender Pekan 1.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section-card mb-4">
+            <div class="flex-between mb-2">
+              <div>
+                <div class="settings-section-title" style="margin-bottom: 2px;">Personalisasi Nama Akun Pengguna</div>
+                <div class="field-hint" style="margin-top: 0;">Nama yang tampil di pojok kanan atas &amp; draf pesan. Kosongkan untuk mengikuti akun MENTARI.</div>
+              </div>
+              <button type="button" class="btn-link-xs" id="btnUseMentariName" style="white-space: nowrap; margin-left: 12px;">⚡ Pakai Nama MENTARI</button>
+            </div>
+            <input type="text" id="inputUserCustomName" class="figma-input" placeholder="Otomatis dari profil akun MENTARI (misal: ATTHORIQ)">
+          </div>
+
+          <div class="settings-modal-footer">
+            <button type="button" class="btn-primary-action" id="btnSaveClassProfile">Simpan Profil Kelas</button>
+          </div>
+        </div>
+
+        <!-- TAB 2: DEADLINE MATKUL -->
+        <div id="panelTabDeadlineSettings" class="settings-panel hidden">
+          <div class="flex-between mb-3">
+            <div>
+              <span class="field-label-sm" style="font-weight: 700; letter-spacing: 0.05em; color: #38bdf8;">PENGATURAN KELOMPOK, SKS &amp; DEADLINE MATKUL</span>
+              <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Atur kelompok daring/luring, bobot SKS, serta batas waktu pengumpulan tugas untuk setiap mata kuliah.</div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button type="button" class="btn-link-xs" id="btnSetAllFriday" title="Setel semua mata kuliah ke Jumat 23:59 WIB">⚡ Semua: Jumat 23:59</button>
+              <button type="button" class="btn-link-xs" id="btnSetAllSaturday" title="Setel semua mata kuliah ke Sabtu 23:59 WIB">⚡ Semua: Sabtu 23:59</button>
+            </div>
+          </div>
+
+          <div class="table-responsive mb-4 settings-table-scroll">
+            <table class="figma-table">
+              <thead>
+                <tr>
+                  <th style="width: 28%;">Mata Kuliah</th>
+                  <th style="width: 20%;">Kelompok / Pola</th>
+                  <th style="width: 13%; text-align: center;">Bobot SKS</th>
+                  <th style="width: 14%;">Hari Deadline</th>
+                  <th style="width: 12%;">Jam Batas</th>
+                  <th style="width: 13%; text-align: center;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="tableCourseDeadlinesBody"></tbody>
+            </table>
+          </div>
+
+          <div class="settings-modal-footer">
+            <button type="button" class="btn-primary-action" id="btnSaveDeadlinesSettings">Simpan Pengaturan Matkul</button>
+          </div>
+        </div>
+
+        <!-- TAB 3: KALENDER PEKAN -->
+        <div id="panelTabWeeksSettings" class="settings-panel hidden">
+          <div class="flex-between mb-3">
+            <div>
+              <span class="field-label-sm" style="font-weight: 700; letter-spacing: 0.05em; color: #94a3b8;">SINKRONISASI LABEL PEKAN PEMBELAJARAN</span>
+              <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Penamaan label rentang tanggal untuk setiap pekan perkuliahan.</div>
+            </div>
+            <button type="button" class="btn-link-xs" id="btnRecalculateWeeks">⚡ Hitung Ulang dari Tanggal Awal</button>
+          </div>
+
+          <div class="table-responsive mb-4 settings-table-scroll">
+            <table class="figma-table">
+              <tbody id="tableWeeksSettingsBody"></tbody>
+            </table>
+          </div>
+
+          <div class="settings-modal-footer">
+            <button type="button" class="btn-primary-action" id="btnSaveWeeksSettings">Simpan Label Pekan</button>
+          </div>
+        </div>
+
+        <!-- TAB 3: FORMAT TEMPLATE WA -->
+        <div id="panelTabTemplates" class="settings-panel hidden">
+          <div class="flex-between mb-2">
+            <label class="form-label">Pilih Jenis Template</label>
+            <button type="button" class="btn-subtle btn-xs" id="btnResetTemplate">Reset Format Baku</button>
+          </div>
+          <div class="select-wrapper mb-3">
+            <select id="selectTemplateType" class="figma-input">
+              <option value="grup_utama">📢 Rekap Seluruh Matkul (Grup Utama)</option>
+              <option value="grup_matkul">📚 Rekap Per Mata Kuliah (Grup Matkul)</option>
+            </select>
+          </div>
+
+          <div class="mb-2 text-xs text-slate-400">Klik tag untuk menyisipkan variabel:</div>
+          <div class="template-tags-row mb-3">
+            <button type="button" class="tag-insert-btn" data-tag="{NAMA_KELAS}">{NAMA_KELAS}</button>
+            <button type="button" class="tag-insert-btn" data-tag="{PEKAN}">{PEKAN}</button>
+            <button type="button" class="tag-insert-btn" data-tag="{DEADLINE}">{DEADLINE}</button>
+            <button type="button" class="tag-insert-btn" data-tag="{LIST_MATKUL_DARING}">{LIST_MATKUL_DARING}</button>
+            <button type="button" class="tag-insert-btn" data-tag="{LIST_FORDIS_BELUM_BUKA}">{LIST_FORDIS_BELUM_BUKA}</button>
+          </div>
+
+          <textarea id="txtTemplateEditor" rows="7" class="figma-textarea mb-3"></textarea>
+
+          <div class="mb-3">
+            <label class="form-label">Format Sebutan Mahasiswa di Pesan WhatsApp</label>
+            <select id="selectMentionFormat" class="figma-input">
+              <option value="format1">Nomor HP + Nama: @628xxx(Nama Mahasiswa) &mdash; (Link wa.me chat)</option>
+              <option value="format2">Nama saja (tanpa nomor)</option>
+              <option value="format3">NIM + Nama</option>
+            </select>
+            <span class="field-hint">💡 Catatan: WhatsApp membatasi teks hasil paste dari clipboard agar tidak otomatis men-tag member</span>
+          </div>
+
+          <div class="settings-modal-footer">
+            <button type="button" class="btn-primary-action" id="btnSaveTemplates">Simpan Format Template</button>
+          </div>
+        </div>
+
+        <!-- TAB 4: BOT TELEGRAM -->
+        <div id="panelTabBot" class="settings-panel hidden">
+          <div class="auto-detect-box mb-4">
+            <div class="flex-center gap-2">
+              <span class="status-dot-emerald" id="botStatusDot"></span>
+              <span class="text-sm font-semibold text-white" id="botStatusLabel">Bot Aktif &mdash; polling Telegram</span>
+            </div>
+            <div class="flex-center gap-2">
+              <button type="button" class="btn-subtle btn-xs" id="btnBotStart">Aktifkan</button>
+              <button type="button" class="btn-subtle btn-xs" id="btnBotStop" style="color: #f87171;">Matikan</button>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Telegram Bot Token</label>
+            <input type="password" id="teleBotToken" class="figma-input" placeholder="123456789:ABCdefGHIjklMNOpqrSTUvwxYZ">
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Chat ID Anda (dari @userinfobot)</label>
+            <input type="text" id="teleChatId" class="figma-input" placeholder="Contoh: 1204098771">
+          </div>
+
+          <div class="settings-modal-footer flex-between">
+            <button type="button" class="btn-subtle" id="btnTestTelegram">Tes Kirim Pesan</button>
+            <button type="button" class="btn-primary-action" id="btnSaveTelegram">Simpan &amp; Terapkan</button>
+          </div>
+        </div>
+
+        <!-- TAB 6: SESI MENTARI -->
+        <div id="panelTabSchedule" class="settings-panel hidden">
+          <div class="auto-detect-box mb-4" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 260px;">
+              <div class="text-sm font-semibold text-white" style="display: flex; align-items: center; gap: 8px;">
+                <span>Status Sesi MENTARI:</span>
+                <span class="pill-badge pill-green" id="sessionStatusDetail" style="font-size: 11px; padding: 2px 8px; border-radius: 6px;">Online (Aktif)</span>
+              </div>
+              <div class="text-xs text-slate-400 mt-1" style="line-height: 1.4;">Sesi MENTARI disimpan aman secara lokal. Anda dapat memperbarui via browser login atau tes koneksi langsung.</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+              <button type="button" class="btn-export" id="btnTestMentariConn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); color: #f1f5f9; transition: all 0.15s;">
+                <span>⚡</span>
+                <span>Tes Koneksi</span>
+              </button>
+              <button type="button" class="btn-figma-primary" id="btnModalReconnect" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; background: #6366f1; color: #ffffff; border: none; transition: all 0.15s; margin: 0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                <span>Perbarui Sesi (Login)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Manual Token Box -->
+          <div class="p-4 bg-sub rounded-lg border-sub mb-4">
+            <div class="flex-between mb-2">
+              <span class="text-xs font-semibold text-slate-200">🔑 Input Token MENTARI Manual (Alternatif Bebas Cloudflare)</span>
+              <button type="button" class="btn-link-xs" id="btnSaveManualToken">Simpan Token</button>
+            </div>
+            <p class="text-xs text-slate-400 mb-2">Jika Cloudflare Turnstile memblokir browser otomasi, Anda bisa login sekali di browser Chrome biasa, buka Console / Application &gt; Local Storage &gt; <code>token</code>, lalu tempel token di bawah:</p>
+            <input type="text" id="inputManualMentariToken" class="figma-input font-mono text-xs" placeholder="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+          </div>
+
+          <div class="p-4 bg-sub rounded-lg border-sub mb-4">
+            <div class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Matriks Perkuliahan Kelas 05TPLE003 (Reguler CS)</div>
+            <div class="grid-2-form text-xs text-slate-400 leading-relaxed">
+              <div>
+                <strong class="text-white">Kelompok I [E-1]</strong><br>
+                &bull; Pekan 1-7: Tatap Muka (Luring R. V.619)<br>
+                &bull; Pekan 8: UTS Luring<br>
+                &bull; Pekan 8-14: E-Learning Daring (MENTARI)<br>
+                &bull; UAS: Daring MENTARI
+              </div>
+              <div>
+                <strong class="text-white">Kelompok II [E-2]</strong><br>
+                &bull; Pekan 1-7: E-Learning Daring (MENTARI)<br>
+                &bull; Pekan 8: UTS Daring MENTARI<br>
+                &bull; Pekan 8-14: Tatap Muka (Luring R. V.619)<br>
+                &bull; UAS: Luring R. V.619
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-modal-footer">
+            <button type="button" class="btn-subtle" id="btnCloseSettingsFooter">Tutup</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. MODAL CHANGELOG & VERSI ─────────────────────────────────────────── -->
+  <div id="modalChangelog" class="modal-backdrop hidden">
+    <div class="modal-dialog modal-dialog-changelog" style="max-width: 580px;">
+      <div class="modal-header">
+        <div class="flex-center gap-3">
+          <div class="settings-modal-icon" style="background: rgba(99, 102, 241, 0.15); color: #818cf8;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
           </div>
           <div>
-            <h3 class="modal-title">Rangkuman Tugas Pribadi (Status Saya)</h3>
-            <p class="modal-subtitle">Pantau status pengerjaan Fordis, Penugasan Terstruktur, dan Posttest Anda di seluruh mata kuliah aktif.</p>
-          </div>
-        </div>
-        <button id="btnClosePersonalSummary" class="btn-icon-close">&times;</button>
-      </div>
-
-      <div class="modal-body" style="padding: 18px 22px;">
-        <!-- CONTROLS & MAHASISWA SELECTOR -->
-        <div class="personal-controls-bar" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; background: rgba(15, 23, 42, 0.75); padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 16px;">
-          <div style="flex: 2; min-width: 260px;">
-            <label style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Pilih Akun Mahasiswa:</label>
-            <div class="select-wrapper">
-              <select id="selectPersonalStudent" class="form-control" style="background: #1e293b; color: #f8fafc; font-size: 13px; font-weight: 600; border-color: rgba(59, 130, 246, 0.4);">
-                <!-- Populated via JS -->
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h2 class="modal-title">Catatan Rilis</h2>
+              <span class="badge-app-version" style="font-size: 11px;">v1.2.1</span>
             </div>
-          </div>
-          <div style="flex: 1; min-width: 150px;">
-            <label style="display: block; font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Pekan Akademik:</label>
-            <div class="select-wrapper">
-              <select id="selectPersonalWeek" class="form-control" style="background: #1e293b; color: #f8fafc; font-size: 13px; font-weight: 600; border-color: rgba(59, 130, 246, 0.4);">
-                <!-- Populated via JS -->
-              </select>
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <button id="btnRefreshPersonal" class="btn btn-primary btn-sm" title="Scan ulang seluruh mata kuliah">
-              <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
-              <span>Scan Ulang</span>
-            </button>
-            <button id="btnCopyPersonalSummary" class="btn btn-ghost btn-sm" title="Salin checklist status tugas pribadi">
-              <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              <span>Salin Checklist</span>
-            </button>
+            <p class="modal-subtitle">Riwayat pembaruan fitur dan perbaikan sistem TugasKu</p>
           </div>
         </div>
-
-        <!-- STAT MINI CARDS -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 16px;">
-          <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px 14px;">
-            <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">TOTAL MATKUL</div>
-            <div id="personalTotalCourses" style="font-size: 22px; font-weight: 700; color: #f8fafc; margin-top: 4px;">0</div>
-          </div>
-          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 12px 14px;">
-            <div style="font-size: 11px; color: #34d399; font-weight: 600;">SELESAI LENGKAP</div>
-            <div id="personalDoneCourses" style="font-size: 22px; font-weight: 700; color: #10b981; margin-top: 4px;">0</div>
-          </div>
-          <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 12px 14px;">
-            <div style="font-size: 11px; color: #f87171; font-weight: 600;">PERLU DIKERJAKAN</div>
-            <div id="personalPendingCourses" style="font-size: 22px; font-weight: 700; color: #ef4444; margin-top: 4px;">0</div>
-          </div>
-          <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 12px 14px;">
-            <div style="font-size: 11px; color: #fbbf24; font-weight: 600;">DEADLINE HARI INI</div>
-            <div id="personalTodayDeadlineCount" style="font-size: 22px; font-weight: 700; color: #f59e0b; margin-top: 4px;">0</div>
-          </div>
-        </div>
-
-        <!-- PERSONAL TABLE -->
-        <div class="table-container small-table" style="min-height: 260px; max-height: 420px; overflow-y: auto;">
-          <table class="modern-table">
-            <thead>
-              <tr>
-                <th width="35">No</th>
-                <th>Mata Kuliah &amp; Dosen</th>
-                <th width="150">Deadline</th>
-                <th width="140">Forum Diskusi</th>
-                <th width="130">Penugasan</th>
-                <th width="120">Posttest</th>
-                <th width="120">Status Saya</th>
-                <th width="75">Aksi</th>
-              </tr>
-            </thead>
-            <tbody id="tablePersonalBody">
-              <tr>
-                <td colspan="8" class="text-center empty-cell">
-                  Memuat data status tugas...
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <button type="button" class="btn-modal-close" id="btnCloseChangelog">&times;</button>
       </div>
-
-      <div class="modal-footer" style="padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;">
-        <div id="personalSummaryFooterNote" style="font-size: 12px; color: #94a3b8;">
-          💡 <em>Pastikan Anda menyelesaikan Fordis (min 2x reply), Penugasan Terstruktur, dan Posttest sebelum deadline.</em>
+      <div class="modal-body settings-body-scroll" style="padding: 20px; max-height: 480px;">
+        
+        <!-- Versi 1.2.1 -->
+        <div class="changelog-release-card">
+          <div class="changelog-release-header">
+            <div class="changelog-version-tag">
+              <span class="version-dot"></span>
+              <span class="version-name">v1.2.1</span>
+              <span class="version-badge-latest">Rilis Saat Ini</span>
+            </div>
+            <div class="changelog-date">25 September 2026</div>
+          </div>
+          <ul class="changelog-list">
+            <li>
+              <strong>Auto-scan Rangkuman Pribadi:</strong> Membuka tab Rangkuman Pribadi kini otomatis memindai seluruh mata kuliah pekan aktif secara langsung tanpa perlu klik manual.
+            </li>
+            <li>
+              <strong>Sakelar Nomor HP pada Draft:</strong> Tombol toggle di header draft untuk memilih mencantumkan nomor HP (@628...) atau nama mahasiswa bersih.
+            </li>
+            <li>
+              <strong>Sakelar Nomor Urut pada Draft:</strong> Tombol toggle untuk memilih format baris nomor urut (1, 2, 3) atau format tanda bullet (•).
+            </li>
+            <li>
+              <strong>Indikator Pemindaian Dinamis:</strong> Tampilan status pemindaian real-time pada tabel rangkuman saat data sedang dimutakhirkan.
+            </li>
+          </ul>
         </div>
-        <button id="btnClosePersonalSummaryFooter" class="btn btn-ghost">Tutup</button>
+
+        <!-- Versi 1.2.0 -->
+        <div class="changelog-release-card">
+          <div class="changelog-release-header">
+            <div class="changelog-version-tag">
+              <span class="version-dot inactive"></span>
+              <span class="version-name">v1.2.0</span>
+            </div>
+            <div class="changelog-date">21 September 2026</div>
+          </div>
+          <ul class="changelog-list">
+            <li>
+              <strong>Auto-scan saat ganti mata kuliah:</strong> Draf grup matkul langsung memindai otomatis saat memilih mata kuliah atau pertemuan baru.
+            </li>
+            <li>
+              <strong>Status kuesioner pribadi:</strong> Menampilkan status pengisian kuesioner pada tabel Rangkuman Pribadi untuk kelengkapan absensi valid (Fordis, Penugasan, Posttest, Kuesioner).
+            </li>
+            <li>
+              <strong>Penamaan ekspor CSV dinamis:</strong> Nama berkas dan lembar kerja Excel disesuaikan dengan kode kelas aktif (misal <code>Data_Mahasiswa_05TPLE001.csv</code>).
+            </li>
+            <li>
+              <strong>Indikator versi sistem:</strong> Menampilkan nomor versi pada sidebar serta riwayat pembaruan untuk verifikasi rilis.
+            </li>
+            <li>
+              <strong>Sinkronisasi akun lintas kelas:</strong> Daftar mata kuliah diperbarui otomatis dari LMS MENTARI saat login dengan akun baru.
+            </li>
+            <li>
+              <strong>Kompatibilitas format Excel:</strong> Pemisah kolom terstandarisasi dengan UTF-8 BOM dan pencegahan konversi NIM ke notasi ilmiah.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Versi 1.1.0 -->
+        <div class="changelog-release-card">
+          <div class="changelog-release-header">
+            <div class="changelog-version-tag">
+              <span class="version-dot inactive"></span>
+              <span class="version-name">v1.1.0</span>
+            </div>
+            <div class="changelog-date">20 September 2026</div>
+          </div>
+          <ul class="changelog-list">
+            <li>
+              <strong>Pengaturan kelompok daring/luring:</strong> Penyesuaian jadwal daring dan tatap muka per mata kuliah di panel pengaturan.
+            </li>
+            <li>
+              <strong>Masking kredensial:</strong> Perlindungan token bot Telegram pada antarmuka pengaturan dan skrip ekspor bersih <code>npm run export:clean</code>.
+            </li>
+            <li>
+              <strong>Integrasi browser Chrome lokal:</strong> Menggunakan instance Google Chrome terpasang untuk mengurangi kebutuhan unduhan biner terpisah.
+            </li>
+          </ul>
+        </div>
+
+        <!-- Versi 1.0.0 -->
+        <div class="changelog-release-card">
+          <div class="changelog-release-header">
+            <div class="changelog-version-tag">
+              <span class="version-dot inactive"></span>
+              <span class="version-name">v1.0.0</span>
+            </div>
+            <div class="changelog-date">Awal September 2026</div>
+          </div>
+          <ul class="changelog-list">
+            <li>
+              <strong>Rilis awal:</strong> Pemindai keaktifan forum dan posttest LMS MENTARI, penanganan sesi browser, draf pesan WhatsApp kelas, dan notifikasi bot Telegram.
+            </li>
+          </ul>
+        </div>
+
+      </div>
+      <div class="modal-footer flex justify-between items-center p-4 border-t border-slate-800" style="background: rgba(15, 23, 42, 0.6);">
+        <div class="text-xs text-slate-400">TugasKu &bull; Sistem Pemantauan LMS MENTARI</div>
+        <button type="button" class="btn-subtle" id="btnCloseChangelogFooter">Tutup</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL QUICK EDIT DEADLINE PER MATKUL -->
-  <div id="modalQuickDeadline" class="modal-overlay hidden">
-    <div class="modal-card modal-sm" style="max-width: 480px;">
-      <div class="modal-header">
-        <div class="modal-header-left">
-          <div class="modal-icon-box" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">⏰</div>
-          <div>
-            <h3 class="modal-title">Atur Deadline Mata Kuliah</h3>
-            <p class="modal-subtitle" id="quickDeadlineCourseName">Nama Mata Kuliah</p>
-          </div>
-        </div>
-        <button type="button" id="btnCloseQuickDeadline" class="btn-icon-close">&times;</button>
-      </div>
-      <div class="modal-body" style="padding: 18px 22px;">
-        <div class="form-group">
-          <label style="font-weight: 700; color: #f1f5f9; margin-bottom: 8px;">Pilihan Batas Waktu:</label>
-          <div style="display: flex; flex-direction: column; gap: 10px; background: rgba(15, 23, 42, 0.6); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.06);">
-            <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; color: #cbd5e1;">
-              <input type="radio" name="radioQuickDeadlineType" id="radioDeadlineDefault" value="default" checked>
-              <span>Ikuti Default Kelas (<strong id="quickDefaultDeadlineLabel" style="color: #38bdf8;">Jumat, 23:59 WIB</strong>)</span>
-            </label>
-            <label style="display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; color: #cbd5e1;">
-              <input type="radio" name="radioQuickDeadlineType" id="radioDeadlineCustom" value="custom">
-              <span>Deadline Khusus untuk Matkul Ini:</span>
-            </label>
-          </div>
-        </div>
-
-        <div id="quickCustomDeadlineFields" style="display: none; margin-top: 14px;">
-          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <div class="form-group" style="margin-bottom: 0;">
-              <label for="quickDeadlineDay">Hari Batas</label>
-              <select id="quickDeadlineDay" class="form-control">
-                <option value="Senin">Senin</option>
-                <option value="Selasa">Selasa</option>
-                <option value="Rabu">Rabu</option>
-                <option value="Kamis">Kamis</option>
-                <option value="Jumat">Jumat</option>
-                <option value="Sabtu">Sabtu</option>
-                <option value="Minggu">Minggu</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <label for="quickDeadlineTime">Jam Batas</label>
-              <input type="text" id="quickDeadlineTime" class="form-control" placeholder="23:59 WIB" value="23:59 WIB">
-            </div>
-          </div>
-          <div style="display: flex; gap: 6px; margin-top: 10px; align-items: center;">
-            <span style="font-size: 10.5px; color: #64748b;">Preset:</span>
-            <button type="button" class="btn btn-ghost btn-xs btn-preset-deadline" data-day="Jumat" data-time="23:59 WIB">Jumat 23:59</button>
-            <button type="button" class="btn btn-ghost btn-xs btn-preset-deadline" data-day="Sabtu" data-time="23:59 WIB">Sabtu 23:59</button>
-            <button type="button" class="btn btn-ghost btn-xs btn-preset-deadline" data-day="Minggu" data-time="23:59 WIB">Minggu 23:59</button>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer" style="display: flex; justify-content: space-between;">
-        <button type="button" id="btnResetQuickDeadline" class="btn btn-ghost btn-sm" style="color: #f87171;">Kembalikan ke Default</button>
-        <div style="display: flex; gap: 8px;">
-          <button type="button" id="btnCancelQuickDeadline" class="btn btn-ghost">Batal</button>
-          <button type="button" id="btnSaveQuickDeadline" class="btn btn-primary">Simpan Deadline</button>
-        </div>
-      </div>
-    </div>
+  <!-- ── 6. TOAST NOTIFICATION ─────────────────────────────────────────────── -->
+  <div id="toast" class="figma-toast hidden">
+    <div class="toast-indicator"></div>
+    <span id="toastMsg">Pemberitahuan TugasKu</span>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="toast-popup hidden">
-    <svg class="icon icon-sm text-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-    </svg>
-    <span id="toastMsg">Teks berhasil disalin.</span>
+  <!-- ── 6. HIDDEN BACKWARDS COMPATIBILITY REPOSITORY ──────────────────────── -->
+  <!-- Keeps elements that app.js queries/binds to prevent any JavaScript runtime errors -->
+  <div style="display: none !important;" aria-hidden="true" id="legacyCompatStore">
+    <button id="btnMenuToggle"></button>
+    <button id="btnBannerReconnect"></button>
+    <button id="btnClearSearch"></button>
+    <button id="btnNamesOn"></button>
+    <button id="btnNamesOff"></button>
+    <button id="btnScanAll"></button>
+    <button id="btnViewDashboard"></button>
+    <button id="btnViewMonitoring"></button>
+    <button id="btnViewSchedule"></button>
+    <button id="btnViewStudents"></button>
+    <button id="btnQuickGoMonitoring"></button>
+    <button id="btnViewAllPending"></button>
+    <button id="btnViewPersonalSummary"></button>
+    <button id="btnClosePersonalSummary"></button>
+    <button id="btnClosePersonalSummaryFooter"></button>
+    <button id="btnCopyPersonalSummary"></button>
+    <button id="btnCloseQuickDeadline"></button>
+    <button id="btnCancelQuickDeadline"></button>
+    <button id="btnSaveQuickDeadline"></button>
+    <button id="btnResetQuickDeadline"></button>
+    <button id="btnResetAllDeadlines"></button>
+    <button id="btnBotTrigger"></button>
+    <button id="tabPendingRevisi"></button>
+    <input type="radio" id="radioDeadlineDefault" name="legacy_deadline">
+    <input type="radio" id="radioDeadlineCustom" name="legacy_deadline">
+    <select id="selectDraftIncludeNames"></select>
+    <select id="selectPersonalStudent"></select>
+    <select id="selectDeadlineDay"><option value="Jumat" selected>Jumat</option></select>
+    <input type="text" id="inputDeadlineTime" value="23:59 WIB">
+    <button id="tabBtnContacts"></button>
+    <div id="panelTabContacts"></div>
+    <input type="text" id="newStudentNim">
+    <input type="text" id="newStudentName">
+    <input type="text" id="newStudentPhone">
+    <button id="btnAddNewStudent"></button>
+    <input type="text" id="searchContactInput">
+    <button id="btnAutoFormatAll"></button>
+    <div id="contactsListContainer"></div>
+    <button id="btnSaveContacts"></button>
+    <span id="scanAllBtnText"></span>
+    <span id="tabCountRevisi"></span>
+    <span id="middlePanelTitle"></span>
+    <span id="deadlineTitle"></span>
+    <span id="deadlineSub"></span>
+    <span id="botActiveWeekLabel"></span>
+    <span id="quickFordisBadge"></span>
+    <span id="quickFordisTitle"></span>
+    <span id="quickFordisDesc"></span>
+    <span id="pillCourseDeadline"></span>
+    <span id="textCourseDeadline"></span>
+    <span id="quickDefaultDeadlineLabel"></span>
+    <span id="quickDeadlineCourseName"></span>
+    <span id="quickDeadlineDay"></span>
+    <span id="quickDeadlineTime"></span>
+    <span id="quickCustomDeadlineFields"></span>
+    <span id="badgeMonitoringPending"></span>
+    <span id="badgeTotalStudents"></span>
+    <span id="infoKelompokPill"></span>
+    <span id="infoRuangPill"></span>
+    <span id="infoTotalUtama"></span>
+    <span id="numPendingPost"></span>
+    <span id="numDonePost"></span>
+    <span id="labelStatusFordis"></span>
+    <span id="labelStatusAssignment"></span>
+    <span id="labelStatusPosttest"></span>
+    <span id="dotFordis"></span>
+    <span id="dotAssignment"></span>
+    <span id="dotPosttest"></span>
+    <span id="chipTagsList"></span>
+    <span id="meetingBtnGroup"></span>
+    <span id="reconnectBanner"></span>
+    <div id="modalPersonalSummary"></div>
+    <div id="modalQuickDeadline"></div>
+    <div id="templateLivePreviewContent"></div>
+    <div id="draftMatkulTitleDisplay"></div>
+    <div id="draftMatkulSubDisplay"></div>
+    <div id="progressPost"></div>
+    <div id="progressForum"></div>
+    <div id="progressAsg"></div>
+    <div id="metricPostPct"></div>
+    <div id="metricForumPct"></div>
+    <div id="metricAsgPct"></div>
+    <button id="btnRefreshScan"></button>
+    <div id="deadlinePill"></div>
+    <div id="forumTopicsHint"></div>
+    <div id="pillStatusAssignment"></div>
+    <div id="fordisAlertBanner"></div>
+    <div id="fordisAlertTitle"></div>
+    <div id="fordisAlertDesc"></div>
+    <button id="tabPendingPost"></button>
+    <button id="tabDonePost"></button>
+    <button id="tabPendingForum"></button>
+    <button id="tabDoneForum"></button>
+    <button id="tabPendingAsg"></button>
   </div>
 
   <script src="app.js"></script>

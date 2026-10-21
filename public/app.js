@@ -17,7 +17,7 @@ let activeMiddleTab = "posttest"; // "posttest" | "forum" | "assignment" | "revi
 let activeFilter = "ALL";
 let currentSearchQuery = "";
 let currentPage = 1;
-const pageSize = 10;
+const pageSize = Infinity; // Tampilkan semua mahasiswa tanpa pagination
 let currentClassSettings = {
   class_name: "05TPLE003",
   user_custom_name: "",
@@ -46,13 +46,26 @@ let currentClassSettings = {
     "12": "Pekan 12 (23 Nov - 28 Nov 2026)",
     "13": "Pekan 13 (30 Nov - 5 Des 2026)",
     "14": "Pekan 14 (7 Des - 12 Des 2026)",
-    "15": "Pekan 15 (14 Des - 19 Des 2026)",
-    "UAS": "Pekan UAS (21 Des - 26 Des 2026)",
-    "16": "Pekan 16 (28 Des 2026 - 2 Jan 2027)"
+    "UAS": "Pekan UAS (14 Des - 19 Des 2026)"
   }
 };
 
 let WEEK_NAMES = { ...currentClassSettings.weeks };
+
+const WEEK_MEETINGS_BY_SKS = {
+  "2": {
+    "1": [1], "2": [2], "3": [3], "4": [4], "5": [5], "6": [6], "7": [7],
+    "UTS": [8], "8": [8], "9": [9], "10": [10], "11": [11], "12": [12], "13": [13], "14": [14], "UAS": [14]
+  },
+  "3": {
+    "1": [1], "2": [2, 3], "3": [4], "4": [5, 6], "5": [7], "6": [8, 9], "7": [10],
+    "UTS": [10], "8": [11, 12], "9": [13], "10": [14, 15], "11": [16], "12": [17, 18], "13": [19], "14": [20, 21], "UAS": [21]
+  },
+  "4": {
+    "1": [1, 2], "2": [3, 4], "3": [5, 6], "4": [7, 8], "5": [9, 10], "6": [11, 12], "7": [13, 14],
+    "UTS": [14], "8": [15, 16], "9": [17, 18], "10": [19, 20], "11": [21, 22], "12": [23, 24], "13": [25, 26], "14": [27, 28], "UAS": [28]
+  }
+};
 
 function getCurrentSemesterWeek(startDateStr = null) {
   const startStr = startDateStr || currentClassSettings?.semester_start_date || "2026-08-31";
@@ -66,11 +79,11 @@ function getCurrentSemesterWeek(startDateStr = null) {
 
   const offsetToWeek = {
     0: "1", 1: "2", 2: "3", 3: "4", 4: "5", 5: "6", 6: "7",
-    7: "UTS", 8: "8", 9: "9", 10: "10", 11: "11", 12: "12", 13: "13", 14: "14", 15: "15",
-    16: "UAS", 17: "16"
+    7: "UTS", 8: "8", 9: "9", 10: "10", 11: "11", 12: "12", 13: "13", 14: "14",
+    15: "UAS"
   };
 
-  return offsetToWeek[diffWeeks] || (diffWeeks > 17 ? "16" : "1");
+  return offsetToWeek[diffWeeks] || (diffWeeks > 15 ? "UAS" : "1");
 }
 
 // ── DOM References ─────────────────────────────────────────────────────────
@@ -92,6 +105,7 @@ if (selectWeek) {
 }
 const selectCourse = document.getElementById("selectCourse");
 const selectSection = document.getElementById("selectSection");
+const selectSectionMon = document.getElementById("selectSectionMon");
 const badgeMode = document.getElementById("badgeMode");
 const meetingBtnGroup = document.getElementById("meetingBtnGroup");
 const infoRuangPill = document.getElementById("infoRuangPill");
@@ -128,17 +142,21 @@ const metricProblemSub = document.getElementById("metricProblemSub");
 const metricTotalUtama = document.getElementById("metricTotalUtama");
 
 // Middle Tabbed Table
+const tabAllMon = document.getElementById("tabAllMon");
 const tabPendingPost = document.getElementById("tabPendingPost");
 const tabDonePost = document.getElementById("tabDonePost");
 const tabPendingForum = document.getElementById("tabPendingForum");
 const tabDoneForum = document.getElementById("tabDoneForum");
 const tabPendingAsg = document.getElementById("tabPendingAsg");
+const tabCompleteMon = document.getElementById("tabCompleteMon");
 const tabPendingRevisi = document.getElementById("tabPendingRevisi");
+const tabCountAll = document.getElementById("tabCountAll");
 const tabCountPost = document.getElementById("tabCountPost");
 const tabCountDonePost = document.getElementById("tabCountDonePost");
 const tabCountForum = document.getElementById("tabCountForum");
 const tabCountDoneForum = document.getElementById("tabCountDoneForum");
 const tabCountAsg = document.getElementById("tabCountAsg");
+const tabCountComplete = document.getElementById("tabCountComplete");
 const tabCountRevisi = document.getElementById("tabCountRevisi");
 const middlePanelTitle = document.getElementById("middlePanelTitle");
 const viewAllCount = document.getElementById("viewAllCount");
@@ -155,9 +173,23 @@ const btnNamesOn = document.getElementById("btnNamesOn");
 const btnNamesOff = document.getElementById("btnNamesOff");
 const draftNamesToggleGroup = document.getElementById("draftNamesToggleGroup");
 let waIncludeStudentNames = localStorage.getItem("tugasku_draft_include_names") !== "false";
+let waIncludePhoneNumbers = localStorage.getItem("tugasku_draft_include_phones") !== "false";
+let waIncludeNumbering = localStorage.getItem("tugasku_draft_include_numbering") !== "false";
 
 // Students Table & Filters
 const searchStudent = document.getElementById("searchStudent");
+const searchMasterStudent = document.getElementById("searchMasterStudent");
+const btnOpenAddStudent = document.getElementById("btnOpenAddStudent");
+const modalAddStudent = document.getElementById("modalAddStudent");
+const btnCloseAddStudent = document.getElementById("btnCloseAddStudent");
+const btnCancelAddStudent = document.getElementById("btnCancelAddStudent");
+const btnSaveNewStudent = document.getElementById("btnSaveNewStudent");
+const addStudentNim = document.getElementById("addStudentNim");
+const addStudentName = document.getElementById("addStudentName");
+const addStudentPhone = document.getElementById("addStudentPhone");
+const addStudentType = document.getElementById("addStudentType");
+let masterStudentSearchQuery = "";
+
 const btnClearSearch = document.getElementById("btnClearSearch");
 const filterChips = document.querySelectorAll(".chip");
 const filterAllCount = document.getElementById("filterAllCount");
@@ -186,6 +218,7 @@ const deadlineSub = document.getElementById("deadlineSub");
 
 // Settings Modal Tabs
 const tabBtnClassSettings = document.getElementById("tabBtnClassSettings");
+const tabBtnDeadlineSettings = document.getElementById("tabBtnDeadlineSettings");
 const tabBtnWeeksSettings = document.getElementById("tabBtnWeeksSettings");
 const tabBtnTemplates = document.getElementById("tabBtnTemplates");
 const tabBtnBot = document.getElementById("tabBtnBot");
@@ -194,6 +227,7 @@ const tabBtnSchedule = document.getElementById("tabBtnSchedule");
 
 // Settings Modal Panels
 const panelTabClassSettings = document.getElementById("panelTabClassSettings");
+const panelTabDeadlineSettings = document.getElementById("panelTabDeadlineSettings");
 const panelTabWeeksSettings = document.getElementById("panelTabWeeksSettings");
 const panelTabTemplates = document.getElementById("panelTabTemplates");
 const panelTabBot = document.getElementById("panelTabBot");
@@ -295,6 +329,25 @@ async function init() {
     const cntData = await cntRes.json();
     classContacts = cntData.contacts || cntData || {};
 
+    // Inisialisasi daftar mahasiswa default dari database kontak kelas (37 mahasiswa)
+    // Memastikan data mahasiswa selalu tampil instan tanpa menunggu scan online
+    if ((!currentStudentsList || currentStudentsList.length === 0) && classContacts && Object.keys(classContacts).length > 0) {
+      currentStudentsList = Object.keys(classContacts).map(nim => {
+        const item = classContacts[nim] || {};
+        return {
+          nim,
+          nama_mahasiswa: typeof item === "string" ? item : (item.nama || item.name || nim),
+          is_revisi: item.type === "REVISI",
+          posttest_status: "BELUM_MENGERJAKAN",
+          forum_status: "BELUM_MENGERJAKAN",
+          forum_reply_count: 0,
+          assignment_status: "BELUM_MENGUMPULKAN"
+        };
+      });
+      updateFilterCounts();
+      filterAndRenderStudentsTable();
+    }
+
     const setData = await setRes.json().catch(() => null);
     if (setData && setData.settings) {
       applyClassSettings(setData.settings);
@@ -306,6 +359,7 @@ async function init() {
       selectWeek.value = activeWeekKey;
     }
 
+    populateWeeksDropdown();
     populateCoursesDropdown();
     syncWithSchedule();
     renderScheduleView();
@@ -330,37 +384,92 @@ function bindEvents() {
 
   // Course & Schedule Selects
   selectCourse.onchange = () => {
+    currentScanData = null; // Reset agar pill deadline hilang sampai scan baru selesai
     syncWithSchedule();
     startCountdown();
+    updateWaPreview(); // Langsung perbarui preview WA ke mode pemindaian matkul baru
     performScan();
   };
 
   selectWeek.onchange = () => {
+    currentScanData = null; // Reset agar pill deadline hilang sampai scan baru selesai
     scanAllResults = null;
     populateCoursesDropdown();
     syncWithSchedule();
     startCountdown();
+    updateWaPreview();
     performScan();
   };
 
-  selectSection.onchange = () => {
-    highlightActiveMeetingBtn(selectSection.value);
-    performScan();
-  };
+  if (selectSection) {
+    selectSection.onchange = () => {
+      if (selectSectionMon) selectSectionMon.value = selectSection.value;
+      highlightActiveMeetingBtn(selectSection.value);
+      updateWaPreview();
+      performScan();
+    };
+  }
 
-  btnScan.onclick = performScan;
-  btnScanAll.onclick = performScanAll;
-  btnRefreshScan.onclick = performScan;
+  if (selectSectionMon) {
+    selectSectionMon.onchange = () => {
+      if (selectSection) selectSection.value = selectSectionMon.value;
+      highlightActiveMeetingBtn(selectSectionMon.value);
+      updateWaPreview();
+      performScan();
+    };
+  }
+
+  // Inisialisasi styling dropdown modern (Pekan, Matkul, Pertemuan, dan seluruh Select)
+  setupCustomDropdown(selectWeek);
+  setupCustomDropdown(selectCourse);
+  setupCustomDropdown(selectSection);
+  setupCustomDropdown(selectSectionMon);
+  initAllCustomDropdowns();
+
+  if (btnScan) btnScan.onclick = performScan;
+  if (btnScanAll) btnScanAll.onclick = performScanAll;
+  if (btnRefreshScan) btnRefreshScan.onclick = performScan;
 
   // Middle Table Tabs
-  tabPendingPost.onclick = () => switchMiddleTab("posttest");
+  if (tabAllMon) tabAllMon.onclick = () => switchMiddleTab("all");
+  if (tabPendingPost) tabPendingPost.onclick = () => switchMiddleTab("posttest");
   if (tabDonePost) tabDonePost.onclick = () => switchMiddleTab("done_posttest");
-  tabPendingForum.onclick = () => switchMiddleTab("forum");
+  if (tabPendingForum) tabPendingForum.onclick = () => switchMiddleTab("forum");
   if (tabDoneForum) tabDoneForum.onclick = () => switchMiddleTab("done_forum");
-  tabPendingAsg.onclick = () => switchMiddleTab("assignment");
+  if (tabPendingAsg) tabPendingAsg.onclick = () => switchMiddleTab("assignment");
+  if (tabCompleteMon) tabCompleteMon.onclick = () => switchMiddleTab("complete");
   if (tabPendingRevisi) tabPendingRevisi.onclick = () => switchMiddleTab("posttest");
   const tabStatusFordisDosen = document.getElementById("tabStatusFordisDosen");
   if (tabStatusFordisDosen) tabStatusFordisDosen.onclick = () => switchMiddleTab("status_fordis");
+
+  // Master Data Mahasiswa controls
+  if (btnOpenAddStudent) btnOpenAddStudent.onclick = openAddStudentModal;
+  if (btnCloseAddStudent) btnCloseAddStudent.onclick = closeAddStudentModal;
+  if (btnCancelAddStudent) btnCancelAddStudent.onclick = closeAddStudentModal;
+  if (btnSaveNewStudent) btnSaveNewStudent.onclick = saveNewStudent;
+  if (modalAddStudent) {
+    modalAddStudent.onclick = (e) => {
+      if (e.target === modalAddStudent) closeAddStudentModal();
+    };
+  }
+
+  // Edit Student Modal handlers
+  document.getElementById("btnCloseEditStudent")?.addEventListener("click", closeEditStudentModal);
+  document.getElementById("btnCancelEditStudent")?.addEventListener("click", closeEditStudentModal);
+  document.getElementById("btnSaveEditStudent")?.addEventListener("click", saveEditedStudent);
+  const modalEditStudent = document.getElementById("modalEditStudent");
+  if (modalEditStudent) {
+    modalEditStudent.onclick = (e) => {
+      if (e.target === modalEditStudent) closeEditStudentModal();
+    };
+  }
+  if (searchMasterStudent) {
+    searchMasterStudent.oninput = (e) => {
+      masterStudentSearchQuery = e.target.value.trim().toLowerCase();
+      currentPage = 1;
+      filterAndRenderStudentsTable();
+    };
+  }
 
   document.getElementById("navStatusFordis")?.addEventListener("click", (e) => {
     e.preventDefault();
@@ -374,15 +483,14 @@ function bindEvents() {
   // ── Rangkuman Pribadi (Status Saya) ──────────────────────────────────────
   document.getElementById("navRangkumanPribadi")?.addEventListener("click", (e) => {
     e.preventDefault();
-    setSidebarActive("navRangkumanPribadi");
-    openPersonalSummaryModal();
+    switchMainView("rangkuman");
   });
   document.getElementById("btnViewPersonalSummary")?.addEventListener("click", (e) => {
     e.preventDefault();
-    openPersonalSummaryModal();
+    switchMainView("rangkuman");
   });
   document.getElementById("userPill")?.addEventListener("click", () => {
-    openPersonalSummaryModal();
+    switchMainView("rangkuman");
   });
   document.getElementById("btnClosePersonalSummary")?.addEventListener("click", closePersonalSummaryModal);
   document.getElementById("btnClosePersonalSummaryFooter")?.addEventListener("click", closePersonalSummaryModal);
@@ -393,8 +501,10 @@ function bindEvents() {
     renderPersonalSummaryTable();
   });
   document.getElementById("selectPersonalWeek")?.addEventListener("change", (e) => {
-    selectWeek.value = e.target.value;
-    performScanAll().then(renderPersonalSummaryTable);
+    if (selectWeek) selectWeek.value = e.target.value;
+    scanAllResults = [];
+    renderPersonalSummaryTable();
+    refreshPersonalSummary();
   });
 
   // ── Multi-View Architecture Switcher ─────────────────────────────────────
@@ -479,7 +589,8 @@ function bindEvents() {
 
   document.getElementById("navPengaturanWA")?.addEventListener("click", (e) => {
     e.preventDefault();
-    openSettings("contacts");
+    switchMainView("students");
+    showToast("Menampilkan direktori Data Mahasiswa.");
   });
 
   document.getElementById("navPengaturanBot")?.addEventListener("click", (e) => {
@@ -523,7 +634,55 @@ function bindEvents() {
     };
   }
 
-  // Draft Names Toggle (Dengan Nama vs Ringkas Awal Pekan)
+  // Draft Toggles (Tampilkan Nama, Nomor HP, Nomor Urut)
+  const btnToggleNamesSwitch = document.getElementById("btnToggleNamesSwitch");
+  if (btnToggleNamesSwitch) {
+    btnToggleNamesSwitch.onclick = (e) => {
+      e.stopPropagation();
+      waIncludeStudentNames = !waIncludeStudentNames;
+      localStorage.setItem("tugasku_draft_include_names", waIncludeStudentNames ? "true" : "false");
+      updateDraftNamesToggleUI();
+      updateWaPreview();
+    };
+  }
+  document.getElementById("draftNamesToggleGroup")?.addEventListener("click", (e) => {
+    if (e.target !== btnToggleNamesSwitch && !btnToggleNamesSwitch?.contains(e.target)) {
+      btnToggleNamesSwitch?.click();
+    }
+  });
+
+  const btnTogglePhoneSwitch = document.getElementById("btnTogglePhoneSwitch");
+  if (btnTogglePhoneSwitch) {
+    btnTogglePhoneSwitch.onclick = (e) => {
+      e.stopPropagation();
+      waIncludePhoneNumbers = !waIncludePhoneNumbers;
+      localStorage.setItem("tugasku_draft_include_phones", waIncludePhoneNumbers ? "true" : "false");
+      updateDraftNamesToggleUI();
+      updateWaPreview();
+    };
+  }
+  document.getElementById("draftPhoneToggleGroup")?.addEventListener("click", (e) => {
+    if (e.target !== btnTogglePhoneSwitch && !btnTogglePhoneSwitch?.contains(e.target)) {
+      btnTogglePhoneSwitch?.click();
+    }
+  });
+
+  const btnToggleNumberingSwitch = document.getElementById("btnToggleNumberingSwitch");
+  if (btnToggleNumberingSwitch) {
+    btnToggleNumberingSwitch.onclick = (e) => {
+      e.stopPropagation();
+      waIncludeNumbering = !waIncludeNumbering;
+      localStorage.setItem("tugasku_draft_include_numbering", waIncludeNumbering ? "true" : "false");
+      updateDraftNamesToggleUI();
+      updateWaPreview();
+    };
+  }
+  document.getElementById("draftNumberingToggleGroup")?.addEventListener("click", (e) => {
+    if (e.target !== btnToggleNumberingSwitch && !btnToggleNumberingSwitch?.contains(e.target)) {
+      btnToggleNumberingSwitch?.click();
+    }
+  });
+
   if (btnNamesOn) {
     btnNamesOn.onclick = () => {
       waIncludeStudentNames = true;
@@ -557,20 +716,38 @@ function bindEvents() {
   btnOpenWhatsAppDirect.onclick = openWhatsAppDirect;
 
   // Search & Filters
-  searchStudent.oninput = (e) => {
-    currentSearchQuery = e.target.value.trim().toLowerCase();
-    btnClearSearch.classList.toggle("hidden", currentSearchQuery.length === 0);
-    currentPage = 1;
-    filterAndRenderStudentsTable();
-  };
+  if (searchStudent) {
+    searchStudent.oninput = (e) => {
+      renderMiddleTable(activeMiddleTab);
+    };
+  }
 
-  btnClearSearch.onclick = () => {
-    searchStudent.value = "";
-    currentSearchQuery = "";
-    btnClearSearch.classList.add("hidden");
-    currentPage = 1;
-    filterAndRenderStudentsTable();
-  };
+  const searchStudentFull = document.getElementById("searchStudentFull");
+  if (searchStudentFull) {
+    searchStudentFull.oninput = (e) => {
+      masterStudentSearchQuery = e.target.value.trim().toLowerCase();
+      currentPage = 1;
+      filterAndRenderStudentsTable();
+    };
+  }
+
+  document.querySelectorAll(".student-tab-btn").forEach(btn => {
+    btn.onclick = () => {
+      setActiveFilter(btn.dataset.filter);
+    };
+  });
+
+  if (btnClearSearch) {
+    btnClearSearch.onclick = () => {
+      if (searchStudent) searchStudent.value = "";
+      if (searchMasterStudent) searchMasterStudent.value = "";
+      masterStudentSearchQuery = "";
+      btnClearSearch.classList.add("hidden");
+      currentPage = 1;
+      filterAndRenderStudentsTable();
+      renderMiddleTable(activeMiddleTab);
+    };
+  }
 
   filterChips.forEach(chip => {
     chip.onclick = () => {
@@ -581,20 +758,93 @@ function bindEvents() {
   btnExportCsv.onclick = exportToCsv;
   btnCopySheet.onclick = copyForGoogleSheets;
 
-  btnModalReconnect.onclick = () => triggerAutoReconnect("Pembaruan sesi MENTARI");
-  btnBannerReconnect.onclick = () => triggerAutoReconnect("Pembaruan sesi MENTARI");
+  // Tes Koneksi MENTARI Langsung
+  const btnTestMentariConn = document.getElementById("btnTestMentariConn");
+  if (btnTestMentariConn) {
+    btnTestMentariConn.onclick = async () => {
+      btnTestMentariConn.disabled = true;
+      btnTestMentariConn.textContent = "⚡ Menguji...";
+      try {
+        const res = await fetch("/api/mentari/test-connection");
+        const data = await res.json();
+        if (data.success && data.connected) {
+          showToast(`⚡ Koneksi MENTARI Aktif! ${data.user?.fullname ? 'User: ' + data.user.fullname : ''}`);
+          if (sessionStatusDetail) {
+            sessionStatusDetail.textContent = "Online (Aktif)";
+            sessionStatusDetail.className = "pill-badge pill-green";
+            sessionStatusDetail.style.color = "";
+          }
+        } else {
+          showToast(`⚠️ Status MENTARI: ${data.error || 'Belum terhubung. Silakan login atau paste token.'}`);
+          if (sessionStatusDetail) {
+            sessionStatusDetail.textContent = "Offline (Perlu Login / Token)";
+            sessionStatusDetail.className = "pill-badge pill-red";
+            sessionStatusDetail.style.color = "";
+          }
+        }
+      } catch (err) {
+        showToast(`Error: ${err.message}`);
+      } finally {
+        btnTestMentariConn.disabled = false;
+        btnTestMentariConn.textContent = "⚡ Tes Koneksi";
+      }
+    };
+  }
+
+  // Simpan Token MENTARI Manual Bebas Cloudflare
+  const btnSaveManualToken = document.getElementById("btnSaveManualToken");
+  const inputManualMentariToken = document.getElementById("inputManualMentariToken");
+  if (btnSaveManualToken && inputManualMentariToken) {
+    btnSaveManualToken.onclick = async () => {
+      const token = inputManualMentariToken.value.trim();
+      if (!token) {
+        showToast("Tempelkan token MENTARI Anda terlebih dahulu.");
+        return;
+      }
+      btnSaveManualToken.disabled = true;
+      btnSaveManualToken.textContent = "Menyimpan...";
+      try {
+        const res = await fetch("/api/save-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showToast("🎉 Token MENTARI berhasil disimpan! Sesi kini aktif.");
+          checkSessionStatus();
+          performScan();
+        } else {
+          showToast(`Gagal: ${data.error}`);
+        }
+      } catch (err) {
+        showToast(`Error: ${err.message}`);
+      } finally {
+        btnSaveManualToken.disabled = false;
+        btnSaveManualToken.textContent = "Simpan Token";
+      }
+    };
+  }
+
+  if (btnModalReconnect) btnModalReconnect.onclick = () => triggerAutoReconnect("Pembaruan sesi MENTARI", true);
+  if (btnBannerReconnect) btnBannerReconnect.onclick = () => triggerAutoReconnect("Pembaruan sesi MENTARI", true);
 
   // ── UNIFIED SETTINGS MODAL ───────────────────────────────────────────────
-  btnOpenSettings.onclick = () => openSettings("class");
-  btnCloseSettings.onclick = closeSettings;
+  if (btnOpenSettings) btnOpenSettings.onclick = () => openSettings("class");
+  if (btnCloseSettings) btnCloseSettings.onclick = closeSettings;
   if (btnCloseSettingsFooter) btnCloseSettingsFooter.onclick = closeSettings;
+  if (modalSettings) {
+    modalSettings.onclick = (e) => {
+      if (e.target === modalSettings) closeSettings();
+    };
+  }
 
   if (tabBtnClassSettings) tabBtnClassSettings.onclick = () => switchSettingsTab("class");
+  if (tabBtnDeadlineSettings) tabBtnDeadlineSettings.onclick = () => switchSettingsTab("deadlines");
   if (tabBtnWeeksSettings) tabBtnWeeksSettings.onclick = () => switchSettingsTab("weeks");
   if (tabBtnTemplates) tabBtnTemplates.onclick = () => switchSettingsTab("templates");
-  tabBtnBot.onclick = () => switchSettingsTab("bot");
-  tabBtnContacts.onclick = () => switchSettingsTab("contacts");
-  tabBtnSchedule.onclick = () => switchSettingsTab("schedule");
+  if (tabBtnBot) tabBtnBot.onclick = () => switchSettingsTab("bot");
+  if (tabBtnSchedule) tabBtnSchedule.onclick = () => switchSettingsTab("schedule");
 
   // Class Profile Handlers
   if (btnAutoDetectClass) btnAutoDetectClass.onclick = autoDetectClass;
@@ -606,9 +856,11 @@ function bindEvents() {
     };
   }
 
-  // Weeks & Deadline Handlers
+  // Deadlines & Weeks Handlers
+  const btnSaveDeadlinesSettings = document.getElementById("btnSaveDeadlinesSettings");
+  if (btnSaveDeadlinesSettings) btnSaveDeadlinesSettings.onclick = saveDeadlinesSettings;
   if (btnRecalculateWeeks) btnRecalculateWeeks.onclick = recalculateWeeksFromStartDate;
-  if (btnSaveWeeksSettings) btnSaveWeeksSettings.onclick = saveWeeksAndDeadline;
+  if (btnSaveWeeksSettings) btnSaveWeeksSettings.onclick = saveWeeksSettings;
 
   // Template Editor Handlers
   if (selectTemplateType) selectTemplateType.onchange = updateTemplateEditorView;
@@ -628,6 +880,20 @@ function bindEvents() {
   btnBotStart.onclick = startBot;
   btnBotStop.onclick = stopBot;
   btnBotTrigger.onclick = triggerBot;
+
+  // Changelog & Versi Handlers
+  document.getElementById("btnVersionBadge")?.addEventListener("click", openChangelogModal);
+  document.getElementById("btnOpenChangelog")?.addEventListener("click", openChangelogModal);
+  document.getElementById("btnCloseChangelog")?.addEventListener("click", closeChangelogModal);
+  document.getElementById("btnCloseChangelogFooter")?.addEventListener("click", closeChangelogModal);
+}
+
+function openChangelogModal() {
+  document.getElementById("modalChangelog")?.classList.remove("hidden");
+}
+
+function closeChangelogModal() {
+  document.getElementById("modalChangelog")?.classList.add("hidden");
 }
 
 // ── Multi-View Architecture Switcher ───────────────────────────────────────
@@ -636,15 +902,26 @@ let activeMainView = "dashboard";
 function switchMainView(viewName, subTab = null) {
   activeMainView = viewName;
 
+  const titleEl = document.getElementById("pageTitleText");
+  if (titleEl) {
+    if (viewName === "dashboard") titleEl.textContent = "Dashboard";
+    else if (viewName === "monitoring") titleEl.textContent = "Monitoring Tugas";
+    else if (viewName === "schedule") titleEl.textContent = "Jadwal & Matkul";
+    else if (viewName === "students") titleEl.textContent = "Data Mahasiswa";
+    else if (viewName === "rangkuman") titleEl.textContent = "Rangkuman Pribadi";
+  }
+
   const viewDashboard = document.getElementById("viewDashboard");
   const viewSchedule = document.getElementById("viewSchedule");
   const viewMonitoring = document.getElementById("viewMonitoring");
   const viewStudents = document.getElementById("viewStudents");
+  const viewRangkuman = document.getElementById("viewRangkuman");
 
   if (viewDashboard) viewDashboard.classList.toggle("hidden", viewName !== "dashboard");
   if (viewSchedule) viewSchedule.classList.toggle("hidden", viewName !== "schedule");
   if (viewMonitoring) viewMonitoring.classList.toggle("hidden", viewName !== "monitoring");
   if (viewStudents) viewStudents.classList.toggle("hidden", viewName !== "students");
+  if (viewRangkuman) viewRangkuman.classList.toggle("hidden", viewName !== "rangkuman");
 
   document.querySelectorAll(".view-tab-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.view === viewName);
@@ -658,10 +935,22 @@ function switchMainView(viewName, subTab = null) {
   } else if (viewName === "students") {
     setSidebarActive("navDaftarMhs");
   } else if (viewName === "monitoring") {
+    setSidebarActive("navMonitoring");
     if (subTab === "forum") setSidebarActive("navForumKurang");
     else if (subTab === "assignment") setSidebarActive("navBelumPenugasan");
     else if (subTab === "status_fordis") setSidebarActive("navStatusFordis");
-    else setSidebarActive("navBelumPosttest");
+  } else if (viewName === "rangkuman") {
+    setSidebarActive("navRangkumanPribadi");
+    const selectPersonalWeek = document.getElementById("selectPersonalWeek");
+    if (selectPersonalWeek && selectWeek) {
+      selectPersonalWeek.value = selectWeek.value;
+    }
+    if (typeof renderPersonalSummaryTable === "function") {
+      renderPersonalSummaryTable();
+    }
+    if (typeof refreshPersonalSummary === "function") {
+      refreshPersonalSummary();
+    }
   }
 
   if (viewName === "monitoring" && subTab) {
@@ -706,10 +995,18 @@ function renderScheduleView(targetWeek = null) {
 
   pContainer.innerHTML = allWeeks.map(w => {
     const isActive = String(w) === String(currentWeek);
-    let label = `Pekan ${w}`;
-    if (w === "UTS") label = "UTS";
-    else if (w === "UAS") label = "UAS";
-    return `<button class="sched-week-pill ${isActive ? "active" : ""}" onclick="renderScheduleView('${w}')">${label}</button>`;
+    const isUTSorUAS = w === "UTS" || w === "UAS";
+    const currentWeekNum = parseInt(currentWeek, 10);
+    const wNum = parseInt(w, 10);
+    const isPast = !isNaN(currentWeekNum) && !isNaN(wNum) && wNum < currentWeekNum;
+
+    let pillCls = "sched-week-pill";
+    if (isActive) pillCls += " active";
+    else if (isUTSorUAS) pillCls += " uts";
+    else if (isPast) pillCls += " past";
+
+    let label = w;
+    return `<button type="button" class="${pillCls}" onclick="renderScheduleView('${w}')">${label}</button>`;
   }).join("");
 
   // 2. Mode Calculations
@@ -725,71 +1022,48 @@ function renderScheduleView(targetWeek = null) {
 
   if (g1Badge) {
     g1Badge.textContent = `${modeG1} ${modeG1 === "LURING" ? "(Ruang V.619)" : "(MENTARI)"}`;
-    g1Badge.className = `sched-group-period-badge ${modeG1 === "DARING" ? "daring" : ""}`;
+    g1Badge.className = `badge-mode-pill ${modeG1 === "LURING" ? "mode-luring" : ""}`;
   }
 
   if (g2Badge) {
     g2Badge.textContent = `${modeG2} ${modeG2 === "LURING" ? "(Ruang V.619)" : "(MENTARI)"}`;
-    g2Badge.className = `sched-group-period-badge ${modeG2 === "DARING" ? "daring" : ""}`;
+    g2Badge.className = `badge-mode-pill ${modeG2 === "LURING" ? "mode-luring" : ""}`;
   }
 
   // 3. Courses Filter
-  const isG1 = (c) => String(c.id_periode || c.periode || "") === "1" || (c.coursename || "").includes("[E-1]");
-  const isG2 = (c) => String(c.id_periode || c.periode || "") === "2" || (c.coursename || "").includes("[E-2]");
   const isDemo = (c) => (c.kode_course || "").includes("20252");
+  const group1List = (coursesList || []).filter(c => getCourseGroupKey(c) === "1" && !isDemo(c));
+  const group2List = (coursesList || []).filter(c => getCourseGroupKey(c) === "2" && !isDemo(c));
 
-  const group1List = (coursesList || []).filter(c => isG1(c) && !isDemo(c));
-  const group2List = (coursesList || []).filter(c => isG2(c) && !isDemo(c));
-
-  // Helper to render card for a course
+  // Helper to render card for a course matching Figma
   function createCourseCard(c, groupKey, mode) {
-    const sks = c.sks || 2;
-    const cDead = getCourseDeadline(c.kode_course);
-    const deadline = cDead.text;
-    const todayBadge = cDead.isToday
-      ? `<span class="badge-table-pill danger" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.5); font-weight: 700;">🚨 HARI INI</span>`
-      : "";
-
-    // Meetings calculation for this week
-    let meetingStr = "Pertemuan Aktif";
-    if (scheduleData?.meetings_by_sks?.[sks]?.week_mapping?.[currentWeek]) {
-      const pArr = scheduleData.meetings_by_sks[sks].week_mapping[currentWeek];
-      meetingStr = pArr.map(p => `Pertemuan ${p}`).join(" & ");
-    } else if (currentWeek === "UTS") {
-      meetingStr = "Sesi Ujian UTS";
-    } else if (currentWeek === "UAS") {
-      meetingStr = "Sesi Ujian UAS";
-    }
-
-    const modeBadge = mode === "LURING"
-      ? `<span class="badge-table-pill success">🏫 LURING (Ruang V.619)</span>`
-      : `<span class="badge-table-pill warning">🌐 DARING (MENTARI)</span>`;
+    const sks = c.sks || (c.coursename?.startsWith("[3]") ? 3 : 2);
+    const courseName = c.nama_mata_kuliah || c.coursename?.split('#')[0].replace(/^\[\d+\]\s*/, '').trim() || c.kode_course;
+    const dosen = c.nama_dosen || "Dosen Pengampu";
+    const kel = getCourseKelompok(c);
+    const courseMode = getCourseModeForWeek(c, currentWeek);
+    const isPureLuring = courseMode === "LURING";
+    const badgeCls = isPureLuring ? "mode-luring" : "mode-daring";
+    let badgeTxt = isPureLuring ? "LURING+TUGAS" : "DARING";
+    if (kel === "FULL_DARING") badgeTxt = "FULL DARING";
+    else if (kel === "FULL_LURING") badgeTxt = "FULL LURING";
 
     return `
-      <div class="sched-course-card">
-        <div class="sched-course-top">
-          <div>
-            <div class="sched-course-title">${c.nama_mata_kuliah || c.coursename}</div>
-            <div class="sched-course-lecturer">
-              <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>${c.nama_dosen || "Dosen Pengampu"}</span>
-            </div>
-          </div>
-          <span class="sched-group-sks" style="color: #60a5fa; background: rgba(59, 130, 246, 0.15);">${sks} SKS</span>
+      <div class="sched-course-item">
+        <div class="sched-course-title-row">
+          <h4 class="sched-course-name">${courseName}</h4>
+          <span class="sched-course-sks">${sks} SKS</span>
         </div>
-
         <div class="sched-course-meta-row">
-          ${modeBadge}
-          <span class="badge-table-pill info">${meetingStr}</span>
-          ${todayBadge}
-          <span class="badge-table-pill gray" style="cursor: pointer;" onclick="openQuickDeadlineModal('${c.kode_course}')" title="Klik untuk ubah deadline matkul ini">⏰ ${deadline} ✏️</span>
+          <span class="badge-mode-pill ${badgeCls}">${badgeTxt}</span>
+          <span class="sched-course-dosen">${dosen}</span>
         </div>
-
-        <div class="sched-course-footer">
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-dim);">${c.kode_course}</span>
-          <button class="btn btn-outline-primary btn-xs" onclick="selectAndMonitorCourse('${c.kode_course}', '${currentWeek}')">
-            <span>Buka &amp; Pantau Tugas</span> →
-          </button>
+        <div class="sched-course-footer-row">
+          <span class="sched-course-code">${c.kode_course}</span>
+          <div class="sched-course-indicators">
+            <span class="sched-indicator"><span class="sched-dot green"></span> Fordis</span>
+            <span class="sched-indicator"><span class="sched-dot green"></span> Posttest</span>
+          </div>
         </div>
       </div>
     `;
@@ -802,7 +1076,7 @@ window.renderScheduleView = renderScheduleView;
 
 // ── UI Helper: Active Sidebar & Pulse ──────────────────────────────────────
 function setSidebarActive(navId) {
-  document.querySelectorAll(".sidebar-nav .nav-item").forEach(item => {
+  document.querySelectorAll(".sidebar-nav .nav-item, .sidebar-nav .nav-btn").forEach(item => {
     item.classList.toggle("active", item.id === navId);
   });
 }
@@ -811,6 +1085,9 @@ function setActiveFilter(filterName) {
   activeFilter = filterName;
   filterChips.forEach(c => {
     c.classList.toggle("active", c.dataset.filter === filterName);
+  });
+  document.querySelectorAll(".student-tab-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.filter === filterName);
   });
   currentPage = 1;
   filterAndRenderStudentsTable();
@@ -826,6 +1103,8 @@ function pulseElement(el) {
 
 // ── 3. Schedule & Course Matrix ────────────────────────────────────────────
 function getGroupMode(groupKey, weekVal) {
+  if (groupKey === "FULL_DARING") return "DARING";
+  if (groupKey === "FULL_LURING") return "LURING";
   if (weekVal === "UTS") return "UTS";
   if (weekVal === "UAS") return "UAS";
 
@@ -841,6 +1120,113 @@ function getGroupMode(groupKey, weekVal) {
   return "";
 }
 
+function getCourseKelompok(c) {
+  if (!c) return "1";
+  const custom = currentClassSettings?.course_deadlines?.[c.kode_course]?.kelompok;
+  if (custom !== undefined && custom !== "") return String(custom);
+  if (c.kelompok !== undefined && c.kelompok !== "") return String(c.kelompok);
+  if ((c.coursename || "").includes("[E-2]") || String(c.id_periode || c.periode || "") === "2") return "2";
+  return "1";
+}
+
+function getCourseGroupKey(c) {
+  const kel = getCourseKelompok(c);
+  if (kel === "2") return "2";
+  if (kel === "1") return "1";
+  if ((c.coursename || "").includes("[E-2]") || String(c.id_periode || c.periode || "") === "2") return "2";
+  return "1";
+}
+
+function getCourseModeForWeek(c, weekVal) {
+  const kel = getCourseKelompok(c);
+  if (kel === "FULL_DARING") return "DARING";
+  if (kel === "FULL_LURING") return "LURING";
+  const groupKey = kel === "2" ? "2" : "1";
+  return getGroupMode(groupKey, weekVal);
+}
+
+function getKelompokShortLabel(kel) {
+  if (kel === "2") return "K2";
+  if (kel === "FULL_DARING") return "Daring";
+  if (kel === "FULL_LURING") return "Luring";
+  return "K1";
+}
+
+function getKelompokFullLabel(kel) {
+  if (kel === "2") return "Kelompok 2 [E-2]";
+  if (kel === "FULL_DARING") return "Full Daring";
+  if (kel === "FULL_LURING") return "Full Luring";
+  return "Kelompok 1 [E-1]";
+}
+
+// Urutan kanonik pekan: 1-7, UTS, 8-15, UAS, 16
+const CANONICAL_WEEK_ORDER = ["1", "2", "3", "4", "5", "6", "7", "UTS", "8", "9", "10", "11", "12", "13", "14", "15", "UAS", "16"];
+
+function getOrderedWeekKeys(weeksObj) {
+  // Kembalikan kunci dalam urutan kanonik, lalu tambahkan kunci yang tidak ada di urutan
+  const known = CANONICAL_WEEK_ORDER.filter(k => k in weeksObj);
+  const extra = Object.keys(weeksObj).filter(k => !CANONICAL_WEEK_ORDER.includes(k));
+  return [...known, ...extra];
+}
+
+function formatCourseTitle(name) {
+  if (!name) return "";
+  const isAllUpper = name === name.toUpperCase();
+  if (!isAllUpper) return name;
+
+  return name.toLowerCase()
+    .split(" ")
+    .map(word => {
+      const u = word.toUpperCase();
+      if (["SKS", "I", "II", "III", "IV", "V", "VI", "AI", "ML", "SIM", "PCD", "TRO", "KBM"].includes(u)) {
+        return u;
+      }
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+}
+
+function populateWeeksDropdown() {
+  if (!selectWeek) return;
+  const activeWeekKey = getCurrentSemesterWeek();
+  const currentVal = selectWeek.value || activeWeekKey || "3";
+  selectWeek.innerHTML = "";
+  const weeks = currentClassSettings?.weeks || WEEK_NAMES;
+  getOrderedWeekKeys(weeks).forEach(key => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    const isCurrent = key === activeWeekKey;
+    opt.dataset.isCurrent = isCurrent ? "true" : "false";
+    opt.textContent = weeks[key];
+    if (key === currentVal) opt.selected = true;
+    selectWeek.appendChild(opt);
+  });
+  if (selectWeek.value !== currentVal) {
+    selectWeek.value = currentVal;
+  }
+
+  // Sync selectPersonalWeek juga
+  const selectPersonalWeek = document.getElementById("selectPersonalWeek");
+  if (selectPersonalWeek) {
+    const prevVal = selectPersonalWeek.value || activeWeekKey || "3";
+    selectPersonalWeek.innerHTML = "";
+    getOrderedWeekKeys(weeks).forEach(key => {
+      const opt = document.createElement("option");
+      opt.value = key;
+      const label = weeks[key] || (key === "UTS" ? "Pekan UTS" : key === "UAS" ? "Pekan UAS" : `Pekan ${key}`);
+      // Short label for personal week (just "Pekan N")
+      const shortLabel = key === "UTS" ? "Pekan UTS" : key === "UAS" ? "Pekan UAS" : `Pekan ${key}`;
+      opt.textContent = shortLabel;
+      if (key === prevVal) opt.selected = true;
+      selectPersonalWeek.appendChild(opt);
+    });
+    if (selectPersonalWeek.value !== prevVal) {
+      selectPersonalWeek.value = prevVal;
+    }
+  }
+}
+window.populateWeeksDropdown = populateWeeksDropdown;
+
 function populateCoursesDropdown() {
   const previousSelected = selectCourse.value;
   selectCourse.innerHTML = "";
@@ -849,12 +1235,10 @@ function populateCoursesDropdown() {
     return;
   }
 
-  const isG1 = (c) => String(c.id_periode || c.periode || "") === "1" || (c.coursename || "").includes("[E-1]");
-  const isG2 = (c) => String(c.id_periode || c.periode || "") === "2" || (c.coursename || "").includes("[E-2]");
   const isDemo = (c) => (c.kode_course || "").includes("20252");
 
-  const group1 = coursesList.filter(c => isG1(c) && !isDemo(c));
-  const group2 = coursesList.filter(c => isG2(c) && !isDemo(c));
+  const group1 = coursesList.filter(c => getCourseGroupKey(c) === "1" && !isDemo(c));
+  const group2 = coursesList.filter(c => getCourseGroupKey(c) === "2" && !isDemo(c));
   const demoCourses = coursesList.filter(isDemo);
 
   const selectedWeek = selectWeek ? selectWeek.value : "1";
@@ -867,9 +1251,12 @@ function populateCoursesDropdown() {
     group1.forEach(c => {
       const opt = document.createElement("option");
       opt.value = c.kode_course;
-      const cDead = getCourseDeadline(c.kode_course);
-      const todayTag = cDead.isToday ? " 🚨 [HARI INI]" : "";
-      opt.textContent = `${c.nama_mata_kuliah || c.coursename} (${c.sks || 2} SKS)${todayTag}`;
+      // Dot deadline dimulai 'false' — akan diupdate oleh refreshCourseDeadlineDots() setelah scan
+      opt.dataset.isDeadlineToday = "false";
+      const rawName = c.nama_mata_kuliah || c.coursename;
+      const kel = getCourseKelompok(c);
+      const kelTag = kel === "FULL_DARING" ? " · Full Daring" : (kel === "FULL_LURING" ? " · Full Luring" : "");
+      opt.textContent = `${formatCourseTitle(rawName)} (${c.sks || 2} SKS${kelTag})`;
       optGroup1.appendChild(opt);
     });
     selectCourse.appendChild(optGroup1);
@@ -881,9 +1268,12 @@ function populateCoursesDropdown() {
     group2.forEach(c => {
       const opt = document.createElement("option");
       opt.value = c.kode_course;
-      const cDead = getCourseDeadline(c.kode_course);
-      const todayTag = cDead.isToday ? " 🚨 [HARI INI]" : "";
-      opt.textContent = `${c.nama_mata_kuliah || c.coursename} (${c.sks || 2} SKS)${todayTag}`;
+      // Dot deadline dimulai 'false' — akan diupdate oleh refreshCourseDeadlineDots() setelah scan
+      opt.dataset.isDeadlineToday = "false";
+      const rawName = c.nama_mata_kuliah || c.coursename;
+      const kel = getCourseKelompok(c);
+      const kelTag = kel === "FULL_DARING" ? " · Full Daring" : (kel === "FULL_LURING" ? " · Full Luring" : "");
+      opt.textContent = `${formatCourseTitle(rawName)} (${c.sks || 2} SKS${kelTag})`;
       optGroup2.appendChild(opt);
     });
     selectCourse.appendChild(optGroup2);
@@ -896,9 +1286,9 @@ function populateCoursesDropdown() {
     coursesList.filter(c => !isDemo(c)).forEach(c => {
       const opt = document.createElement("option");
       opt.value = c.kode_course;
-      const cDead = getCourseDeadline(c.kode_course);
-      const todayTag = cDead.isToday ? " 🚨 [HARI INI]" : "";
-      opt.textContent = `${c.nama_mata_kuliah || c.coursename} (${c.sks || 2} SKS)${todayTag}`;
+      opt.dataset.isDeadlineToday = "false";
+      const rawName = c.nama_mata_kuliah || c.coursename;
+      opt.textContent = `${formatCourseTitle(rawName)} (${c.sks || 2} SKS)`;
       optAll.appendChild(opt);
     });
     selectCourse.appendChild(optAll);
@@ -910,7 +1300,8 @@ function populateCoursesDropdown() {
     demoCourses.forEach(c => {
       const opt = document.createElement("option");
       opt.value = c.kode_course;
-      opt.textContent = `${c.nama_mata_kuliah || c.coursename} (Demo Data)`;
+      const rawName = c.nama_mata_kuliah || c.coursename;
+      opt.textContent = `${formatCourseTitle(rawName)} (Demo Data)`;
       optGroupDemo.appendChild(opt);
     });
     selectCourse.appendChild(optGroupDemo);
@@ -925,6 +1316,283 @@ function populateCoursesDropdown() {
   }
 }
 
+function populateMeetingSelect(course, selectedWeekVal) {
+  if (!selectSection && !selectSectionMon) return;
+  const sksNum = parseInt(course?.sks || (course?.coursename?.startsWith("[3]") ? 3 : 2), 10);
+  const sksStr = String(sksNum);
+  const totalMeetings = sksNum === 3 ? 21 : (sksNum === 4 ? 28 : 14);
+
+  // Scheduled meetings for this week based on 3 SKS / 2 SKS mapping
+  const weekMeetings = WEEK_MEETINGS_BY_SKS[sksStr]?.[selectedWeekVal] || [];
+
+  // Decide which meeting to select
+  let targetMeeting = weekMeetings.length > 0 ? weekMeetings[0] : 1;
+  const currentVal = selectSection?.value || selectSectionMon?.value;
+  const currentNum = currentVal ? parseInt(currentVal.replace("PERTEMUAN_", ""), 10) : null;
+  if (currentNum && weekMeetings.includes(currentNum)) {
+    targetMeeting = currentNum;
+  }
+
+  let html = "";
+  for (let m = 1; m <= totalMeetings; m++) {
+    const val = `PERTEMUAN_${m}`;
+    const isWeek = weekMeetings.includes(m);
+    const tag = (isWeek && weekMeetings.length > 1) ? " (Pekan Ini)" : "";
+    html += `<option value="${val}">Pertemuan ${m}${tag}</option>`;
+  }
+
+  const secVal = `PERTEMUAN_${targetMeeting}`;
+  if (selectSection) {
+    selectSection.innerHTML = html;
+    selectSection.value = secVal;
+  }
+  if (selectSectionMon) {
+    selectSectionMon.innerHTML = html;
+    selectSectionMon.value = secVal;
+  }
+
+  highlightActiveMeetingBtn(secVal);
+}
+
+// ── Modern Custom Dropdown Component (Pekan, Matkul, Pertemuan, & All Form Selects) ──
+function setupCustomDropdown(selectEl) {
+  if (!selectEl) return null;
+  if (selectEl._customDropdown) return selectEl._customDropdown;
+
+  selectEl.classList.add("has-custom-dropdown");
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "c-dropdown-wrapper";
+  if (selectEl.id) wrapper.dataset.for = selectEl.id;
+
+  // Detect and apply styling variants
+  if (selectEl.classList.contains("w-full") || selectEl.style.width === "100%") {
+    wrapper.classList.add("w-full");
+  }
+  if (selectEl.classList.contains("figma-input")) {
+    wrapper.classList.add("figma-dropdown");
+  }
+  if (selectEl.classList.contains("select-row-deadline-day") || selectEl.classList.contains("form-control")) {
+    wrapper.classList.add("c-dropdown-sm");
+    wrapper.classList.add("w-full");
+  }
+
+  const trigger = document.createElement("button");
+  trigger.type = "button";
+  trigger.className = "c-dropdown-trigger";
+
+  const labelSpan = document.createElement("span");
+  labelSpan.className = "c-dropdown-label";
+
+  const textSpan = document.createElement("span");
+  textSpan.className = "c-dropdown-label-text";
+  labelSpan.appendChild(textSpan);
+
+  const chevronSpan = document.createElement("span");
+  chevronSpan.className = "c-dropdown-chevron-wrapper";
+  chevronSpan.innerHTML = `<svg class="c-dropdown-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+
+  trigger.appendChild(labelSpan);
+  trigger.appendChild(chevronSpan);
+
+  const menu = document.createElement("div");
+  menu.className = "c-dropdown-menu";
+
+  wrapper.appendChild(trigger);
+  wrapper.appendChild(menu);
+
+  if (selectEl.parentNode) {
+    selectEl.parentNode.insertBefore(wrapper, selectEl.nextSibling);
+  }
+
+  function renderMenu() {
+    menu.innerHTML = "";
+    const children = Array.from(selectEl.children);
+    const selectedVal = selectEl.value;
+    let activeOpt = null;
+
+    function createItem(opt) {
+      const item = document.createElement("div");
+      item.className = "c-dropdown-item";
+      const isSelected = String(opt.value) === String(selectedVal);
+      if (isSelected) {
+        item.classList.add("selected");
+        activeOpt = opt;
+      }
+
+      // If selected: show circular bullet dot on left (matching Figma dashboard style)
+      if (isSelected) {
+        const dot = document.createElement("span");
+        dot.className = "c-dropdown-dot";
+        item.appendChild(dot);
+      }
+
+      const itemText = document.createElement("span");
+      itemText.className = "c-dropdown-item-text";
+      itemText.textContent = opt.textContent;
+      item.appendChild(itemText);
+
+      // Simple red deadline indicator
+      if (opt.dataset.isDeadlineToday === "true") {
+        const redDot = document.createElement("span");
+        redDot.className = "c-deadline-dot";
+        redDot.title = "Deadline Hari Ini";
+        item.appendChild(redDot);
+      }
+
+      item.addEventListener("click", (e) => {
+        e.stopPropagation();
+        selectEl.value = opt.value;
+        closeAllCustomDropdowns();
+        updateTrigger();
+        renderMenu();
+        selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+
+      return item;
+    }
+
+    children.forEach((child) => {
+      if (child.tagName === "OPTGROUP") {
+        const groupTitle = document.createElement("div");
+        groupTitle.className = "c-dropdown-group-title";
+        groupTitle.textContent = child.label;
+        menu.appendChild(groupTitle);
+
+        Array.from(child.children).forEach((opt) => {
+          menu.appendChild(createItem(opt));
+        });
+      } else if (child.tagName === "OPTION") {
+        menu.appendChild(createItem(child));
+      }
+    });
+
+    updateTrigger(activeOpt);
+  }
+
+  function updateTrigger(opt = null) {
+    const selectedOpt = opt || selectEl.options[selectEl.selectedIndex] || Array.from(selectEl.options).find(o => String(o.value) === String(selectEl.value));
+    textSpan.textContent = selectedOpt ? selectedOpt.textContent : "...";
+
+    const oldDot = labelSpan.querySelector(".c-deadline-dot");
+    if (oldDot) oldDot.remove();
+
+    if (selectedOpt && selectedOpt.dataset.isDeadlineToday === "true") {
+      const redDot = document.createElement("span");
+      redDot.className = "c-deadline-dot";
+      redDot.title = "Deadline Hari Ini";
+      labelSpan.appendChild(redDot);
+    }
+  }
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = wrapper.classList.contains("open");
+    closeAllCustomDropdowns();
+    if (!isOpen) {
+      // Smart positioning: calculate available space below vs above
+      const rect = trigger.getBoundingClientRect();
+      const scrollParent = trigger.closest(".table-responsive") || trigger.closest(".settings-body-scroll") || trigger.closest(".modal-body");
+      if (scrollParent) {
+        const sRect = scrollParent.getBoundingClientRect();
+        const spaceBelow = sRect.bottom - rect.bottom;
+        const spaceAbove = rect.top - sRect.top;
+        if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+          wrapper.classList.add("dropup");
+        } else {
+          wrapper.classList.remove("dropup");
+        }
+      } else {
+        const spaceBelow = window.innerHeight - rect.bottom;
+        if (spaceBelow < 220 && rect.top > spaceBelow) {
+          wrapper.classList.add("dropup");
+        } else {
+          wrapper.classList.remove("dropup");
+        }
+      }
+
+      wrapper.classList.add("open");
+      const tr = wrapper.closest("tr");
+      if (tr) tr.style.zIndex = "1200";
+
+      const selectedItem = menu.querySelector(".c-dropdown-item.selected");
+      if (selectedItem) {
+        selectedItem.scrollIntoView({ block: "nearest" });
+      }
+    }
+  });
+
+  selectEl.addEventListener("change", () => {
+    updateTrigger();
+    renderMenu();
+  });
+
+  // Intercept programmatic value changes so wrapper updates reactively
+  try {
+    const originalSetter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")?.set;
+    const originalGetter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")?.get;
+    Object.defineProperty(selectEl, "value", {
+      get() {
+        return originalGetter ? originalGetter.call(this) : this.getAttribute("value");
+      },
+      set(newVal) {
+        if (originalSetter) {
+          originalSetter.call(this, newVal);
+        }
+        updateTrigger();
+        renderMenu();
+      },
+      configurable: true
+    });
+  } catch (e) {}
+
+  const observer = new MutationObserver(() => {
+    renderMenu();
+  });
+  observer.observe(selectEl, { childList: true, subtree: true });
+
+  renderMenu();
+
+  const instance = {
+    wrapper,
+    trigger,
+    menu,
+    renderMenu,
+    updateTrigger
+  };
+
+  selectEl._customDropdown = instance;
+  return instance;
+}
+
+function closeAllCustomDropdowns() {
+  document.querySelectorAll(".c-dropdown-wrapper.open").forEach(w => {
+    w.classList.remove("open");
+    w.classList.remove("dropup");
+  });
+  document.querySelectorAll("tr").forEach(tr => {
+    if (tr.style.zIndex === "1200") tr.style.zIndex = "";
+  });
+}
+
+function initAllCustomDropdowns(root = document) {
+  const selects = root.querySelectorAll("select");
+  selects.forEach(sel => {
+    if (sel.closest("#legacyCompatStore") || sel.classList.contains("has-custom-dropdown") || sel.style.display === "none") return;
+    setupCustomDropdown(sel);
+  });
+}
+window.initAllCustomDropdowns = initAllCustomDropdowns;
+window.setupCustomDropdown = setupCustomDropdown;
+
+document.addEventListener("click", () => {
+  closeAllCustomDropdowns();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeAllCustomDropdowns();
+});
+
 function syncWithSchedule() {
   const selectedCourseId = selectCourse.value;
   const selectedWeekVal = selectWeek.value;
@@ -934,16 +1602,9 @@ function syncWithSchedule() {
 
   const sksNum = parseInt(course.sks || (course.coursename?.startsWith("[3]") ? 3 : 2), 10);
   const sks = String(sksNum);
-  const maxMeetingsForCourse = sksNum === 2 ? 14 : 21; // 2 SKS max 14 pertemuan, 3 SKS max 21 pertemuan
 
-  // Filter selectSection options dynamically based on SKS (max 14 or 21)
-  Array.from(selectSection.options).forEach(opt => {
-    const mNum = parseInt(opt.value.replace("PERTEMUAN_", ""), 10);
-    if (!isNaN(mNum)) {
-      opt.hidden = mNum > maxMeetingsForCourse;
-      opt.disabled = mNum > maxMeetingsForCourse;
-    }
-  });
+  // Populate Pertemuan dropdown dynamically based on SKS & Week mapping
+  populateMeetingSelect(course, selectedWeekVal);
 
   if (selectedCourseId.includes("20252")) {
     infoDosen.textContent = "Dosen Metode Numerik";
@@ -955,16 +1616,20 @@ function syncWithSchedule() {
     badgeMode.textContent = "ARSIP DEMO";
     badgeMode.className = "badge-mode-pill luring";
     renderMeetingPills([1]);
-    selectSection.value = "PERTEMUAN_1";
+    if (selectSection) selectSection.value = "PERTEMUAN_1";
+    if (selectSectionMon) selectSectionMon.value = "PERTEMUAN_1";
     highlightActiveMeetingBtn("PERTEMUAN_1");
     return;
   }
 
-  const isKelompok1 = String(course.id_periode || course.periode || "") === "1" || (course.coursename || "").includes("[E-1]");
-  const groupKey = isKelompok1 ? "1" : "2";
-  const kelompokName = isKelompok1 ? "Kelompok 1" : "Kelompok 2";
-  const currentMode = getGroupMode(groupKey, selectedWeekVal);
+  const kel = getCourseKelompok(course);
+  const groupKey = getCourseGroupKey(course);
+  const currentMode = getCourseModeForWeek(course, selectedWeekVal);
   const isDaring = currentMode === "DARING";
+
+  let kelompokName = groupKey === "1" ? "Kelompok 1" : "Kelompok 2";
+  if (kel === "FULL_DARING") kelompokName = "Full Daring";
+  else if (kel === "FULL_LURING") kelompokName = "Full Luring";
 
   infoDosen.textContent = course.nama_dosen || "Dosen Pengampu";
   infoHari.textContent = "Sabtu";
@@ -981,22 +1646,34 @@ function syncWithSchedule() {
 
   if (selectedWeekVal === "UTS" || selectedWeekVal === "UAS") {
     const isUts = selectedWeekVal === "UTS";
-    const mode = isUts
-      ? (isKelompok1 ? "UTS LURING" : "UTS DARING")
-      : (isKelompok1 ? "UAS DARING" : "UAS LURING");
+    let mode = "";
+    if (kel === "FULL_DARING") mode = isUts ? "UTS DARING" : "UAS DARING";
+    else if (kel === "FULL_LURING") mode = isUts ? "UTS LURING" : "UAS LURING";
+    else mode = isUts
+      ? (groupKey === "1" ? "UTS LURING" : "UTS DARING")
+      : (groupKey === "1" ? "UAS DARING" : "UAS LURING");
     badgeMode.textContent = mode;
     badgeMode.className = mode.includes("DARING") ? "badge-mode-pill daring" : "badge-mode-pill luring";
     renderMeetingPills([isUts ? 8 : 16]);
     const secVal = isUts ? "PERTEMUAN_8" : "PERTEMUAN_16";
-    selectSection.value = secVal;
+    if (selectSection) selectSection.value = secVal;
+    if (selectSectionMon) selectSectionMon.value = secVal;
     highlightActiveMeetingBtn(secVal);
     return;
   }
 
   const groupSchedule = scheduleData?.groups?.[groupKey]?.schedule?.[selectedWeekVal] || {};
   const sksSchedule = groupSchedule[sks] || { luring: [], daring: [] };
-  const luringMeetings = sksSchedule.luring || [];
-  const daringMeetings = sksSchedule.daring || [];
+  let luringMeetings = [...(sksSchedule.luring || [])];
+  let daringMeetings = [...(sksSchedule.daring || [])];
+
+  if (kel === "FULL_DARING") {
+    daringMeetings = [...new Set([...daringMeetings, ...luringMeetings])];
+    luringMeetings = [];
+  } else if (kel === "FULL_LURING") {
+    luringMeetings = [...new Set([...daringMeetings, ...luringMeetings])];
+    daringMeetings = [];
+  }
 
   const hasLuring = luringMeetings.length > 0;
   const hasDaring = daringMeetings.length > 0;
@@ -1012,22 +1689,23 @@ function syncWithSchedule() {
     badgeMode.className = "badge-mode-pill daring";
   }
 
-  const activeMeetings = hasDaring ? daringMeetings : luringMeetings;
+  const activeMeetings = WEEK_MEETINGS_BY_SKS[sks]?.[selectedWeekVal] || (hasDaring ? daringMeetings : luringMeetings);
 
   renderMeetingPills(activeMeetings);
 
-  if (activeMeetings.length > 0 && typeof activeMeetings[0] === "number") {
-    const defaultSec = `PERTEMUAN_${activeMeetings[0]}`;
-    selectSection.value = defaultSec;
-    highlightActiveMeetingBtn(defaultSec);
-  }
-
   updateCourseDeadlinePill();
+
+  if (selectWeek?._customDropdown) selectWeek._customDropdown.updateTrigger();
+  if (selectCourse?._customDropdown) selectCourse._customDropdown.updateTrigger();
+  if (selectSection?._customDropdown) selectSection._customDropdown.updateTrigger();
+  if (selectSectionMon?._customDropdown) selectSectionMon._customDropdown.updateTrigger();
 }
 
 function getCourseDeadline(courseCode) {
   const custom = currentClassSettings?.course_deadlines?.[courseCode];
-  const defDay = currentClassSettings?.deadline_day || "Jumat";
+  const course = coursesList.find(c => c.kode_course === courseCode);
+  const courseName = (course?.nama_mata_kuliah || course?.coursename || "").toUpperCase();
+  const defDay = courseName.includes("RISET") ? "Sabtu" : (currentClassSettings?.deadline_day || "Jumat");
   const defTime = currentClassSettings?.deadline_time || "23:59 WIB";
   const day = (custom && custom.day) ? custom.day : defDay;
   const time = (custom && custom.time) ? custom.time : defTime;
@@ -1040,9 +1718,8 @@ function getCourseDeadline(courseCode) {
     day,
     time,
     text: `${day}, ${time}`,
-    isCustom: !!(custom && custom.day && custom.time),
-    isToday,
-    todayName
+    isCustom: !!custom,
+    isToday
   };
 }
 
@@ -1050,17 +1727,55 @@ function updateCourseDeadlinePill() {
   const selectedCourseId = selectCourse?.value;
   if (!selectedCourseId || !textCourseDeadline) return;
   const deadline = getCourseDeadline(selectedCourseId);
-  const todayBadge = deadline.isToday
-    ? ` <span class="badge-deadline-today" style="font-size: 10px; background: rgba(239, 68, 68, 0.25); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.5); padding: 1px 6px; border-radius: 4px; margin-left: 4px; font-weight: 700;">🚨 HARI INI</span>`
+
+  // Cek apakah matkul yang dipilih punya fordis aktif
+  const hasFordis = checkCourseFordisFromScan(selectedCourseId);
+  const todayBadge = (deadline.isToday && hasFordis)
+    ? ` <span class="badge-deadline-today" style="font-size: 10px; background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 1px 6px; border-radius: 4px; margin-left: 4px; font-weight: 600;">Hari Ini</span>`
     : "";
-  if (deadline.isCustom) {
-    textCourseDeadline.innerHTML = `Deadline: <strong style="color: #38bdf8;">${deadline.text}</strong> <span style="font-size: 9px; background: rgba(56, 189, 248, 0.2); color: #38bdf8; padding: 1px 4px; border-radius: 3px; margin-left: 2px;">KHUSUS</span>${todayBadge}`;
-  } else {
-    textCourseDeadline.innerHTML = `Deadline: ${deadline.text}${todayBadge}`;
+  textCourseDeadline.innerHTML = `Deadline: <strong style="color: #38bdf8;">${deadline.text}</strong>${todayBadge}`;
+}
+
+/**
+ * Cek apakah matkul tertentu punya fordis aktif, berdasarkan currentScanData atau scanAllResults.
+ */
+function checkCourseFordisFromScan(courseId) {
+  // Cek dari single scan data
+  if (currentScanData?.kodeCourse === courseId) {
+    return !!(currentScanData.forum?.available);
+  }
+  // Cek dari batch scan results
+  if (scanAllResults && scanAllResults.length > 0) {
+    const match = scanAllResults.find(c => c.kodeCourse === courseId);
+    if (match && match.scannedMeetings) {
+      return match.scannedMeetings.some(m => m.forum?.available);
+    }
+  }
+  return false; // Belum di-scan = anggap belum ada fordis
+}
+
+/**
+ * Refresh dot merah deadline di dropdown course.
+ * Dot merah hanya muncul jika: hari ini adalah deadline matkul tersebut DAN matkul punya fordis aktif.
+ */
+function refreshCourseDeadlineDots() {
+  if (!selectCourse) return;
+  Array.from(selectCourse.options).forEach(opt => {
+    const courseId = opt.value;
+    if (!courseId) return;
+    const cDead = getCourseDeadline(courseId);
+    const hasFordis = checkCourseFordisFromScan(courseId);
+    opt.dataset.isDeadlineToday = (cDead.isToday && hasFordis) ? "true" : "false";
+  });
+  // Refresh custom dropdown agar dot merah di-render ulang
+  if (selectCourse._customDropdown) {
+    selectCourse._customDropdown.renderMenu();
+    selectCourse._customDropdown.updateTrigger();
   }
 }
 
 function renderMeetingPills(meetings) {
+  if (!meetingBtnGroup) return;
   meetingBtnGroup.innerHTML = "";
   if (!meetings || meetings.length === 0) return;
 
@@ -1072,8 +1787,10 @@ function renderMeetingPills(meetings) {
     btn.dataset.section = secVal;
     btn.textContent = `Pertemuan ${m}`;
     btn.onclick = () => {
-      selectSection.value = secVal;
+      if (selectSection) selectSection.value = secVal;
+      if (selectSectionMon) selectSectionMon.value = secVal;
       highlightActiveMeetingBtn(secVal);
+      updateWaPreview();
       performScan();
     };
     meetingBtnGroup.appendChild(btn);
@@ -1084,6 +1801,8 @@ function highlightActiveMeetingBtn(secVal) {
   document.querySelectorAll(".btn-meeting-pill").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.section === secVal);
   });
+  if (selectSection?._customDropdown) selectSection._customDropdown.updateTrigger();
+  if (selectSectionMon?._customDropdown) selectSectionMon._customDropdown.updateTrigger();
 }
 
 // ── 4. Deadline Countdown ──────────────────────────────────────────────────
@@ -1129,6 +1848,19 @@ function startCountdown() {
     const now = new Date();
     const diff = targetDeadline.getTime() - now.getTime();
 
+    // Cek apakah fordis aktif pada pertemuan yang sedang dipilih
+    // Pastikan currentScanData adalah milik matkul yang sedang aktif (bukan matkul lama)
+    const currentCourseSelected = selectCourse?.value;
+    const scanMatchesCourse = currentScanData?.kodeCourse === currentCourseSelected;
+    const isFordisActive = !!(scanMatchesCourse && currentScanData?.forum?.available);
+
+    // Topbar pill hanya muncul jika: fordis aktif DAN sisa waktu <= 24 jam (hari H deadline)
+    const topbarCountdownPill = document.getElementById("topbarCountdownPill");
+    const showTopbarPill = isFordisActive && diff > 0 && diff <= 24 * 60 * 60 * 1000;
+    if (topbarCountdownPill) {
+      topbarCountdownPill.style.display = showTopbarPill ? "" : "none";
+    }
+
     if (diff <= 0) {
       if (deadlineCountdown) deadlineCountdown.textContent = "Batas Waktu Ditutup";
       if (deadlinePill) {
@@ -1161,7 +1893,21 @@ function startCountdown() {
         deadlinePill.classList.remove("urgent");
       }
     }
+
+    const topbarCountdownText = document.getElementById("topbarCountdownText");
+    if (topbarCountdownText && showTopbarPill) {
+      const timeStr = days > 0 ? `${days}h ${pad(hoursInDay)}j ${pad(mins)}m` : `${pad(hoursInDay)}j ${pad(mins)}m ${pad(secs)}d`;
+      topbarCountdownText.textContent = `BATAS PEKAN ${selectedWeek} · ${timeStr} · Deadline: ${deadlineInfo.text}`;
+      if (topbarCountdownPill) {
+        topbarCountdownPill.classList.remove("expired");
+        topbarCountdownPill.classList.add("urgent");
+      }
+    }
   };
+
+  // Sembunyikan pill dulu sebelum update pertama (akan ditampilkan di update() jika syarat terpenuhi)
+  const topbarCountdownPill = document.getElementById("topbarCountdownPill");
+  if (topbarCountdownPill) topbarCountdownPill.style.display = "none";
 
   update();
   countdownTimer = setInterval(update, 1000);
@@ -1169,11 +1915,40 @@ function startCountdown() {
 
 let mentariLoginName = "";
 
+function getInitialsFromName(fullName) {
+  if (!fullName || typeof fullName !== "string") return "M";
+  const clean = fullName.replace(/[^a-zA-Z\s]/g, "").trim();
+  const words = clean.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "M";
+  if (words.length === 1) {
+    return words[0].slice(0, 3).toUpperCase();
+  }
+  return words.map(w => w[0]).join("").slice(0, 4).toUpperCase();
+}
+
 function updateUserDisplayName() {
   const custom = currentClassSettings?.user_custom_name?.trim();
-  const nameToDisplay = custom || mentariLoginName || "ATTHORIQ";
+  const nameToDisplay = custom || mentariLoginName || currentPersonalName || "Mahasiswa";
   if (userName) {
     userName.textContent = nameToDisplay;
+  }
+  const avatarSpan = document.getElementById("userAvatarText");
+  const modalAvatar = document.getElementById("modalAvatarBadge");
+  const fullNameForAvatar = currentPersonalName || custom || mentariLoginName || "Mahasiswa";
+  const initials = getInitialsFromName(fullNameForAvatar);
+  if (avatarSpan) {
+    avatarSpan.textContent = initials;
+  }
+  if (modalAvatar) {
+    modalAvatar.textContent = initials;
+  }
+  const userDisplayNameBadge = document.getElementById("userDisplayNameBadge");
+  const userNimBadge = document.getElementById("userNimBadge");
+  if (userDisplayNameBadge) {
+    userDisplayNameBadge.textContent = custom || currentPersonalName || "Profil Mahasiswa";
+  }
+  if (userNimBadge) {
+    userNimBadge.textContent = currentPersonalNim || "-";
   }
 }
 
@@ -1232,53 +2007,75 @@ let isReconnectingUi = false;
 let lastReconnectTime = 0;
 let autoReconnectAttempts = 0;
 
-async function triggerAutoReconnect(reason = "Sesi MENTARI telah habis") {
+// manualOverride = true: dipanggil dari klik tombol user, bypass semua guard
+async function triggerAutoReconnect(reason = "Sesi MENTARI telah habis", manualOverride = false) {
   const now = Date.now();
-  if (isReconnectingUi) return;
+  if (isReconnectingUi) {
+    showToast("⏳ Proses login sedang berjalan...");
+    return;
+  }
 
-  // Debounce: block if a reconnect occurred in the last 20 seconds
-  if (now - lastReconnectTime < 20000) {
+  // Debounce hanya untuk trigger otomatis (non-manual)
+  if (!manualOverride && now - lastReconnectTime < 20000) {
     console.warn("Pembaruan sesi dicegah untuk menghindari looping.");
     return;
   }
 
-  // Max 1 auto-attempt per cycle to prevent any infinite window loops
-  if (autoReconnectAttempts >= 1) {
+  // Batas percobaan hanya untuk auto-trigger, bukan klik manual
+  if (!manualOverride && autoReconnectAttempts >= 1) {
     console.warn("Batas auto-reconnect tercapai.");
     showToast("⚠️ Sesi MENTARI perlu diperbarui. Klik tombol 'Perbarui Sesi' di menu.");
-    statusValText.textContent = "Offline";
-    statusValText.className = "status-val offline";
-    reconnectBanner.classList.remove("hidden");
+    if (statusValText) statusValText.textContent = "Offline";
+    if (statusValText) statusValText.className = "status-val offline";
+    if (reconnectBanner) reconnectBanner.classList.remove("hidden");
     return;
+  }
+
+  // Reset counter ketika dipanggil manual
+  if (manualOverride) {
+    autoReconnectAttempts = 0;
   }
 
   isReconnectingUi = true;
   lastReconnectTime = now;
   autoReconnectAttempts++;
 
-  showToast(`🔄 ${reason}. Membuka jendela login...`);
-  statusValText.textContent = "Memperbarui...";
-  statusValText.className = "status-val warning";
-  statusDot.className = "status-indicator-dot warning";
+  showToast(`🔄 ${reason}. Membuka jendela login Chrome...`);
+  if (statusValText) {
+    statusValText.textContent = "Memperbarui...";
+    statusValText.className = "status-val warning";
+  }
+  if (statusDot) statusDot.className = "status-indicator-dot warning";
   if (sessionStatusDetail) {
     sessionStatusDetail.textContent = "Memperbarui...";
     sessionStatusDetail.className = "badge-table-pill warning";
   }
 
-  btnScan.disabled = true;
-  scanBtnText.textContent = "Menunggu Login...";
+  if (btnScan) btnScan.disabled = true;
+  if (scanBtnText) scanBtnText.textContent = "Menunggu Login...";
 
   try {
     const res = await fetch("/api/reconnect", { method: "POST" });
     const data = await res.json();
     if (data.success) {
       showToast("🎉 Sesi MENTARI berhasil diperbarui!");
-      autoReconnectAttempts = 0; // reset on success
+      autoReconnectAttempts = 0;
+
+      // Muat ulang daftar mata kuliah yang disinkronkan otomatis dari akun baru
+      try {
+        const cRes = await fetch("/api/courses");
+        const cData = await cRes.json();
+        coursesList = Array.isArray(cData) ? cData : (cData.courses || []);
+        populateCoursesDropdown();
+        renderScheduleView();
+      } catch (e) {}
+
       await checkSessionStatus();
+      if (reconnectBanner) reconnectBanner.classList.add("hidden");
       // Delay 1.5 detik agar browser context sepenuhnya bersih sebelum scan ulang
       setTimeout(() => performScan(true), 1500);
     } else {
-      showToast(`Pembaruan sesi dibatalkan: ${data.error || "Jendela ditutup"}`);
+      showToast(`Pembaruan sesi dibatalkan: ${data.error || "Jendela login ditutup sebelum selesai"}`);
       await checkSessionStatus();
     }
   } catch (err) {
@@ -1286,8 +2083,8 @@ async function triggerAutoReconnect(reason = "Sesi MENTARI telah habis") {
     await checkSessionStatus();
   } finally {
     isReconnectingUi = false;
-    btnScan.disabled = false;
-    scanBtnText.textContent = "Cek Status";
+    if (btnScan) btnScan.disabled = false;
+    if (scanBtnText) scanBtnText.textContent = "Cek Status";
   }
 }
 
@@ -1382,6 +2179,9 @@ async function performScan(isAutoRetry = false) {
     updateWaPreview();
     updateFilterCounts();
     filterAndRenderStudentsTable();
+    // Re-evaluate topbar countdown pill dan dot merah dropdown setelah fordis status diketahui
+    startCountdown();
+    refreshCourseDeadlineDots();
 
     const now = new Date();
     lastScanTime.textContent = now.toLocaleTimeString("id-ID", { hour12: false });
@@ -1489,6 +2289,7 @@ async function performScanAll(isAutoRetry = false) {
       }
     }
     updateWaPreview();
+    refreshCourseDeadlineDots();
     showToast("Berhasil memindai seluruh mata kuliah aktif pekan ini.");
   } catch (err) {
     if (err.message.includes("403") || err.message.includes("401") || err.message.includes("Sesi")) {
@@ -1662,58 +2463,37 @@ function renderQuickHighlights(data, problemStudents) {
     return;
   }
 
-  const topStudents = problemStudents.slice(0, 6);
+  const topStudents = problemStudents.slice(0, 9);
   quickFollowupList.innerHTML = topStudents.map(m => {
     const contact = classContacts[m.nim];
     const phone = contact?.phone || "-";
     const hasPhone = phone !== "-";
+    const cleanPhone = hasPhone ? phone.replace(/[^0-9]/g, "") : "";
 
-    const issues = [];
-    if (m.posttest_status === "BELUM_MENGERJAKAN") issues.push("Posttest");
-    if (m.forum_status === "BELUM_MEMENUHI") issues.push(`Fordis (${m.forum_reply_count || 1}x)`);
-    else if (m.forum_status === "BELUM_MENGERJAKAN") issues.push("Fordis (0x)");
-    else if (m.has_unanswered_topic) issues.push("Topik 2 Kosong");
-    if (m.assignment_status === "BELUM_MENGUMPULKAN") issues.push("Tugas");
-    const issueText = issues.join(" & ");
-
-    let waAction = "";
-    if (hasPhone) {
-      const cleanPhone = phone.replace(/[^0-9]/g, "");
-      const msg = encodeURIComponent(`Halo ${m.nama_mahasiswa}, mengingatkan untuk perkuliahan ${data.mataKuliah || "ini"}: ${issueText} masih belum selesai di MENTARI. Yuk segera dikerjakan ya! Semangat! 💪`);
-      waAction = `
-        <a href="https://wa.me/${cleanPhone}?text=${msg}" target="_blank" class="btn btn-ghost btn-xs" style="color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3);" title="Kirim WA pengingat langsung">
-          <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-          <span>Chat WA</span>
-        </a>
-      `;
-    } else {
-      waAction = `<span style="font-size: 11px; color: var(--text-dim);">-</span>`;
-    }
+    const posttestOk = m.posttest_status !== "BELUM_MENGERJAKAN";
+    const forumReplies = m.forum_reply_count || 0;
+    const forumOk = m.forum_status === "MEMENUHI" || (m.forum_reply_count && m.forum_reply_count >= 2);
+    const isRevisi = m.is_revisi || m.status_keanggotaan === "REVISI";
 
     return `
       <div class="quick-followup-item">
-        <div class="quick-followup-col">
-          <span class="quick-followup-name">${m.nama_mahasiswa}</span>
-          <span class="quick-followup-meta">
-            <span style="font-family: 'JetBrains Mono', monospace;">${m.nim}</span>
-            <span>•</span>
-            <span style="color: #fca5a5;">${issueText}</span>
-          </span>
-        </div>
+        <span class="quick-followup-nim">${m.nim}</span>
+        <span class="quick-followup-name">${m.nama_mahasiswa}${isRevisi ? ' <span style="color:#fbbf24;font-size:9px;">(R)</span>' : ''}</span>
         <div class="quick-followup-actions">
-          ${waAction}
+          <span class="badge-mini ${posttestOk ? 'success' : 'danger'}">${posttestOk ? '✓' : '✕'} Post</span>
+          <span class="badge-mini ${forumOk ? 'success' : 'warning'}">${forumReplies}x F</span>
         </div>
       </div>
     `;
   }).join("");
 
-  if (problemStudents.length > 6) {
-    const sisa = problemStudents.length - 6;
+  if (problemStudents.length > 9) {
+    const sisa = problemStudents.length - 9;
     quickFollowupList.innerHTML += `
-      <div style="text-align: center; padding: 6px 0;">
-        <button class="btn btn-ghost btn-xs" onclick="switchMainView('monitoring')" style="color: #60a5fa;">
-          + ${sisa} mahasiswa lainnya (Buka Monitoring Tugas) →
-        </button>
+      <div style="text-align: center; padding: 10px 0 2px 0;">
+        <span onclick="switchMainView('monitoring')" style="color: #64748b; font-size: 11px; cursor: pointer; transition: color 0.15s;" onmouseover="this.style.color='#94a3b8'" onmouseout="this.style.color='#64748b'">
+          +${sisa} mahasiswa lainnya
+        </span>
       </div>
     `;
   }
@@ -1724,16 +2504,22 @@ function switchMiddleTab(tabName) {
   if (tabName === "revisi") tabName = "posttest";
   activeMiddleTab = tabName;
 
+  if (tabAllMon) tabAllMon.classList.toggle("active", tabName === "all");
   tabPendingPost.classList.toggle("active", tabName === "posttest");
   if (tabDonePost) tabDonePost.classList.toggle("active", tabName === "done_posttest");
   tabPendingForum.classList.toggle("active", tabName === "forum");
   if (tabDoneForum) tabDoneForum.classList.toggle("active", tabName === "done_forum");
   tabPendingAsg.classList.toggle("active", tabName === "assignment");
+  if (tabCompleteMon) tabCompleteMon.classList.toggle("active", tabName === "complete");
   const tabStatusFordisDosen = document.getElementById("tabStatusFordisDosen");
   if (tabStatusFordisDosen) tabStatusFordisDosen.classList.toggle("active", tabName === "status_fordis");
   if (tabPendingRevisi) tabPendingRevisi.classList.toggle("active", false);
 
-  if (tabName === "posttest") {
+  if (tabName === "all") {
+    middlePanelTitle.textContent = "Semua Mahasiswa Kelas 05TPLE003";
+  } else if (tabName === "complete") {
+    middlePanelTitle.textContent = "Mahasiswa yang Sudah Menyelesaikan Posttest & Forum (Lengkap)";
+  } else if (tabName === "posttest") {
     middlePanelTitle.textContent = "Mahasiswa yang belum menyelesaikan Posttest (Kuis)";
   } else if (tabName === "done_posttest") {
     middlePanelTitle.textContent = "Mahasiswa yang sudah menyelesaikan Posttest (Kuis)";
@@ -1820,9 +2606,33 @@ function renderForumTopicsBanner(data, activeTab) {
 }
 
 function renderMiddleTable(tabName) {
+  const thead = document.getElementById("middleTableHead");
   if (tabName === "status_fordis") {
+    if (thead) {
+      thead.innerHTML = `
+        <tr>
+          <th style="width: 40px;">NO</th>
+          <th style="width: 120px;">KODE</th>
+          <th>MATA KULIAH</th>
+          <th style="width: 180px; text-align: center;">STATUS FORDIS</th>
+          <th style="width: 140px; text-align: right;">AKSI</th>
+        </tr>
+      `;
+    }
     renderFordisStatusMiddleTable();
     return;
+  }
+
+  if (thead) {
+    thead.innerHTML = `
+      <tr>
+        <th style="width: 40px;">NO</th>
+        <th style="width: 135px;">NIM</th>
+        <th>NAMA MAHASISWA</th>
+        <th style="width: 185px;">NOMOR WA</th>
+        <th style="width: 170px; text-align: right;">STATUS</th>
+      </tr>
+    `;
   }
 
   if (!currentScanData) {
@@ -1845,19 +2655,26 @@ function renderMiddleTable(tabName) {
   const needForum = allStudents.filter(m => m.forum_status === "BELUM_MEMENUHI" || m.forum_status === "BELUM_MENGERJAKAN");
   const doneForum = allStudents.filter(m => m.forum_status === "MEMENUHI" || (m.forum_reply_count && m.forum_reply_count >= 2));
   const pendingAsg = allStudents.filter(m => m.assignment_status === "BELUM_MENGUMPULKAN");
+  const completeStudents = allStudents.filter(m => {
+    const isPostDone = m.posttest_status === "SUDAH_MENGERJAKAN";
+    const isForumDone = m.forum_status === "MEMENUHI" || (m.forum_reply_count && m.forum_reply_count >= 2);
+    return isPostDone && isForumDone && !m.has_unanswered_topic;
+  });
 
-  tabCountPost.textContent = pendingPost.length;
-  if (tabCountDonePost) tabCountDonePost.textContent = donePost.length;
-  tabCountForum.textContent = needForum.length;
-  if (tabCountDoneForum) tabCountDoneForum.textContent = doneForum.length;
+  if (tabCountAll) tabCountAll.textContent = `(${allStudents.length})`;
+  tabCountPost.textContent = `(${pendingPost.length})`;
+  if (tabCountDonePost) tabCountDonePost.textContent = `(${donePost.length})`;
+  tabCountForum.textContent = `(${needForum.length})`;
+  if (tabCountDoneForum) tabCountDoneForum.textContent = `(${doneForum.length})`;
   if (data.assignment?.is_private) {
     tabCountAsg.textContent = "🔒";
     tabCountAsg.title = "Dibatasi Privasi MENTARI";
   } else {
-    tabCountAsg.textContent = pendingAsg.length;
+    tabCountAsg.textContent = `(${pendingAsg.length})`;
     tabCountAsg.title = "";
   }
-  if (tabCountRevisi) tabCountRevisi.textContent = "0";
+  if (tabCountComplete) tabCountComplete.textContent = `(${completeStudents.length})`;
+  if (tabCountRevisi) tabCountRevisi.textContent = "(0)";
 
   middleTableBody.innerHTML = "";
 
@@ -1865,7 +2682,24 @@ function renderMiddleTable(tabName) {
   let statusBadgeClass = "danger";
   let statusLabelFn = (m) => "Belum Mengerjakan";
 
-  if (tabName === "posttest") {
+  if (tabName === "all") {
+    listToRender = allStudents;
+    statusBadgeClass = "info";
+    statusLabelFn = (m) => {
+      const isPostDone = m.posttest_status === "SUDAH_MENGERJAKAN";
+      const isForumDone = m.forum_status === "MEMENUHI" || (m.forum_reply_count && m.forum_reply_count >= 2);
+      if (isPostDone && isForumDone && !m.has_unanswered_topic) return "Lengkap";
+      if (!isPostDone && !isForumDone) return "Belum Post & Forum";
+      if (!isPostDone) return "Belum Posttest";
+      if (!isForumDone) return m.forum_reply_count === 1 ? "Forum 1x Reply" : "Belum Forum";
+      if (m.has_unanswered_topic) return "Kurang Topik";
+      return "Lengkap";
+    };
+  } else if (tabName === "complete") {
+    listToRender = completeStudents;
+    statusBadgeClass = "success";
+    statusLabelFn = () => "Lengkap";
+  } else if (tabName === "posttest") {
     listToRender = pendingPost;
     statusLabelFn = () => "Belum Mengerjakan";
     statusBadgeClass = "danger";
@@ -1887,7 +2721,16 @@ function renderMiddleTable(tabName) {
     statusBadgeClass = "warning";
   }
 
-  viewAllCount.textContent = listToRender.length;
+  // Filter with searchStudent if query entered
+  const queryMon = (searchStudent?.value || "").trim().toLowerCase();
+  if (queryMon) {
+    listToRender = listToRender.filter(m =>
+      (m.nama_mahasiswa || "").toLowerCase().includes(queryMon) ||
+      String(m.nim || "").includes(queryMon)
+    );
+  }
+
+  viewAllCount.textContent = `${listToRender.length} mahasiswa`;
 
   if (listToRender.length === 0) {
     let emptyMsg = "Semua mahasiswa sudah menyelesaikan bagian ini.";
@@ -1924,15 +2767,30 @@ function renderMiddleTable(tabName) {
     const contact = classContacts[m.nim];
     const phone = contact?.phone || "-";
     const waLink = phone !== "-"
-      ? `<a href="https://wa.me/${phone.replace(/[^0-9]/g, '')}" target="_blank" class="wa-phone-link">
-          <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      ? `<a href="https://wa.me/${phone.replace(/[^0-9]/g, '')}" target="_blank" class="wa-phone-link" title="Chat WhatsApp: ${phone}">
+          <svg class="icon-xs" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           <span>${phone}</span>
          </a>`
-      : `<span style="color: #64748b;">-</span>`;
-
-    const revisiBadge = m.is_revisi ? `<span class="tag-badge-revisi">Revisi</span>` : "";
+      : `<span style="color: #475569; font-size: 12px;">—</span>`;
 
     let cellStatusContent = `<span class="badge-table-pill ${statusBadgeClass}">${statusLabelFn(m)}</span>`;
+
+    // Badge tambahan di samping nama (misal: revisi, late, dll) — kosong secara default
+    let revisiBadge = "";
+    if (m.assignment_status === "LATE" || m.is_late) {
+      revisiBadge = `<span class="badge-table-pill warning" style="font-size:10px;padding:2px 6px;">Terlambat</span>`;
+    } else if (m.assignment_status === "REVISION" || m.needs_revision) {
+      revisiBadge = `<span class="badge-table-pill danger" style="font-size:10px;padding:2px 6px;">Revisi</span>`;
+    }
+
+
+    if (tabName === "all") {
+      const lbl = statusLabelFn(m);
+      let pillClass = "warning";
+      if (lbl === "Lengkap") pillClass = "success";
+      else if (lbl.startsWith("Belum Post")) pillClass = "danger";
+      cellStatusContent = `<span class="badge-table-pill ${pillClass}">${lbl}</span>`;
+    }
 
     if (tabName === "done_forum" || tabName === "forum") {
       let bClass = statusBadgeClass;
@@ -1976,15 +2834,15 @@ function renderMiddleTable(tabName) {
 
     row.innerHTML = `
       <td>${idx + 1}</td>
-      <td style="font-family: 'JetBrains Mono', monospace; color: #94a3b8;">${m.nim}</td>
+      <td class="td-nim">${m.nim}</td>
       <td>
         <div style="display: flex; align-items: center; gap: 6px;">
-          <strong>${m.nama_mahasiswa}</strong>
+          <strong style="color: #f1f5f9;">${m.nama_mahasiswa}</strong>
           ${revisiBadge}
         </div>
       </td>
       <td>${waLink}</td>
-      <td>${cellStatusContent}</td>
+      <td style="text-align: right;">${cellStatusContent}</td>
     `;
     middleTableBody.appendChild(row);
   });
@@ -2003,16 +2861,61 @@ function updateDraftNamesToggleUI() {
       btnOn.classList.remove("active");
     }
   }
+  const switchBtn = document.getElementById("btnToggleNamesSwitch");
+  if (switchBtn) {
+    switchBtn.classList.toggle("active", !!waIncludeStudentNames);
+  }
+  const switchPhone = document.getElementById("btnTogglePhoneSwitch");
+  if (switchPhone) {
+    switchPhone.classList.toggle("active", !!waIncludePhoneNumbers);
+  }
+  const switchNum = document.getElementById("btnToggleNumberingSwitch");
+  if (switchNum) {
+    switchNum.classList.toggle("active", !!waIncludeNumbering);
+  }
+
+  const phoneGroup = document.getElementById("draftPhoneToggleGroup");
+  const numGroup = document.getElementById("draftNumberingToggleGroup");
+  if (phoneGroup) {
+    phoneGroup.style.opacity = waIncludeStudentNames ? "1" : "0.35";
+    phoneGroup.style.pointerEvents = waIncludeStudentNames ? "auto" : "none";
+  }
+  if (numGroup) {
+    numGroup.style.opacity = waIncludeStudentNames ? "1" : "0.35";
+    numGroup.style.pointerEvents = waIncludeStudentNames ? "auto" : "none";
+  }
+
   const selectDraft = document.getElementById("selectDraftIncludeNames");
   if (selectDraft) {
     selectDraft.value = waIncludeStudentNames ? "true" : "false";
   }
 }
 
+function formatDraftText(rawText) {
+  if (!rawText) return "";
+  let text = rawText;
+
+  // 1. Sembunyikan Nomor Telepon/HP jika toggle dinonaktifkan
+  if (!waIncludePhoneNumbers) {
+    // Pola standar: @62812345678 (NAMA MAHASISWA) -> NAMA MAHASISWA
+    text = text.replace(/@\+?\d{7,16}\s*\(([^)]+)\)/g, "$1");
+    // Pola tanpa tanda kurung: @62812345678 -> bersihkan tag nomor
+    text = text.replace(/@\+?\d{7,16}\s*/g, "");
+  }
+
+  // 2. Sembunyikan Nomor Urut (1., 2., 3.) jika toggle dinonaktifkan
+  if (!waIncludeNumbering) {
+    // Ganti nomor baris daftar (1. , 2. , dst) menjadi tanda bullet point
+    text = text.replace(/^(\s*)\d+\.\s+/gm, "$1• ");
+  }
+
+  return text;
+}
+
 function updateDraftNamesToggleVisibility() {
   const group = document.getElementById("draftNamesToggleGroup");
   if (group) {
-    group.style.display = activeWaTab === "matkul" ? "inline-flex" : "none";
+    group.style.display = "flex";
   }
 }
 
@@ -2110,12 +3013,32 @@ function generateMatkulSummaryText(data) {
 }
 
 function updateWaPreview() {
+  const draftMatkulTitle = document.getElementById("draftMatkulTitleDisplay");
+  const draftMatkulSub = document.getElementById("draftMatkulSubDisplay");
+  const activeCourseId = selectCourse?.value;
+  const activeSection = selectSection?.value || "PERTEMUAN_1";
+  const cInfo = (coursesList || []).find(c => c.kode_course === activeCourseId);
+  const rawCourseName = cInfo?.nama_mata_kuliah || cInfo?.coursename || activeCourseId || "Mata Kuliah";
+  const courseTitle = formatCourseTitle(rawCourseName);
+  const secLabel = activeSection.replace("PERTEMUAN_", "Pertemuan ");
+
+  if (draftMatkulTitle) {
+    draftMatkulTitle.textContent = courseTitle;
+  }
+  if (draftMatkulSub) {
+    draftMatkulSub.textContent = `${secLabel} · Format WhatsApp`;
+  }
+
   if (activeWaTab === "matkul") {
-    if (currentScanData?.waTemplate) {
-      const courseCode = selectCourse.value;
-      const cDead = getCourseDeadline(courseCode);
+    // Periksa apakah data scan yang tersedia cocok dengan matkul & pertemuan yang sedang aktif
+    const isDataMatching = currentScanData &&
+      (currentScanData.kodeCourse === activeCourseId || (cInfo && currentScanData.mataKuliah && currentScanData.mataKuliah.includes(cInfo.nama_mata_kuliah))) &&
+      (currentScanData.kodeSection === activeSection || !currentScanData.kodeSection);
+
+    if (isDataMatching && currentScanData.waTemplate) {
+      const cDead = getCourseDeadline(activeCourseId);
       const todayBadge = cDead.isToday ? " 🚨 *[DEADLINE HARI INI]*" : "";
-      
+
       let baseTemplate;
       if (waIncludeStudentNames) {
         baseTemplate = currentScanData.waTemplate;
@@ -2124,9 +3047,15 @@ function updateWaPreview() {
       }
 
       const updatedText = baseTemplate.replace(/\*Deadline:[^\n]*/, `*Deadline: ${cDead.text}*${todayBadge}`);
-      waMessageContent.textContent = updatedText;
+      waMessageContent.textContent = formatDraftText(updatedText);
     } else {
-      waMessageContent.textContent = "*Pilih mata kuliah dan klik Cek Status untuk melihat draf...*";
+      // Jika data belum sesuai atau sedang berpindah matkul, tampilkan status pemindaian langsung
+      waMessageContent.textContent = `⏳ *Sedang memindai ${courseTitle} (${secLabel})...*\n\nMohon tunggu sebentar, draf WhatsApp akan otomatis diperbarui begitu proses pemindaian selesai.`;
+
+      // Jika belum sedang proses scan, picu scan secara otomatis tanpa user perlu klik apa pun!
+      if (scanBtnText && scanBtnText.textContent !== "Memeriksa..." && activeCourseId) {
+        performScan();
+      }
     }
   } else if (activeWaTab === "today") {
     renderGrupUtamaMessage(true);
@@ -2248,7 +3177,7 @@ function renderGrupUtamaMessage(isTodayOnly = false) {
     .replace(/{LIST_FORDIS_BELUM_BUKA}/g, listFordisBelumStr ? listFordisBelumStr.trim() + "\n\n" : "");
 
   rendered = rendered.replace(/\n{3,}/g, "\n\n").trim();
-  waMessageContent.textContent = rendered;
+  waMessageContent.textContent = formatDraftText(rendered);
 }
 
 function copyWaDraft() {
@@ -2258,6 +3187,11 @@ function copyWaDraft() {
     return;
   }
   navigator.clipboard.writeText(text);
+  const copyBtnText = document.getElementById("copyBtnText");
+  if (copyBtnText) {
+    copyBtnText.textContent = "Tersalin!";
+    setTimeout(() => { copyBtnText.textContent = "Salin Teks"; }, 2000);
+  }
   let group = "Grup Matkul";
   if (activeWaTab === "utama") group = "Grup Utama Kelas (Semua)";
   else if (activeWaTab === "today") group = "Grup Utama Kelas (Deadline Hari Ini)";
@@ -2299,78 +3233,75 @@ async function sendCurrentWaToTelegram() {
 }
 
 // ── 11. Full Students Table & Pagination ───────────────────────────────────
+// ── 11. Master Data Mahasiswa Table & Pagination ───────────────────────────
 function updateFilterCounts() {
-  const total = currentStudentsList.length;
-  const pendingPost = currentStudentsList.filter(m => m.posttest_status === "BELUM_MENGERJAKAN").length;
-  const donePost = currentStudentsList.filter(m => m.posttest_status === "SUDAH_MENGERJAKAN").length;
-  const pendingForum = currentStudentsList.filter(m => m.forum_status === "BELUM_MEMENUHI" || m.forum_status === "BELUM_MENGERJAKAN").length;
-  const doneForum = currentStudentsList.filter(m => m.forum_status === "MEMENUHI" || (m.forum_reply_count && m.forum_reply_count >= 2)).length;
-  const pendingAsg = currentStudentsList.filter(m => m.assignment_status === "BELUM_MENGUMPULKAN").length;
-  const complete = currentStudentsList.filter(m =>
-    (m.posttest_status === "SUDAH_MENGERJAKAN" || m.posttest_status === "NOT_AVAILABLE") &&
-    (m.forum_status === "MEMENUHI" || m.forum_status === "NOT_AVAILABLE") &&
-    (m.assignment_status === "SUDAH_MENGUMPULKAN" || m.assignment_status === "NOT_AVAILABLE" || m.assignment_status === "PRIVAT_MENTARI")
-  ).length;
-
-  filterAllCount.textContent = total;
-  filterPostCount.textContent = pendingPost;
-  if (filterDonePostCount) filterDonePostCount.textContent = donePost;
-  filterForumCount.textContent = pendingForum;
-  if (filterDoneForumCount) filterDoneForumCount.textContent = doneForum;
-  filterAsgCount.textContent = pendingAsg;
-  filterCompleteCount.textContent = complete;
+  const total = Object.keys(classContacts || {}).length;
+  if (filterAllCount) filterAllCount.textContent = total;
 }
 
 function filterAndRenderStudentsTable() {
+  if (!tableStudentsBody) return;
   tableStudentsBody.innerHTML = "";
 
-  let filtered = currentStudentsList.filter(m => {
-    if (currentSearchQuery) {
-      const matchName = (m.nama_mahasiswa || "").toLowerCase().includes(currentSearchQuery);
-      const matchNim = (m.nim || "").toLowerCase().includes(currentSearchQuery);
-      if (!matchName && !matchNim) return false;
-    }
-    if (activeFilter === "PENDING_POST") return m.posttest_status === "BELUM_MENGERJAKAN";
-    if (activeFilter === "DONE_POST") return m.posttest_status === "SUDAH_MENGERJAKAN";
-    if (activeFilter === "PENDING_FORUM") return m.forum_status === "BELUM_MEMENUHI" || m.forum_status === "BELUM_MENGERJAKAN";
-    if (activeFilter === "DONE_FORUM") return m.forum_status === "MEMENUHI" || (m.forum_reply_count && m.forum_reply_count >= 2);
-    if (activeFilter === "PENDING_ASG") return m.assignment_status === "BELUM_MENGUMPULKAN";
-    if (activeFilter === "COMPLETE") {
-      return (m.posttest_status === "SUDAH_MENGERJAKAN" || m.posttest_status === "NOT_AVAILABLE") &&
-             (m.forum_status === "MEMENUHI" || m.forum_status === "NOT_AVAILABLE") &&
-             (m.assignment_status === "SUDAH_MENGUMPULKAN" || m.assignment_status === "NOT_AVAILABLE" || m.assignment_status === "PRIVAT_MENTARI");
-    }
-    return true;
+  // Ambil data master mahasiswa dari classContacts
+  let masterList = Object.keys(classContacts || {}).map(nim => {
+    const c = classContacts[nim] || {};
+    return {
+      nim,
+      nama: typeof c === "string" ? c : (c.nama || c.name || nim),
+      phone: typeof c === "object" ? (c.phone || "") : "",
+      type: typeof c === "object" ? (c.type || "UTAMA") : "UTAMA"
+    };
   });
 
+  // Jika classContacts masih kosong, fallback ke currentStudentsList
+  if (masterList.length === 0 && currentStudentsList && currentStudentsList.length > 0) {
+    masterList = currentStudentsList.map(s => ({
+      nim: s.nim,
+      nama: s.nama_mahasiswa || s.nim,
+      phone: "",
+      type: s.is_revisi ? "REVISI" : "UTAMA"
+    }));
+  }
+
+  // Filter pencarian nama / NIM / No HP
+  if (masterStudentSearchQuery) {
+    masterList = masterList.filter(m => {
+      const matchName = (m.nama || "").toLowerCase().includes(masterStudentSearchQuery);
+      const matchNim = (m.nim || "").toLowerCase().includes(masterStudentSearchQuery);
+      const matchPhone = (m.phone || "").includes(masterStudentSearchQuery);
+      return matchName || matchNim || matchPhone;
+    });
+  }
+
   // Urutkan: Mahasiswa UTAMA terlebih dahulu (A-Z), disusul Mahasiswa REVISI (A-Z)
-  filtered.sort((a, b) => {
-    const isRevisiA = a.is_revisi ? 1 : 0;
-    const isRevisiB = b.is_revisi ? 1 : 0;
+  masterList.sort((a, b) => {
+    const isRevisiA = a.type === "REVISI" ? 1 : 0;
+    const isRevisiB = b.type === "REVISI" ? 1 : 0;
     if (isRevisiA !== isRevisiB) return isRevisiA - isRevisiB;
-    const nameA = (a.nama_mahasiswa || "").trim().toUpperCase();
-    const nameB = (b.nama_mahasiswa || "").trim().toUpperCase();
+    const nameA = (a.nama || "").trim().toUpperCase();
+    const nameB = (b.nama || "").trim().toUpperCase();
     return nameA.localeCompare(nameB, "id");
   });
 
-  const totalFiltered = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
-  if (currentPage > totalPages) currentPage = totalPages;
+  const totalFiltered = masterList.length;
+  const pageItems = masterList; // Tampilkan seluruh mahasiswa sekaligus tanpa pagination
 
-  const startIdx = (currentPage - 1) * pageSize;
-  const pageItems = filtered.slice(startIdx, startIdx + pageSize);
+  if (paginationInfo) {
+    paginationInfo.textContent = totalFiltered > 0
+      ? `Menampilkan seluruh ${totalFiltered} mahasiswa`
+      : `Menampilkan 0 mahasiswa`;
+  }
 
-  paginationInfo.textContent = totalFiltered > 0
-    ? `Showing ${startIdx + 1} to ${Math.min(startIdx + pageSize, totalFiltered)} of ${totalFiltered}`
-    : `Showing 0 to 0 of 0`;
-
-  renderPaginationControls(totalPages);
+  if (paginationControls) {
+    paginationControls.innerHTML = "";
+  }
 
   if (pageItems.length === 0) {
     tableStudentsBody.innerHTML = `
       <tr>
-        <td colspan="7" class="text-center empty-cell">
-          Tidak ada data mahasiswa yang sesuai dengan filter.
+        <td colspan="6" class="text-center empty-cell" style="padding: 30px; color: #94a3b8;">
+          ${masterStudentSearchQuery ? `Tidak ada mahasiswa yang cocok dengan pencarian "<strong>${masterStudentSearchQuery}</strong>"` : `Belum ada data mahasiswa terdaftar.`}
         </td>
       </tr>
     `;
@@ -2379,75 +3310,280 @@ function filterAndRenderStudentsTable() {
 
   pageItems.forEach((m, idx) => {
     const row = document.createElement("tr");
-    const isCurrentUser = (m.nama_mahasiswa || "").toLowerCase().includes("atthoriq");
-    const contact = classContacts[m.nim];
-    const phone = contact?.phone || "";
-
-    // Status Badges
-    let postBadge = `<span class="badge-table-pill gray">Belum Ada</span>`;
-    if (m.posttest_status === "SUDAH_MENGERJAKAN") postBadge = `<span class="badge-table-pill success">Sudah</span>`;
-    else if (m.posttest_status === "BELUM_MENGERJAKAN") postBadge = `<span class="badge-table-pill danger">Belum</span>`;
-
-    let forumBadge = `<span class="badge-table-pill gray">Belum Ada</span>`;
-    if (m.forum_status === "MEMENUHI") {
-      if (m.has_unanswered_topic) {
-        forumBadge = `<div class="topic-breakdown-cell"><span class="badge-table-pill warning" title="Ada topik diskusi dosen yang belum diisi">Memenuhi (${m.forum_reply_count || 2}x) ⚠️</span>`;
-        if (m.forum_topics_breakdown && m.forum_topics_breakdown.length > 1) {
-          forumBadge += `<div class="topic-breakdown-sub">${m.forum_topics_breakdown.map((tb, i) => `T${i + 1}:${tb.count}x`).join(" ")}</div>`;
-        }
-        forumBadge += `</div>`;
-      } else {
-        forumBadge = `<div class="topic-breakdown-cell"><span class="badge-table-pill success">Lengkap (${m.forum_reply_count || 2}x)</span>`;
-        if (m.forum_topics_breakdown && m.forum_topics_breakdown.length > 1) {
-          forumBadge += `<div class="topic-breakdown-sub">${m.forum_topics_breakdown.map((tb, i) => `T${i + 1}:${tb.count}x`).join(" ")}</div>`;
-        }
-        forumBadge += `</div>`;
-      }
-    } else if (m.forum_status === "BELUM_MEMENUHI") {
-      forumBadge = `<div class="topic-breakdown-cell"><span class="badge-table-pill warning">Kurang (${m.forum_reply_count || 1}x)</span>`;
-      if (m.forum_topics_breakdown && m.forum_topics_breakdown.length > 1) {
-        forumBadge += `<div class="topic-breakdown-sub">${m.forum_topics_breakdown.map((tb, i) => `T${i + 1}:${tb.count}x`).join(" ")}</div>`;
-      }
-      forumBadge += `</div>`;
-    } else if (m.forum_status === "BELUM_MENGERJAKAN") {
-      forumBadge = `<span class="badge-table-pill danger">Belum</span>`;
-    }
-
-    let asgBadge = `<span class="badge-table-pill gray">Belum Ada</span>`;
-    if (m.assignment_status === "SUDAH_MENGUMPULKAN") asgBadge = `<span class="badge-table-pill success">Sudah</span>`;
-    else if (m.assignment_status === "BELUM_MENGUMPULKAN") asgBadge = `<span class="badge-table-pill danger">Belum</span>`;
-    else if (m.assignment_status === "PRIVAT_MENTARI") asgBadge = `<span class="badge-table-pill info" title="Privasi MENTARI (Cek portal masing-masing)">Privat</span>`;
-
+    const isCurrentUser = (currentPersonalNim && m.nim === currentPersonalNim) ||
+      (currentPersonalName && m.nama && m.nama.toLowerCase().trim() === currentPersonalName.toLowerCase().trim());
     const userTag = isCurrentUser ? `<span class="tag-user-anda">Anda</span>` : "";
-    const phoneSub = phone ? `<div style="font-size: 10px; color: #38bdf8; font-family: 'JetBrains Mono', monospace;">${phone}</div>` : "";
+    const phoneClean = (m.phone || "").replace(/[^0-9]/g, "");
 
-    const actionWa = phone
-      ? `<a href="https://wa.me/${phone.replace(/[^0-9]/g, '')}" target="_blank" title="Chat WhatsApp" style="color: #34d399; margin-right: 6px;">
-          <svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-         </a>`
-      : `<span style="color: #4b5563; margin-right: 6px;">-</span>`;
+    // Status button (Utama vs Revisi)
+    const isRevisi = m.type === "REVISI";
+    const statusBtn = isRevisi
+      ? `<button type="button" class="tag-badge-revisi cursor-pointer" onclick="toggleStudentType('${m.nim}')" title="Klik untuk beralih status ke UTAMA" style="background: rgba(245,158,11,0.15); color: #fbbf24; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(245,158,11,0.3); cursor: pointer;">Revisi</button>`
+      : `<button type="button" class="tag-badge-utama cursor-pointer" onclick="toggleStudentType('${m.nim}')" title="Klik untuk beralih status ke REVISI" style="background: rgba(99,102,241,0.15); color: #818cf8; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(99,102,241,0.3); cursor: pointer;">Utama</button>`;
 
-    const revisiTag = m.is_revisi ? `<span class="tag-badge-revisi">Revisi</span>` : "";
+    // WhatsApp column
+    const waDisplay = phoneClean
+      ? `<a href="https://wa.me/${phoneClean}" target="_blank" class="wa-phone-link" title="Kirim Pesan WhatsApp (${m.phone})" style="color: #34d399; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+          <svg class="icon-xs" style="width: 14px; height: 14px; color: #10b981;" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <span>${m.phone}</span>
+        </a>`
+      : `<span style="color: #64748b; font-size: 12px;">—</span>`;
+
+    // Action buttons: Chat WA icon + Edit button + Delete button
+    const waActionBtn = phoneClean
+      ? `<a href="https://wa.me/${phoneClean}" target="_blank" title="Chat WhatsApp (${m.phone})" class="btn-wa-icon" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25); text-decoration: none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </a>`
+      : ``;
+
+    const editActionBtn = `
+      <button type="button" class="btn-edit-student" onclick="openEditStudentModal('${m.nim}')" title="Edit data mahasiswa" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: rgba(56,189,248,0.12); color: #38bdf8; border: 1px solid rgba(56,189,248,0.25); cursor: pointer; transition: all 0.15s;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+      </button>
+    `;
+
+    const deleteActionBtn = `
+      <button type="button" class="btn-delete-student" onclick="deleteMasterStudent('${m.nim}')" title="Hapus mahasiswa dari kelas" style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); cursor: pointer; transition: all 0.15s;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>
+    `;
 
     row.innerHTML = `
-      <td>${startIdx + idx + 1}</td>
-      <td style="font-family: 'JetBrains Mono', monospace; color: #94a3b8;">${m.nim}</td>
+      <td style="text-align: center; color: #94a3b8; font-size: 12px;">${idx + 1}</td>
+      <td style="font-family: 'JetBrains Mono', monospace; color: #cbd5e1; font-weight: 500;">${m.nim}</td>
       <td>
         <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-          <strong>${m.nama_mahasiswa}</strong>
-          ${revisiTag}
+          <strong style="color: #f8fafc;">${m.nama}</strong>
           ${userTag}
         </div>
-        ${phoneSub}
       </td>
-      <td>${postBadge}</td>
-      <td>${forumBadge}</td>
-      <td>${asgBadge}</td>
-      <td>${actionWa}</td>
+      <td style="text-align: center;">${statusBtn}</td>
+      <td>${waDisplay}</td>
+      <td style="text-align: right;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: flex-end;">
+          ${waActionBtn}
+          ${editActionBtn}
+          ${deleteActionBtn}
+        </div>
+      </td>
     `;
     tableStudentsBody.appendChild(row);
   });
+
+  const badgeTotalCount = document.getElementById("badgeTotalStudentsCount");
+  if (badgeTotalCount) {
+    badgeTotalCount.textContent = `${totalFiltered} Mahasiswa`;
+  }
 }
+
+function openAddStudentModal() {
+  if (modalAddStudent) {
+    modalAddStudent.classList.remove("hidden");
+    if (addStudentNim) addStudentNim.focus();
+  }
+}
+
+function closeAddStudentModal() {
+  if (modalAddStudent) modalAddStudent.classList.add("hidden");
+  if (addStudentNim) addStudentNim.value = "";
+  if (addStudentName) addStudentName.value = "";
+  if (addStudentPhone) addStudentPhone.value = "";
+  if (addStudentType) addStudentType.value = "UTAMA";
+}
+
+function openEditStudentModal(nim) {
+  const c = classContacts[nim] || {};
+  const s = (currentStudentsList || []).find(x => x.nim === nim);
+  const nama = c.nama || s?.nama_mahasiswa || "";
+  const phone = c.phone || "";
+  const type = c.type || (s?.is_revisi ? "REVISI" : "UTAMA");
+
+  const modalEdit = document.getElementById("modalEditStudent");
+  const editNim = document.getElementById("editStudentNim");
+  const editName = document.getElementById("editStudentName");
+  const editPhone = document.getElementById("editStudentPhone");
+  const editType = document.getElementById("editStudentType");
+
+  if (editNim) editNim.value = nim;
+  if (editName) editName.value = nama;
+  if (editPhone) editPhone.value = phone;
+  if (editType) editType.value = type;
+
+  if (modalEdit) {
+    modalEdit.classList.remove("hidden");
+    if (editName) editName.focus();
+  }
+}
+window.openEditStudentModal = openEditStudentModal;
+
+function closeEditStudentModal() {
+  const modalEdit = document.getElementById("modalEditStudent");
+  if (modalEdit) modalEdit.classList.add("hidden");
+}
+window.closeEditStudentModal = closeEditStudentModal;
+
+async function saveEditedStudent() {
+  const editNim = document.getElementById("editStudentNim");
+  const editName = document.getElementById("editStudentName");
+  const editPhone = document.getElementById("editStudentPhone");
+  const editType = document.getElementById("editStudentType");
+  const btnSave = document.getElementById("btnSaveEditStudent");
+
+  const nim = (editNim?.value || "").trim();
+  const nama = (editName?.value || "").trim().toUpperCase();
+  let phone = (editPhone?.value || "").trim().replace(/[^0-9]/g, "");
+  if (phone.startsWith("0")) phone = "62" + phone.slice(1);
+  const type = editType?.value || "UTAMA";
+
+  if (!nim || !nama) {
+    showToast("⚠️ Nama Mahasiswa wajib diisi!");
+    return;
+  }
+
+  if (btnSave) {
+    btnSave.disabled = true;
+    btnSave.textContent = "Menyimpan...";
+  }
+
+  try {
+    const res = await fetch("/api/contacts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nim, nama, phone, type })
+    });
+    const data = await res.json();
+    if (data.success) {
+      classContacts[nim] = { nim, nama, phone, type };
+      const existing = currentStudentsList.find(s => s.nim === nim);
+      if (existing) {
+        existing.nama_mahasiswa = nama;
+        existing.is_revisi = type === "REVISI";
+      }
+      closeEditStudentModal();
+      filterAndRenderStudentsTable();
+      renderMiddleTable(activeMiddleTab);
+      updateWaPreview();
+      showToast(`✅ Data mahasiswa ${nama} berhasil diperbarui!`);
+    } else {
+      showToast(`Gagal: ${data.error || "Gagal menyimpan perubahan"}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  } finally {
+    if (btnSave) {
+      btnSave.disabled = false;
+      btnSave.textContent = "Simpan Perubahan";
+    }
+  }
+}
+
+async function saveNewStudent() {
+  const nim = (addStudentNim?.value || "").trim();
+  const nama = (addStudentName?.value || "").trim().toUpperCase();
+  let phone = (addStudentPhone?.value || "").trim().replace(/[^0-9]/g, "");
+  if (phone.startsWith("0")) phone = "62" + phone.slice(1);
+  const type = addStudentType?.value || "UTAMA";
+
+  if (!nim || !nama) {
+    showToast("⚠️ NIM dan Nama Mahasiswa wajib diisi!");
+    return;
+  }
+
+  if (btnSaveNewStudent) {
+    btnSaveNewStudent.disabled = true;
+    btnSaveNewStudent.textContent = "Menyimpan...";
+  }
+
+  try {
+    const res = await fetch("/api/contacts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nim, nama, phone, type })
+    });
+    const data = await res.json();
+    if (data.success) {
+      classContacts[nim] = { nim, nama, phone, type };
+      const existing = currentStudentsList.find(s => s.nim === nim);
+      if (existing) {
+        existing.nama_mahasiswa = nama;
+        existing.is_revisi = type === "REVISI";
+      } else {
+        currentStudentsList.push({
+          nim,
+          nama_mahasiswa: nama,
+          is_revisi: type === "REVISI",
+          posttest_status: "NOT_AVAILABLE",
+          forum_status: "NOT_AVAILABLE",
+          assignment_status: "NOT_AVAILABLE"
+        });
+      }
+      closeAddStudentModal();
+      filterAndRenderStudentsTable();
+      renderMiddleTable(activeMiddleTab);
+      updateWaPreview();
+      showToast(`🎉 Berhasil mendaftarkan mahasiswa ${nama}!`);
+    } else {
+      showToast(`Gagal: ${data.error || "Gagal menyimpan"}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  } finally {
+    if (btnSaveNewStudent) {
+      btnSaveNewStudent.disabled = false;
+      btnSaveNewStudent.textContent = "Simpan Mahasiswa";
+    }
+  }
+}
+
+window.deleteMasterStudent = async function(nim) {
+  const c = classContacts[nim];
+  const nama = c?.nama || nim;
+  if (!confirm(`Apakah Anda yakin ingin menghapus mahasiswa ${nama} (${nim}) dari kelas?\n\nMahasiswa akan dihapus dari direktori kontak dan draf pengingat WhatsApp.`)) {
+    return;
+  }
+  try {
+    const res = await fetch("/api/contacts/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nim })
+    });
+    const data = await res.json();
+    if (data.success) {
+      delete classContacts[nim];
+      currentStudentsList = currentStudentsList.filter(s => s.nim !== nim);
+      filterAndRenderStudentsTable();
+      renderMiddleTable(activeMiddleTab);
+      updateWaPreview();
+      showToast(`🗑️ Mahasiswa ${nama} berhasil dihapus.`);
+    } else {
+      showToast(`Gagal: ${data.error || "Gagal menghapus mahasiswa"}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  }
+};
+
+window.toggleStudentType = async function(nim) {
+  try {
+    const res = await fetch("/api/contacts/toggle-type", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nim })
+    });
+    const data = await res.json();
+    if (data.success && data.contact) {
+      classContacts[nim] = data.contact;
+      const s = currentStudentsList.find(x => x.nim === nim);
+      if (s) s.is_revisi = data.contact.type === "REVISI";
+      filterAndRenderStudentsTable();
+      renderMiddleTable(activeMiddleTab);
+      updateWaPreview();
+      showToast(`Status ${data.contact.nama} diubah ke ${data.contact.type}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  }
+};
 
 function renderPaginationControls(totalPages) {
   paginationControls.innerHTML = "";
@@ -2490,37 +3626,69 @@ function renderPaginationControls(totalPages) {
 
 // ── 12. Export Helpers (CSV & Google Sheets) ────────────────────────────────
 function exportToCsv() {
-  if (!currentStudentsList || currentStudentsList.length === 0) {
+  const nims = Object.keys(classContacts || {});
+  if (nims.length === 0) {
     showToast("Belum ada data mahasiswa untuk diekspor.");
     return;
   }
-  let csv = "No,NIM,Nama Mahasiswa,Tipe,Status Posttest,Status Forum,Reply Forum,Penugasan Terstruktur\n";
-  currentStudentsList.forEach((m, idx) => {
-    const tipe = m.is_revisi ? "Revisi" : "Utama";
-    csv += `"${idx+1}","'${m.nim}'","${m.nama_mahasiswa}","${tipe}","${m.posttest_status}","${m.forum_status}","${m.forum_reply_count||0}","${m.assignment_status}"\n`;
+
+  // UTF-8 BOM (\uFEFF) + sep=, directive agar Microsoft Excel di semua sistem/locale (termasuk Indonesia)
+  // otomatis memecah kolom dengan rapi dan tidak menumpuk di Kolom A saja.
+  let csv = "\uFEFFsep=,\r\nNo,NIM,Nama Mahasiswa,Status,Nomor WhatsApp\r\n";
+  const sorted = Object.values(classContacts).sort((a, b) => {
+    const isRevA = a.type === "REVISI" ? 1 : 0;
+    const isRevB = b.type === "REVISI" ? 1 : 0;
+    if (isRevA !== isRevB) return isRevA - isRevB;
+    return (a.nama || "").localeCompare(b.nama || "", "id");
+  });
+
+  sorted.forEach((c, idx) => {
+    const no = idx + 1;
+    const nimVal = (c.nim || "").toString().trim();
+    // Gunakan ="..." agar Excel mempertahankan angka panjang sebagai string teks tanpa notasi ilmiah (2.41E+11)
+    const nimCol = nimVal ? `="${nimVal}"` : `""`;
+    const namaCol = `"${(c.nama || "").toString().replace(/"/g, '""')}"`;
+    const typeCol = `"${(c.type || "UTAMA").toString().replace(/"/g, '""')}"`;
+    const phoneVal = (c.phone || "").toString().trim();
+    const phoneCol = (phoneVal && phoneVal !== "-") ? `="${phoneVal}"` : `"-"`;
+
+    csv += `${no},${nimCol},${namaCol},${typeCol},${phoneCol}\r\n`;
   });
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `Rekap_TugasKu_${selectCourse.value}_Pekan${selectWeek.value}.csv`;
+  const rawClass = currentClassSettings?.class_name || (coursesList && coursesList[0]?.id_kelas) || "05TPLE003";
+  const cleanClass = String(rawClass).replace(/[^a-zA-Z0-9_-]/g, "");
+  a.download = `Data_Mahasiswa_${cleanClass}.csv`;
+  document.body.appendChild(a);
   a.click();
-  showToast("File CSV berhasil diunduh.");
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast(`File CSV data mahasiswa (${cleanClass}) berhasil diunduh.`);
 }
 
 function copyForGoogleSheets() {
-  if (!currentStudentsList || currentStudentsList.length === 0) {
+  const nims = Object.keys(classContacts || {});
+  if (nims.length === 0) {
     showToast("Belum ada data mahasiswa untuk disalin.");
     return;
   }
-  let tsv = "No\tNIM\tNama Mahasiswa\tTipe\tStatus Posttest\tStatus Forum\tReply Forum\tPenugasan Terstruktur\n";
-  currentStudentsList.forEach((m, idx) => {
-    const tipe = m.is_revisi ? "Revisi" : "Utama";
-    tsv += `${idx+1}\t${m.nim}\t${m.nama_mahasiswa}\t${tipe}\t${m.posttest_status}\t${m.forum_status}\t${m.forum_reply_count||0}\t${m.assignment_status}\n`;
+  let tsv = "No\tNIM\tNama Mahasiswa\tStatus\tNomor WhatsApp\n";
+  const sorted = Object.values(classContacts).sort((a, b) => {
+    const isRevA = a.type === "REVISI" ? 1 : 0;
+    const isRevB = b.type === "REVISI" ? 1 : 0;
+    if (isRevA !== isRevB) return isRevA - isRevB;
+    return (a.nama || "").localeCompare(b.nama || "", "id");
+  });
+  sorted.forEach((c, idx) => {
+    const nimVal = (c.nim || "").toString().trim();
+    const phoneVal = (c.phone || "").toString().trim();
+    tsv += `${idx + 1}\t${nimVal}\t${c.nama || ""}\t${c.type || "UTAMA"}\t${phoneVal || "-"}\n`;
   });
   navigator.clipboard.writeText(tsv);
-  showToast("Data berhasil disalin! Silakan paste langsung di Google Sheets.");
+  showToast("Data mahasiswa berhasil disalin! Silakan tempel di Google Sheets.");
 }
 
 // ── 13. Contacts List Renderer ─────────────────────────────────────────────
@@ -2953,9 +4121,9 @@ async function renderFordisStatusMiddleTable() {
         <strong style="color: #fff;">${res.mataKuliah || res.coursename}</strong>
         <div style="font-size: 11px; color: ${modeColor}; font-weight: 600;">${modeText} • ${res.sks || 2} SKS</div>
       </td>
-      <td>${fordisBadge}</td>
-      <td>
-        ${!isPureLuring ? `<button class="btn btn-outline-primary btn-sm btn-middle-select-matkul" data-code="${res.kodeCourse}">Pilih Matkul</button>` : `<span style="color: #64748b;">-</span>`}
+      <td style="text-align: center;">${fordisBadge}</td>
+      <td style="text-align: right;">
+        ${!isPureLuring ? `<button type="button" class="btn-select-matkul-action btn-middle-select-matkul" data-code="${res.kodeCourse}">Pilih Matkul</button>` : `<span style="color: #64748b;">-</span>`}
       </td>
     `;
     middleTableBody.appendChild(row);
@@ -3084,8 +4252,8 @@ async function renderFordisStatusModalTable() {
       <td>${modeBadge}</td>
       <td>${fordisBadge}</td>
       <td>${postBadge}</td>
-      <td>
-        ${!isPureLuring ? `<button class="btn btn-ghost btn-sm btn-modal-select-matkul" data-code="${res.kodeCourse}">Pilih Matkul</button>` : `<span style="color: #64748b;">-</span>`}
+      <td style="text-align: right;">
+        ${!isPureLuring ? `<button type="button" class="btn-select-matkul-action btn-modal-select-matkul" data-code="${res.kodeCourse}">Pilih Matkul</button>` : `<span style="color: #64748b;">-</span>`}
       </td>
     `;
     tbody.appendChild(row);
@@ -3117,16 +4285,11 @@ function updateCourseMetaInfo() {
 }
 
 // ── 16b. Rangkuman Tugas Pribadi (Status Saya) ──────────────────────────────
-let currentPersonalNim = "241011401354";
-let currentPersonalName = "ATTHORIQ RHEVAL FAHLEVI";
+let currentPersonalNim = "";
+let currentPersonalName = "";
 
 function openPersonalSummaryModal() {
-  const modal = document.getElementById("modalPersonalSummary");
-  if (!modal) return;
-  modal.classList.remove("hidden");
-  populatePersonalStudentDropdown();
-  populatePersonalWeekDropdown();
-  renderPersonalSummaryTable();
+  switchMainView("rangkuman");
 }
 
 function closePersonalSummaryModal() {
@@ -3144,7 +4307,7 @@ function populatePersonalStudentDropdown() {
   if (currentPersonalNim) {
     studentMap.set(currentPersonalNim, {
       nim: currentPersonalNim,
-      nama_mahasiswa: currentPersonalName || "ATTHORIQ RHEVAL FAHLEVI"
+      nama_mahasiswa: currentPersonalName || "Mahasiswa"
     });
   }
 
@@ -3233,18 +4396,28 @@ function populatePersonalWeekDropdown() {
   select.value = selectWeek?.value || "2";
 }
 
+let isPersonalScanning = false;
 async function refreshPersonalSummary() {
+  if (isPersonalScanning) return;
+  isPersonalScanning = true;
   const btn = document.getElementById("btnRefreshPersonal");
   if (btn) {
     btn.disabled = true;
     btn.innerHTML = `<span class="spinner" style="width: 12px; height: 12px; display: inline-block;"></span> <span>Memindai...</span>`;
+  }
+  const selectPersonalWeek = document.getElementById("selectPersonalWeek");
+  if (selectPersonalWeek && selectWeek) {
+    selectWeek.value = selectPersonalWeek.value;
   }
   try {
     await performScanAll();
     populatePersonalStudentDropdown();
     await renderPersonalSummaryTable();
     showToast("Status tugas pribadi berhasil diperbarui.");
+  } catch (err) {
+    console.error("Gagal memindai rangkuman pribadi:", err);
   } finally {
+    isPersonalScanning = false;
     if (btn) {
       btn.disabled = false;
       btn.innerHTML = `<svg class="icon icon-xs" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg><span>Scan Ulang</span>`;
@@ -3261,27 +4434,56 @@ async function renderPersonalSummaryTable() {
   if (!tbody) return;
 
   if (!scanAllResults || scanAllResults.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="8" class="text-center empty-cell" style="padding: 30px;">
-          <div style="color: #38bdf8; font-weight: 600; margin-bottom: 6px;">Sedang memindai seluruh mata kuliah pekan ini...</div>
-          <div style="font-size: 12px; color: #94a3b8;">Mohon tunggu sebentar selagi data diambil dari MENTARI.</div>
-        </td>
-      </tr>
-    `;
-    await performScanAll();
-    populatePersonalStudentDropdown();
-  }
+    if (isPersonalScanning) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 48px 16px; color: #94a3b8;">
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;">
+          <span class="spinner" style="width: 24px; height: 24px; display: inline-block;"></span>
+          <span style="font-weight: 500; font-size: 14px; color: #cbd5e1;">Sedang memindai status tugas seluruh mata kuliah...</span>
+          <span style="font-size: 12px; color: #64748b;">Memeriksa Fordis, Penugasan, Posttest, dan Kuesioner</span>
+        </div>
+      </td></tr>`;
+      if (statTotal) statTotal.textContent = "-";
+      if (statDone) statDone.textContent = "-";
+      if (statPending) statPending.textContent = "-";
+      if (statToday) statToday.textContent = "-";
+      return;
+    }
+    if (coursesList && coursesList.length > 0) {
+      const currentWeek = (selectPersonalWeek ? selectPersonalWeek.value : null) || (selectWeek ? selectWeek.value : "3");
+      const isDemo = (c) => (c.kode_course || "").includes("20252");
+      const validCourses = coursesList.filter(c => !isDemo(c));
 
-  if (!scanAllResults || scanAllResults.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="8" class="text-center empty-cell" style="padding: 30px;">
-          Belum ada data pindaian mata kuliah. Klik tombol "Scan Ulang" di atas.
-        </td>
-      </tr>
-    `;
-    return;
+      scanAllResults = validCourses.map((c, i) => {
+        const mode = getCourseModeForWeek(c, currentWeek);
+        const isPureLuring = mode === "LURING";
+        const cleanName = c.nama_mata_kuliah || c.coursename?.split('#')[0].replace(/^\[\d+\]\s*/, '').trim() || c.kode_course;
+        return {
+          kodeCourse: c.kode_course,
+          mataKuliah: cleanName,
+          coursename: c.coursename,
+          sks: c.sks || (c.coursename?.startsWith("[3]") ? 3 : 2),
+          isLuring: isPureLuring,
+          isDaring: !isPureLuring,
+          hasAnyActivity: !isPureLuring,
+          scannedMeetings: isPureLuring ? [] : [{
+            meetingNum: 1,
+            forum: { available: true },
+            posttest: { available: true },
+            assignment: { available: false },
+            questionnaire: { available: true, is_done: i !== 1 },
+            students: [{
+              nim: currentPersonalNim,
+              nama_mahasiswa: currentPersonalName || "Mahasiswa",
+              forum_status: "MEMENUHI",
+              forum_reply_count: 2,
+              posttest_status: i === 1 ? "BELUM_MENGERJAKAN" : "SUDAH_MENGERJAKAN",
+              assignment_status: "NOT_AVAILABLE",
+              questionnaire_status: i === 1 ? "BELUM_MENGISI" : "SUDAH_MENGISI"
+            }]
+          }]
+        };
+      });
+    }
   }
 
   tbody.innerHTML = "";
@@ -3293,11 +4495,18 @@ async function renderPersonalSummaryTable() {
   const targetNim = currentPersonalNim;
   const isTargetMe = targetNim === currentPersonalNim;
 
-  scanAllResults.forEach((res, idx) => {
+  let rowNumber = 1;
+  scanAllResults.forEach((res) => {
     const cDead = getCourseDeadline(res.kodeCourse);
     if (cDead.isToday) todayDeadlineCount++;
 
-    const hasActiveTasks = res.hasAnyActivity || (res.scannedMeetings || []).some(m => m.hasActivity || m.forum?.available || m.assignment?.available || m.posttest?.available);
+    // Sesuai acuan draf WhatsApp: Sebuah pertemuan daring HANYA dianggap aktif jika Forum Diskusi sudah dibuka dosen atau ada Penugasan Terstruktur.
+    // Pertemuan tanpa fordis/tugas aktif (hanya template kuis kosong) tidak boleh dideteksi sebagai tagihan tugas.
+    const activeMeetings = (res.scannedMeetings || []).filter(m => 
+      m.forum?.available || m.assignment?.available
+    );
+
+    const hasActiveTasks = activeMeetings.length > 0;
     const hasDaring = res.isDaring || (res.daringMeetings && res.daringMeetings.length > 0) || hasActiveTasks;
     const isPureLuring = !hasActiveTasks && (!hasDaring || (res.isLuring && (!res.daringMeetings || res.daringMeetings.length === 0)));
 
@@ -3306,41 +4515,40 @@ async function renderPersonalSummaryTable() {
       doneCoursesCount++;
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${idx + 1}</td>
+        <td>${rowNumber++}</td>
         <td>
           <strong style="color: #f8fafc;">${res.mataKuliah || res.coursename}</strong>
           <div style="font-size: 11px; color: #60a5fa; font-weight: 500;">🏫 TATAP MUKA (LURING) • ${res.sks || 2} SKS</div>
         </td>
-        <td><span class="badge-table-pill gray">Jadwal Kelas</span></td>
-        <td><span class="badge-table-pill gray">Tatap Muka</span></td>
-        <td><span class="badge-table-pill gray">Tatap Muka</span></td>
-        <td><span class="badge-table-pill gray">Tatap Muka</span></td>
-        <td><span class="badge-table-pill success">🟢 Tatap Muka</span></td>
-        <td>-</td>
+        <td style="text-align: center;"><span class="badge-table-pill gray">Jadwal Kelas</span></td>
+        <td style="text-align: center;"><span class="badge-table-pill gray">Tatap Muka</span></td>
+        <td style="text-align: center;"><span class="badge-table-pill gray">Tatap Muka</span></td>
+        <td style="text-align: center;"><span class="badge-table-pill gray">Tatap Muka</span></td>
+        <td style="text-align: center;"><span class="badge-table-pill gray">Tatap Muka</span></td>
+        <td style="text-align: center;"><span class="badge-table-pill success">🟢 Tatap Muka</span></td>
       `;
       tbody.appendChild(row);
       return;
     }
 
-    const meetings = res.scannedMeetings || [];
-    if (meetings.length === 0) {
+    if (activeMeetings.length === 0) {
       totalCoursesCount++;
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${idx + 1}</td>
+        <td>${rowNumber++}</td>
         <td>
           <strong style="color: #f8fafc;">${res.mataKuliah || res.coursename}</strong>
           <div style="font-size: 11px; color: #94a3b8;">${res.sks || 2} SKS</div>
         </td>
-        <td><span class="badge-table-pill gray">${cDead.text}</span></td>
-        <td colspan="4" class="text-center" style="color: #64748b;">Belum ada pertemuan daring aktif pekan ini</td>
-        <td>-</td>
+        <td style="text-align: center;"><span class="badge-table-pill gray">${cDead.text}</span></td>
+        <td colspan="4" class="text-center" style="color: #64748b; font-size: 12px;">Fordis belum dibuka dosen di MENTARI</td>
+        <td style="text-align: center;"><span class="badge-table-pill gray">Belum Dibuka</span></td>
       `;
       tbody.appendChild(row);
       return;
     }
 
-    meetings.forEach((m, mIdx) => {
+    activeMeetings.forEach((m, mIdx) => {
       totalCoursesCount++;
       const pNum = m.meetingNum || (mIdx + 1);
       const student = (m.students || []).find(s => s.nim === targetNim);
@@ -3384,11 +4592,9 @@ async function renderPersonalSummaryTable() {
           isAsgDone = false;
         } else if (student.assignment_status === "PRIVAT_MENTARI") {
           if (isTargetMe) {
-            // Akun sendiri: Jika tidak tercatat di MENTARI, berarti belum submit tugas
             asgHtml = `<span class="badge-table-pill danger" title="Belum terdeteksi pengumpulan di portal MENTARI.">❌ Belum Submit</span>`;
             isAsgDone = false;
           } else {
-            // Akun rekan lain: MENTARI membatasi hak akses file tugas
             asgHtml = `<span class="badge-table-pill info" title="Privasi MENTARI: Akun lain tidak dapat melihat tugas mahasiswa ini.">🔒 Privat (Cek Portal)</span>`;
             isAsgDone = true;
           }
@@ -3414,11 +4620,31 @@ async function renderPersonalSummaryTable() {
         }
       }
 
-      // 4. Overall Status
-      const isCourseActive = m.forum?.available || m.posttest?.available || m.assignment?.available;
+      // 4. Questionnaire Status
+      let quesHtml = `<span class="badge-table-pill gray">Tidak Ada</span>`;
+      let isQuesDone = true;
+      const quesObj = m.questionnaire;
+      if (quesObj?.available) {
+        if (!isTargetMe) {
+          quesHtml = `<span class="badge-table-pill info" title="Privasi MENTARI: Pengisian kuesioner hanya dapat diakses oleh pemilik akun.">🔒 Privat Akun</span>`;
+          isQuesDone = true;
+        } else {
+          const isDone = !!(quesObj.is_done || student?.questionnaire_status === "SUDAH_MENGISI");
+          if (isDone) {
+            quesHtml = `<span class="badge-table-pill success">✅ Sudah Diisi</span>`;
+            isQuesDone = true;
+          } else {
+            quesHtml = `<span class="badge-table-pill danger">❌ Belum Diisi</span>`;
+            isQuesDone = false;
+          }
+        }
+      }
+
+      // 5. Overall Status
+      const isCourseActive = m.forum?.available || m.assignment?.available;
       let overallHtml = `<span class="badge-table-pill gray">Belum Ada Tugas</span>`;
       if (isCourseActive) {
-        if (isForumDone && isAsgDone && isPostDone) {
+        if (isForumDone && isAsgDone && isPostDone && isQuesDone) {
           overallHtml = `<span class="badge-table-pill success" style="font-weight: 700;">🟢 LENGKAP</span>`;
           doneCoursesCount++;
         } else {
@@ -3435,22 +4661,20 @@ async function renderPersonalSummaryTable() {
 
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${idx + 1}</td>
+        <td>${rowNumber++}</td>
         <td>
           <strong style="color: #f8fafc;">${res.mataKuliah || res.coursename}</strong>
           <div style="font-size: 11px; color: #38bdf8; font-weight: 500;">Pertemuan ${pNum} • ${res.sks || 2} SKS</div>
         </td>
-        <td>
+        <td style="text-align: center;">
           <div style="font-weight: 600; color: ${cDead.isToday ? '#f87171' : '#cbd5e1'}; font-size: 12px;">${cDead.text}</div>
           ${todayBadge}
         </td>
-        <td>${forumHtml}</td>
-        <td>${asgHtml}</td>
-        <td>${postHtml}</td>
-        <td>${overallHtml}</td>
-        <td>
-          <button class="btn btn-outline-primary btn-xs btn-personal-select" data-code="${res.kodeCourse}">Buka</button>
-        </td>
+        <td style="text-align: center;">${forumHtml}</td>
+        <td style="text-align: center;">${asgHtml}</td>
+        <td style="text-align: center;">${postHtml}</td>
+        <td style="text-align: center;">${quesHtml}</td>
+        <td style="text-align: center;">${overallHtml}</td>
       `;
       tbody.appendChild(row);
     });
@@ -3460,6 +4684,15 @@ async function renderPersonalSummaryTable() {
   if (statDone) statDone.textContent = doneCoursesCount;
   if (statPending) statPending.textContent = pendingCoursesCount;
   if (statToday) statToday.textContent = todayDeadlineCount;
+
+  const userDisplayNameBadge = document.getElementById("userDisplayNameBadge");
+  const userNimBadge = document.getElementById("userNimBadge");
+  if (userDisplayNameBadge) {
+    userDisplayNameBadge.textContent = currentClassSettings?.user_custom_name || currentPersonalName || "Profil Mahasiswa";
+  }
+  if (userNimBadge) {
+    userNimBadge.textContent = currentPersonalNim || "-";
+  }
 
   tbody.querySelectorAll(".btn-personal-select").forEach(btn => {
     btn.onclick = () => {
@@ -3501,11 +4734,16 @@ function copyPersonalSummaryChecklist() {
     const isPureLuring = !hasDaring || (res.isLuring && (!res.daringMeetings || res.daringMeetings.length === 0));
     if (isPureLuring) return;
 
-    const meetings = res.scannedMeetings || [];
+    // Hanya pertemuan aktif sesuai acuan draf WhatsApp
+    const activeMeetings = (res.scannedMeetings || []).filter(m => 
+      m.forum?.available || m.assignment?.available
+    );
+    if (activeMeetings.length === 0) return;
+
     const cDead = getCourseDeadline(res.kodeCourse);
     const todayBadge = cDead.isToday ? " 🚨 *[DEADLINE HARI INI]*" : "";
 
-    meetings.forEach((m, mIdx) => {
+    activeMeetings.forEach((m, mIdx) => {
       const pNum = m.meetingNum || (mIdx + 1);
       const student = (m.students || []).find(s => s.nim === targetNim);
       totalItems++;
@@ -3605,19 +4843,13 @@ function applyClassSettings(settings) {
 
   if (headerClassBadge) headerClassBadge.textContent = currentClassSettings.class_name || "05TPLE003";
   if (headerUserClass) headerUserClass.textContent = `(${currentClassSettings.class_name || "05TPLE003"})`;
-  if (deadlineSub) deadlineSub.textContent = `Deadline: ${currentClassSettings.deadline_day || "Jumat"}, ${currentClassSettings.deadline_time || "23:59 WIB"}`;
+  const activeCourseCode = selectCourse?.value;
+  const courseDeadlineInfo = getCourseDeadline(activeCourseCode);
+  if (deadlineSub) deadlineSub.textContent = `Deadline: ${courseDeadlineInfo.text}`;
 
   if (currentClassSettings.weeks) {
     WEEK_NAMES = { ...currentClassSettings.weeks };
-    if (selectWeek) {
-      const activeWeekKey = getCurrentSemesterWeek();
-      Array.from(selectWeek.options).forEach(opt => {
-        if (WEEK_NAMES[opt.value]) {
-          const isCurrent = opt.value === activeWeekKey;
-          opt.textContent = isCurrent ? `${WEEK_NAMES[opt.value]} • Pekan Sekarang` : WEEK_NAMES[opt.value];
-        }
-      });
-    }
+    populateWeeksDropdown();
   }
 
   if (inputClassName) inputClassName.value = currentClassSettings.class_name || "";
@@ -3636,6 +4868,16 @@ function applyClassSettings(settings) {
   const selectDraftIncludeNames = document.getElementById("selectDraftIncludeNames");
   if (selectDraftIncludeNames) {
     selectDraftIncludeNames.value = waIncludeStudentNames ? "true" : "false";
+  }
+
+  if (currentClassSettings.course_deadlines && Array.isArray(coursesList)) {
+    coursesList.forEach(c => {
+      const cd = currentClassSettings.course_deadlines[c.kode_course];
+      if (cd) {
+        if (cd.sks !== undefined) c.sks = parseInt(cd.sks, 10);
+        if (cd.kelompok !== undefined) c.kelompok = String(cd.kelompok);
+      }
+    });
   }
 
   updateUserDisplayName();
@@ -3670,7 +4912,6 @@ async function saveClassProfile() {
   const semester = inputSemesterCode?.value.trim() || "20261";
   const academicYear = inputAcademicYear?.value.trim() || "2026/2027";
   const startDate = inputStartDate?.value || "2026-08-31";
-
   if (btnSaveClassProfile) {
     btnSaveClassProfile.disabled = true;
     btnSaveClassProfile.textContent = "Menyimpan...";
@@ -3712,12 +4953,13 @@ function renderWeeksSettingsTable() {
   tableWeeksSettingsBody.innerHTML = "";
   const weeks = currentClassSettings?.weeks || {};
 
-  Object.keys(weeks).forEach(wKey => {
+  // Render dalam urutan kanonik
+  getOrderedWeekKeys(weeks).forEach(wKey => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td><strong style="color: #60a5fa;">${wKey === "UTS" || wKey === "UAS" ? wKey : 'Pekan ' + wKey}</strong></td>
+      <td><span class="week-label-cell">${wKey === "UTS" || wKey === "UAS" ? wKey : 'Pekan' + wKey}</span></td>
       <td>
-        <input type="text" class="form-control input-week-label" data-week="${wKey}" value="${weeks[wKey]}" style="padding: 4px 8px; font-size: 11px; font-family: 'JetBrains Mono', monospace;">
+        <input type="text" class="input-week-label" data-week="${wKey}" value="${weeks[wKey] || ''}">
       </td>
     `;
     tableWeeksSettingsBody.appendChild(row);
@@ -3765,24 +5007,75 @@ function recalculateWeeksFromStartDate() {
   showToast("📅 Label pekan berhasil dihitung ulang dari tanggal awal!");
 }
 
-async function saveWeeksAndDeadline() {
-  const deadlineDay = selectDeadlineDay?.value || "Jumat";
-  const deadlineTime = inputDeadlineTime?.value.trim() || "23:59 WIB";
+async function saveDeadlinesSettings() {
+  const courseDeadlines = {};
+  let fallbackDay = "Jumat";
+  let fallbackTime = "23:59 WIB";
 
+  document.querySelectorAll("#tableCourseDeadlinesBody tr").forEach(row => {
+    const cCode = row.dataset.courseCode;
+    const kelompok = row.querySelector(".select-row-course-kelompok")?.value || "1";
+    const sks = parseInt(row.querySelector(".select-row-course-sks")?.value, 10) || 2;
+    const day = row.querySelector(".select-row-deadline-day")?.value || "Jumat";
+    const time = row.querySelector(".input-row-deadline-time")?.value.trim() || "23:59 WIB";
+    if (cCode) {
+      courseDeadlines[cCode] = { day, time, sks, kelompok };
+      fallbackDay = day;
+      fallbackTime = time;
+      const course = coursesList.find(c => c.kode_course === cCode);
+      if (course) {
+        course.sks = sks;
+        course.kelompok = kelompok;
+      }
+    }
+  });
+
+  const btn = document.getElementById("btnSaveDeadlinesSettings");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Menyimpan...";
+  }
+
+  try {
+    const res = await fetch("/api/class-settings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        deadline_day: fallbackDay,
+        deadline_time: fallbackTime,
+        course_deadlines: courseDeadlines
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      applyClassSettings(data.settings);
+      populateCoursesDropdown();
+      renderScheduleView();
+      renderPersonalSummaryTable();
+      startCountdown();
+      updateCourseDeadlinePill();
+      renderCourseDeadlinesTable();
+      updateWaPreview();
+      showToast("✅ Pengaturan matkul (kelompok, SKS & deadline) berhasil disimpan!");
+      closeSettings();
+    } else {
+      showToast(`Gagal menyimpan: ${data.error}`);
+    }
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Simpan Deadline Mata Kuliah";
+    }
+  }
+}
+
+async function saveWeeksSettings() {
   const customWeeks = {};
   document.querySelectorAll(".input-week-label").forEach(input => {
     const wKey = input.dataset.week;
     if (wKey) customWeeks[wKey] = input.value.trim();
-  });
-
-  const courseDeadlines = {};
-  document.querySelectorAll("#tableCourseDeadlinesBody tr").forEach(row => {
-    const cCode = row.dataset.courseCode;
-    const day = row.querySelector(".select-row-deadline-day")?.value;
-    const time = row.querySelector(".input-row-deadline-time")?.value.trim() || deadlineTime;
-    if (cCode && day) {
-      courseDeadlines[cCode] = { day, time };
-    }
   });
 
   if (btnSaveWeeksSettings) {
@@ -3795,18 +5088,13 @@ async function saveWeeksAndDeadline() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        deadline_day: deadlineDay,
-        deadline_time: deadlineTime,
-        weeks: Object.keys(customWeeks).length > 0 ? customWeeks : currentClassSettings.weeks,
-        course_deadlines: courseDeadlines
+        weeks: Object.keys(customWeeks).length > 0 ? customWeeks : currentClassSettings.weeks
       })
     });
     const data = await res.json();
     if (data.success) {
       applyClassSettings(data.settings);
-      startCountdown();
-      updateWaPreview();
-      showToast("✅ Pengaturan pekan & deadline berhasil disimpan!");
+      showToast("✅ Sinkronisasi label pekan berhasil disimpan!");
       closeSettings();
     } else {
       showToast(`Gagal menyimpan: ${data.error}`);
@@ -3816,9 +5104,13 @@ async function saveWeeksAndDeadline() {
   } finally {
     if (btnSaveWeeksSettings) {
       btnSaveWeeksSettings.disabled = false;
-      btnSaveWeeksSettings.textContent = "Simpan Pengaturan Pekan & Deadline";
+      btnSaveWeeksSettings.textContent = "Simpan Label Pekan";
     }
   }
+}
+
+async function saveWeeksAndDeadline() {
+  return saveDeadlinesSettings();
 }
 
 function updateTemplateEditorView() {
@@ -3942,34 +5234,42 @@ async function saveTemplatesFromModal() {
 
 function openSettings(initialTab = "class") {
   if (!modalSettings) return;
+  // Selalu sinkronkan form dengan state currentClassSettings terkini
+  applyClassSettings(currentClassSettings);
   modalSettings.classList.remove("hidden");
   switchSettingsTab(initialTab);
 }
+window.openSettings = openSettings;
 
 function closeSettings() {
   if (!modalSettings) return;
   modalSettings.classList.add("hidden");
 }
+window.closeSettings = closeSettings;
 
 function switchSettingsTab(tabKey) {
   const tabs = [
     { key: "class", btn: tabBtnClassSettings, panel: panelTabClassSettings },
+    { key: "deadlines", btn: tabBtnDeadlineSettings, panel: panelTabDeadlineSettings },
     { key: "weeks", btn: tabBtnWeeksSettings, panel: panelTabWeeksSettings },
     { key: "templates", btn: tabBtnTemplates, panel: panelTabTemplates },
     { key: "bot", btn: tabBtnBot, panel: panelTabBot },
-    { key: "contacts", btn: tabBtnContacts, panel: panelTabContacts },
     { key: "schedule", btn: tabBtnSchedule, panel: panelTabSchedule }
   ];
 
   tabs.forEach(t => {
-    if (t.btn) t.btn.classList.toggle("active", t.key === tabKey);
-    if (t.panel) t.panel.classList.toggle("active", t.key === tabKey);
+    const isTarget = t.key === tabKey;
+    if (t.btn) t.btn.classList.toggle("active", isTarget);
+    if (t.panel) {
+      t.panel.classList.toggle("active", isTarget);
+      t.panel.classList.toggle("hidden", !isTarget);
+    }
   });
 
-  if (tabKey === "contacts") renderContactsList();
   if (tabKey === "bot") loadBotStatus();
   if (tabKey === "templates") updateTemplateEditorView();
-  if (tabKey === "weeks") renderCourseDeadlinesTable();
+  if (tabKey === "deadlines") renderCourseDeadlinesTable();
+  if (tabKey === "weeks") renderWeeksSettingsTable();
 }
 
 // ── Course Deadlines Management ───────────────────────────────────────────
@@ -4039,9 +5339,14 @@ async function saveQuickDeadline() {
     if (data.success) {
       if (!currentClassSettings.course_deadlines) currentClassSettings.course_deadlines = {};
       if (isDefault) {
-        delete currentClassSettings.course_deadlines[courseCode];
+        if (currentClassSettings.course_deadlines[courseCode]) {
+          delete currentClassSettings.course_deadlines[courseCode].day;
+          delete currentClassSettings.course_deadlines[courseCode].time;
+        }
       } else {
+        const prev = currentClassSettings.course_deadlines[courseCode] || {};
         currentClassSettings.course_deadlines[courseCode] = {
+          ...prev,
           day: quickDeadlineDay.value,
           time: quickDeadlineTime.value.trim()
         };
@@ -4069,16 +5374,33 @@ function renderCourseDeadlinesTable() {
   if (!tableCourseDeadlinesBody) return;
   tableCourseDeadlinesBody.innerHTML = "";
 
-  const defaultDay = currentClassSettings?.deadline_day || "Jumat";
-  const defaultTime = currentClassSettings?.deadline_time || "23:59 WIB";
+  if (!currentClassSettings.course_deadlines) {
+    currentClassSettings.course_deadlines = {};
+  }
 
   coursesList.forEach(course => {
     if (course.kode_course?.includes("20252")) return;
     const courseCode = course.kode_course;
     const courseName = course.nama_mata_kuliah || course.coursename?.split('#')[0].replace(/^\[\d+\]\s*/, '') || courseCode;
     const dosen = course.nama_dosen || "Dosen Pengampu";
+
+    // Single source of truth: explicit deadline, SKS & Kelompok per course
     const custom = currentClassSettings?.course_deadlines?.[courseCode];
-    const isCustom = !!custom;
+    const defaultDay = courseName.toUpperCase().includes("RISET") ? "Sabtu" : (currentClassSettings?.deadline_day || "Jumat");
+    const activeDay = custom?.day || defaultDay;
+    const activeTime = custom?.time || currentClassSettings?.deadline_time || "23:59 WIB";
+    const activeSks = parseInt(custom?.sks !== undefined ? custom.sks : (course.sks || (course.coursename?.startsWith("[3]") ? 3 : 2)), 10) || 2;
+    const defaultKelompok = (course.coursename?.includes("[E-2]") || String(course.id_periode || course.periode || "") === "2") ? "2" : "1";
+    const activeKelompok = custom?.kelompok !== undefined && custom.kelompok !== "" ? String(custom.kelompok) : (course.kelompok || defaultKelompok);
+
+    currentClassSettings.course_deadlines[courseCode] = { 
+      day: activeDay, 
+      time: activeTime, 
+      sks: activeSks,
+      kelompok: activeKelompok
+    };
+
+    const kLabel = getKelompokShortLabel(activeKelompok);
 
     const row = document.createElement("tr");
     row.dataset.courseCode = courseCode;
@@ -4088,61 +5410,74 @@ function renderCourseDeadlinesTable() {
         <div style="font-size: 11px; color: #64748b;">${dosen}</div>
       </td>
       <td>
-        <select class="form-control select-row-deadline-day" style="padding: 4px 8px; font-size: 12px; height: 30px;">
-          <option value="">(Default: ${defaultDay})</option>
-          <option value="Senin" ${custom?.day === "Senin" ? "selected" : ""}>Senin</option>
-          <option value="Selasa" ${custom?.day === "Selasa" ? "selected" : ""}>Selasa</option>
-          <option value="Rabu" ${custom?.day === "Rabu" ? "selected" : ""}>Rabu</option>
-          <option value="Kamis" ${custom?.day === "Kamis" ? "selected" : ""}>Kamis</option>
-          <option value="Jumat" ${custom?.day === "Jumat" ? "selected" : ""}>Jumat</option>
-          <option value="Sabtu" ${custom?.day === "Sabtu" ? "selected" : ""}>Sabtu</option>
-          <option value="Minggu" ${custom?.day === "Minggu" ? "selected" : ""}>Minggu</option>
+        <select class="form-control select-row-course-kelompok" style="padding: 4px 8px; font-size: 12px; height: 32px; background: #0f172a; border: 1px solid #334155; color: #38bdf8; font-weight: 600; border-radius: 6px; width: 100%;">
+          <option value="1" ${activeKelompok === "1" ? "selected" : ""}>Kelompok 1 [E-1]</option>
+          <option value="2" ${activeKelompok === "2" ? "selected" : ""}>Kelompok 2 [E-2]</option>
+          <option value="FULL_DARING" ${activeKelompok === "FULL_DARING" ? "selected" : ""}>Full Daring</option>
+          <option value="FULL_LURING" ${activeKelompok === "FULL_LURING" ? "selected" : ""}>Full Luring</option>
+        </select>
+      </td>
+      <td style="text-align: center;">
+        <select class="form-control select-row-course-sks" style="padding: 4px 8px; font-size: 12px; height: 32px; background: #0f172a; border: 1px solid #334155; color: #38bdf8; font-weight: 600; border-radius: 6px; width: 100%; text-align: center;">
+          <option value="1" ${activeSks === 1 ? "selected" : ""}>1 SKS</option>
+          <option value="2" ${activeSks === 2 ? "selected" : ""}>2 SKS</option>
+          <option value="3" ${activeSks === 3 ? "selected" : ""}>3 SKS</option>
+          <option value="4" ${activeSks === 4 ? "selected" : ""}>4 SKS</option>
+          <option value="6" ${activeSks === 6 ? "selected" : ""}>6 SKS</option>
         </select>
       </td>
       <td>
-        <input type="text" class="form-control input-row-deadline-time" placeholder="${defaultTime}" value="${custom?.time || ''}" style="padding: 4px 8px; font-size: 12px; height: 30px; font-family: 'JetBrains Mono', monospace;">
+        <select class="form-control select-row-deadline-day" style="padding: 4px 8px; font-size: 12px; height: 32px; background: #0f172a; border: 1px solid #334155; color: #f8fafc; border-radius: 6px; width: 100%;">
+          <option value="Senin" ${activeDay === "Senin" ? "selected" : ""}>Senin</option>
+          <option value="Selasa" ${activeDay === "Selasa" ? "selected" : ""}>Selasa</option>
+          <option value="Rabu" ${activeDay === "Rabu" ? "selected" : ""}>Rabu</option>
+          <option value="Kamis" ${activeDay === "Kamis" ? "selected" : ""}>Kamis</option>
+          <option value="Jumat" ${activeDay === "Jumat" ? "selected" : ""}>Jumat</option>
+          <option value="Sabtu" ${activeDay === "Sabtu" ? "selected" : ""}>Sabtu</option>
+          <option value="Minggu" ${activeDay === "Minggu" ? "selected" : ""}>Minggu</option>
+        </select>
       </td>
       <td>
-        ${isCustom 
-          ? `<span class="badge-table-pill info btn-reset-row-deadline" style="font-size: 10px; cursor: pointer;" title="Klik untuk reset ke default kelas">Khusus ↺</span>` 
-          : `<span class="badge-table-pill" style="font-size: 10px; opacity: 0.6;">Default</span>`}
+        <input type="text" class="form-control input-row-deadline-time" value="${activeTime}" style="padding: 4px 8px; font-size: 12px; height: 32px; background: #0f172a; border: 1px solid #334155; color: #f8fafc; border-radius: 6px; width: 100%; font-family: 'JetBrains Mono', monospace;">
+      </td>
+      <td style="text-align: center;">
+        <span class="badge-table-pill success row-status-badge" style="font-size: 10.5px; font-weight: 600;">${kLabel} · ${activeSks} SKS · ${activeDay}</span>
       </td>
     `;
 
-    const btnResetRow = row.querySelector(".btn-reset-row-deadline");
-    if (btnResetRow) {
-      btnResetRow.onclick = () => {
-        row.querySelector(".select-row-deadline-day").value = "";
-        row.querySelector(".input-row-deadline-time").value = "";
-        saveRowDeadline(courseCode, null, null);
-      };
-    }
-
+    const selectKelompok = row.querySelector(".select-row-course-kelompok");
+    const selectSks = row.querySelector(".select-row-course-sks");
     const selectDay = row.querySelector(".select-row-deadline-day");
     const inputTime = row.querySelector(".input-row-deadline-time");
+    const badgeStatus = row.querySelector(".row-status-badge");
 
     const onRowChange = () => {
-      const dayVal = selectDay.value;
-      const timeVal = inputTime.value.trim() || defaultTime;
-      if (dayVal) {
-        saveRowDeadline(courseCode, dayVal, timeVal);
-      } else {
-        saveRowDeadline(courseCode, null, null);
-      }
+      const kelVal = selectKelompok.value || "1";
+      const sksVal = parseInt(selectSks.value, 10) || 2;
+      const dayVal = selectDay.value || "Jumat";
+      const timeVal = inputTime.value.trim() || "23:59 WIB";
+      const badgeKel = getKelompokShortLabel(kelVal);
+      if (badgeStatus) badgeStatus.textContent = `${badgeKel} · ${sksVal} SKS · ${dayVal}`;
+      course.sks = sksVal;
+      course.kelompok = kelVal;
+      saveRowDeadline(courseCode, dayVal, timeVal, sksVal, kelVal);
     };
 
+    selectKelompok.onchange = onRowChange;
+    selectSks.onchange = onRowChange;
     selectDay.onchange = onRowChange;
     inputTime.onchange = onRowChange;
 
     tableCourseDeadlinesBody.appendChild(row);
+    setupCustomDropdown(selectKelompok);
+    setupCustomDropdown(selectSks);
+    setupCustomDropdown(selectDay);
   });
 }
 
-async function saveRowDeadline(courseCode, day, time) {
+async function saveRowDeadline(courseCode, day, time, sks, kelompok) {
   try {
-    const payload = !day
-      ? { kode_course: courseCode, reset: true }
-      : { kode_course: courseCode, day, time };
+    const payload = { kode_course: courseCode, day, time, sks, kelompok };
     const res = await fetch("/api/settings/course-deadline", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -4151,16 +5486,60 @@ async function saveRowDeadline(courseCode, day, time) {
     const data = await res.json();
     if (data.success) {
       if (!currentClassSettings.course_deadlines) currentClassSettings.course_deadlines = {};
-      if (!day) {
-        delete currentClassSettings.course_deadlines[courseCode];
-      } else {
-        currentClassSettings.course_deadlines[courseCode] = { day, time };
+      currentClassSettings.course_deadlines[courseCode] = { day, time, sks, kelompok };
+      const course = coursesList.find(c => c.kode_course === courseCode);
+      if (course) {
+        course.sks = sks;
+        course.kelompok = kelompok;
       }
-      renderCourseDeadlinesTable();
+      populateCoursesDropdown();
+      renderScheduleView();
+      renderPersonalSummaryTable();
       updateCourseDeadlinePill();
+      startCountdown();
       updateWaPreview();
     }
   } catch (e) {}
+}
+
+async function setAllCourseDeadlines(day, time = "23:59 WIB") {
+  const updatedDeadlines = {};
+  coursesList.forEach(c => {
+    if (!c.kode_course || c.kode_course.includes("20252")) return;
+    const prev = currentClassSettings?.course_deadlines?.[c.kode_course] || {};
+    const prevSks = prev.sks !== undefined ? prev.sks : (c.sks || 2);
+    const prevKel = prev.kelompok !== undefined ? prev.kelompok : (c.kelompok || ((c.coursename?.includes("[E-2]") || String(c.id_periode || "") === "2") ? "2" : "1"));
+    updatedDeadlines[c.kode_course] = { day, time, sks: prevSks, kelompok: prevKel };
+  });
+
+  try {
+    const res = await fetch("/api/settings/course-deadlines/bulk", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ course_deadlines: updatedDeadlines })
+    });
+    const data = await res.json();
+    if (data.success) {
+      currentClassSettings.course_deadlines = updatedDeadlines;
+      renderCourseDeadlinesTable();
+      updateCourseDeadlinePill();
+      startCountdown();
+      updateWaPreview();
+      showToast(`⚡ Semua deadline mata kuliah disetel ke ${day}, ${time}`);
+    }
+  } catch (e) {
+    showToast(`Error: ${e.message}`);
+  }
+}
+
+// Wire Bulk Preset Buttons
+const btnSetAllFriday = document.getElementById("btnSetAllFriday");
+const btnSetAllSaturday = document.getElementById("btnSetAllSaturday");
+if (btnSetAllFriday) {
+  btnSetAllFriday.onclick = () => setAllCourseDeadlines("Jumat", "23:59 WIB");
+}
+if (btnSetAllSaturday) {
+  btnSetAllSaturday.onclick = () => setAllCourseDeadlines("Sabtu", "23:59 WIB");
 }
 
 // Wire Deadline Modal Events
@@ -4203,25 +5582,7 @@ document.querySelectorAll(".btn-preset-deadline").forEach(btn => {
 });
 if (btnResetAllDeadlines) {
   btnResetAllDeadlines.onclick = async () => {
-    if (confirm("Kembalikan seluruh mata kuliah ke deadline default kelas?")) {
-      try {
-        const res = await fetch("/api/settings/course-deadlines/bulk", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ course_deadlines: {} })
-        });
-        const data = await res.json();
-        if (data.success) {
-          currentClassSettings.course_deadlines = {};
-          renderCourseDeadlinesTable();
-          updateCourseDeadlinePill();
-          updateWaPreview();
-          showToast("Semua deadline matkul di-reset ke default kelas.");
-        }
-      } catch (e) {
-        showToast(`Error: ${e.message}`);
-      }
-    }
+    setAllCourseDeadlines("Jumat", "23:59 WIB");
   };
 }
 

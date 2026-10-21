@@ -24,7 +24,7 @@ export function findAssignmentActivity(meeting) {
 
 export function findQuestionnaireActivity(meeting) {
   const activities = Array.isArray(meeting?.sub_section) ? meeting.sub_section : [];
-  return activities.find((activity) => activity?.tipe === 'QUESIONER' && activity?.kode_template === 'KUESIONER' && activity?.id) ?? null;
+  return activities.find((activity) => activity?.tipe === 'QUESIONER' || activity?.kode_template === 'KUESIONER') ?? null;
 }
 
 export function findAllForumTopics(forumTopicsResponse) {

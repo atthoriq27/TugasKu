@@ -17,6 +17,8 @@ yarn-error.log*
 config/session.json
 config/telegram.json
 config/contacts.json
+config/whatsapp-session.json
+config/whatsapp.json
 data/
 *.session
 *.session.json
@@ -31,8 +33,12 @@ test-whatsapp-data/
 
 # Output & Build Files
 output/
+dist-clean/
+dist-electron/
+*.zip
 
 # Internal Tooling & Index Caches
+scratch/
 graphify-out/
 .codex/
 .vscode/

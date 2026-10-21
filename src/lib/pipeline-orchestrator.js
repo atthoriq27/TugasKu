@@ -3,7 +3,6 @@ import { TugasKuCoreEngine } from "./core-engine.js";
 import { ReminderEngine } from "./reminder-engine.js";
 import { WhatsAppMessageRouter } from "./whatsapp-message-router.js";
 import { MockWhatsAppAdapter } from "./adapters/mock-whatsapp-adapter.js";
-import { PlaywrightWhatsAppAdapter } from "./adapters/playwright-whatsapp-adapter.js";
 
 // Offline Mentari Client matching MENTARI API response schema
 class OfflineMentariClient {
@@ -171,13 +170,20 @@ export class TugasKuPipelineOrchestrator {
       return result;
     }
 
+    if (mode === "live") {
+      result.deliveryStatus = {
+        sent: false,
+        method: "LIVE_DISABLED",
+        warning: "Fitur koneksi langsung WhatsApp dinonaktifkan. Gunakan bot Telegram atau salin draft pesan."
+      };
+      return result;
+    }
+
     let adapter;
     if (mode === "dry-run") {
       adapter = new MockWhatsAppAdapter();
-    } else if (mode === "live") {
-      adapter = new PlaywrightWhatsAppAdapter();
     } else {
-      throw new Error(`Mode tidak valid: ${mode}. Gunakan 'preview', 'dry-run', atau 'live'.`);
+      throw new Error(`Mode tidak valid: ${mode}. Gunakan 'preview' atau 'dry-run'.`);
     }
 
     try {

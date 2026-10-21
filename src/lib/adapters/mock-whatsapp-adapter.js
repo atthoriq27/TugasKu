@@ -1,9 +1,7 @@
-﻿import { randomUUID } from "crypto";
-import { WhatsAppAdapter } from "../whatsapp-adapter.js";
+import { randomUUID } from "crypto";
 
-export class MockWhatsAppAdapter extends WhatsAppAdapter {
+export class MockWhatsAppAdapter {
   constructor() {
-    super();
     this.connected = false;
   }
 

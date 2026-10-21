@@ -13,6 +13,48 @@ import { TelegramBot } from "./src/lib/telegram-bot.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || "127.0.0.1";
+const CONFIG_DIR = process.env.TUGASKU_CONFIG_DIR || path.join(__dirname, "config");
+const DATA_DIR = process.env.TUGASKU_DATA_DIR || path.join(__dirname, "data");
+const MAX_BODY_SIZE = 2 * 1024 * 1024; // 2 MB limit
+
+if (!fs.existsSync(CONFIG_DIR)) fs.mkdirSync(CONFIG_DIR, { recursive: true });
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+function readJsonBody(req, res) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    let tooLarge = false;
+
+    req.on("data", chunk => {
+      if (tooLarge) return;
+      body += chunk;
+      if (body.length > MAX_BODY_SIZE) {
+        tooLarge = true;
+        res.writeHead(413, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Ukuran data terlalu besar (maksimum 2MB)." }));
+        req.destroy();
+        reject(new Error("PAYLOAD_TOO_LARGE"));
+      }
+    });
+
+    req.on("end", () => {
+      if (tooLarge) return;
+      try {
+        const json = JSON.parse(body || "{}");
+        resolve(json);
+      } catch (err) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "Format payload JSON tidak valid." }));
+        reject(err);
+      }
+    });
+
+    req.on("error", (err) => {
+      if (!tooLarge) reject(err);
+    });
+  });
+}
 
 const MIME_TYPES = {
   ".html": "text/html; charset=UTF-8",
@@ -25,10 +67,15 @@ const MIME_TYPES = {
   ".ico": "image/x-icon"
 };
 
-const sessionManager = new MentariBrowserSession();
+const sessionManager = new MentariBrowserSession({
+  configDir: CONFIG_DIR,
+  sessionDir: path.join(DATA_DIR, "mentari-session")
+});
 const reminderEngine = new ReminderEngine();
-const contactManager = new ContactManager();
-const telegramNotifier = new TelegramNotifier();
+const contactManager = new ContactManager(path.join(CONFIG_DIR, "contacts.json"));
+const telegramNotifier = new TelegramNotifier({
+  configPath: path.join(CONFIG_DIR, "telegram.json")
+});
 
 // ── Auto-Reconnect Mutex & Helper ──────────────────────────────────────────
 let isReconnecting = false;
@@ -40,11 +87,9 @@ async function ensureActiveSession(force = false) {
   const current = sessionManager.getSession();
   const now = Date.now();
 
-  // If a session exists and was updated within the last 45 seconds, reuse it!
-  if (current && current.token) {
-    if (!force || (now - lastLoginTime < 45000)) {
-      return current;
-    }
+  // If not forced, reuse existing session
+  if (!force && current && current.token) {
+    return current;
   }
 
   if (reconnectPromise) {
@@ -81,13 +126,21 @@ async function runScanAll(weekVal) {
   const results = [];
 
   for (const course of courses) {
-    const isKelompok1 = course.coursename?.includes("[E-1]") || course.periode === "1";
-    const groupKey = isKelompok1 ? "1" : "2";
+    const kel = course.kelompok || (course.coursename?.includes("[E-1]") || course.periode === "1" ? "1" : "2");
+    const groupKey = kel === "2" ? "2" : "1";
     const sks = String(course.sks || (course.coursename?.startsWith("[3]") ? 3 : 2));
     const groupSchedule = scheduleData.groups?.[groupKey]?.schedule?.[weekVal] || {};
     const sksSchedule = groupSchedule[sks] || { luring: [], daring: [] };
-    const daringMeetings = sksSchedule.daring || [];
-    const luringMeetings = sksSchedule.luring || [];
+    let daringMeetings = [...(sksSchedule.daring || [])];
+    let luringMeetings = [...(sksSchedule.luring || [])];
+
+    if (kel === "FULL_DARING") {
+      daringMeetings = [...new Set([...daringMeetings, ...luringMeetings])];
+      luringMeetings = [];
+    } else if (kel === "FULL_LURING") {
+      luringMeetings = [...new Set([...daringMeetings, ...luringMeetings])];
+      daringMeetings = [];
+    }
 
     const allMeetings = [...new Set([...daringMeetings, ...luringMeetings])];
 
@@ -152,17 +205,31 @@ const telegramBot = new TelegramBot({
 });
 
 function getCourses() {
-  const coursesPath = path.join(__dirname, "config", "courses.json");
+  const coursesPath = path.join(CONFIG_DIR, "courses.json");
+  let courses = [];
   if (fs.existsSync(coursesPath)) {
     try {
-      return JSON.parse(fs.readFileSync(coursesPath, "utf-8"));
+      courses = JSON.parse(fs.readFileSync(coursesPath, "utf-8"));
     } catch (e) {}
   }
-  return [];
+  const settings = getClassSettings();
+  const deadlines = settings.course_deadlines || {};
+  return courses.map(c => {
+    const custom = deadlines[c.kode_course] || {};
+    const customSks = custom.sks;
+    const customKelompok = custom.kelompok;
+    return {
+      ...c,
+      sks: customSks !== undefined ? parseInt(customSks, 10) : (c.sks || (c.coursename?.startsWith("[3]") ? 3 : 2)),
+      kelompok: customKelompok !== undefined && customKelompok !== ""
+        ? String(customKelompok)
+        : (c.kelompok || String(c.id_periode || c.periode || "") || (c.coursename?.includes("[E-2]") ? "2" : "1"))
+    };
+  });
 }
 
 function getSchedule() {
-  const schedulePath = path.join(__dirname, "config", "schedule.json");
+  const schedulePath = path.join(CONFIG_DIR, "schedule.json");
   if (fs.existsSync(schedulePath)) {
     try {
       return JSON.parse(fs.readFileSync(schedulePath, "utf-8"));
@@ -202,14 +269,21 @@ const DEFAULT_CLASS_SETTINGS = {
     "12": "Pekan 12 (23 Nov - 28 Nov 2026)",
     "13": "Pekan 13 (30 Nov - 5 Des 2026)",
     "14": "Pekan 14 (7 Des - 12 Des 2026)",
-    "15": "Pekan 15 (14 Des - 19 Des 2026)",
-    "UAS": "Pekan UAS (21 Des - 26 Des 2026)",
-    "16": "Pekan 16 (28 Des 2026 - 2 Jan 2027)"
+    "UAS": "Pekan UAS (14 Des - 19 Des 2026)"
   }
 };
 
+// Urutan kanonik pekan agar tidak acak di JSON
+const CANONICAL_WEEK_ORDER = ["1", "2", "3", "4", "5", "6", "7", "UTS", "8", "9", "10", "11", "12", "13", "14", "UAS"];
+function orderWeeks(weeksObj) {
+  const result = {};
+  CANONICAL_WEEK_ORDER.forEach(k => { if (k in weeksObj) result[k] = weeksObj[k]; });
+  Object.keys(weeksObj).forEach(k => { if (!(k in result)) result[k] = weeksObj[k]; });
+  return result;
+}
+
 function getClassSettings() {
-  const p = path.join(__dirname, "config", "class-settings.json");
+  const p = path.join(CONFIG_DIR, "class-settings.json");
   if (fs.existsSync(p)) {
     try {
       const data = JSON.parse(fs.readFileSync(p, "utf-8"));
@@ -225,14 +299,15 @@ function getClassSettings() {
 }
 
 function saveClassSettings(data) {
-  const p = path.join(__dirname, "config", "class-settings.json");
+  const p = path.join(CONFIG_DIR, "class-settings.json");
   const current = getClassSettings();
+  const mergedWeeks = orderWeeks({ ...current.weeks, ...(data.weeks || {}) });
   const merged = {
     ...current,
     ...data,
     mention_format: data.mention_format || current.mention_format || "phone_name",
     templates: { ...current.templates, ...(data.templates || {}) },
-    weeks: { ...current.weeks, ...(data.weeks || {}) },
+    weeks: mergedWeeks,
     course_deadlines: data.course_deadlines !== undefined ? data.course_deadlines : (current.course_deadlines || {})
   };
   fs.writeFileSync(p, JSON.stringify(merged, null, 2), "utf-8");
@@ -260,7 +335,8 @@ async function scanCourse(kodeCourse, kodeSection = "PERTEMUAN_1") {
         posttest_status: isPendingPost ? "BELUM_MENGERJAKAN" : "SUDAH_MENGERJAKAN",
         forum_reply_count: isPendingForum ? (idx === 0 ? 1 : 0) : 2,
         forum_status: isPendingForum ? (idx === 0 ? "BELUM_MEMENUHI" : "BELUM_MENGERJAKAN") : "MEMENUHI",
-        assignment_status: isPendingAsg ? "BELUM_MENGUMPULKAN" : "SUDAH_MENGUMPULKAN"
+        assignment_status: isPendingAsg ? "BELUM_MENGUMPULKAN" : "SUDAH_MENGUMPULKAN",
+        questionnaire_status: idx === 1 ? "BELUM_MENGISI" : "SUDAH_MENGISI"
       };
     });
 
@@ -359,6 +435,11 @@ async function scanCourse(kodeCourse, kodeSection = "PERTEMUAN_1") {
         percent: Math.round(((totalMhs - allPendingAsg.length) / totalMhs) * 100),
         pendingStudents: allPendingAsg,
         pendingRevisiStudents: pendingAsgRevisi
+      },
+      questionnaire: {
+        available: true,
+        is_done: true,
+        title: "Kuesioner Pembelajaran"
       },
       students: demoStudents,
       waTemplate: demoWa,
@@ -680,6 +761,11 @@ async function scanCourse(kodeCourse, kodeSection = "PERTEMUAN_1") {
       pendingUtamaStudents: isAssignmentPrivate ? [] : pendingAssignmentUtama,
       pendingRevisiStudents: isAssignmentPrivate ? [] : pendingAssignmentRevisi
     },
+    questionnaire: {
+      available: !!report.aktivitas?.questionnaire?.available,
+      is_done: !!report.aktivitas?.questionnaire?.is_done,
+      title: report.aktivitas?.questionnaire?.title || "Kuesioner"
+    },
     students: detail,
     deadline: {
       day: deadlineDay,
@@ -694,13 +780,20 @@ async function scanCourse(kodeCourse, kodeSection = "PERTEMUAN_1") {
 }
 
 const server = http.createServer(async (req, res) => {
-  const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
+  const parsedUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   const pathname = parsedUrl.pathname;
 
-  // Enable CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  // Security Headers & CORS
+  const origin = req.headers.origin;
+  if (origin) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  } else {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+  }
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
 
   if (req.method === "OPTIONS") {
     res.writeHead(204);
@@ -718,6 +811,19 @@ const server = http.createServer(async (req, res) => {
       updatedAt: session?.updatedAt || null,
       user: session?.user || null
     }));
+    return;
+  }
+
+  // API: Test MENTARI Connection
+  if (pathname === "/api/mentari/test-connection" || pathname === "/api/test-connection") {
+    try {
+      const result = await sessionManager.testConnection();
+      res.writeHead(result.success ? 200 : (result.status || 500), { "Content-Type": "application/json" });
+      res.end(JSON.stringify(result));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, connected: false, error: err.message }));
+    }
     return;
   }
 
@@ -750,16 +856,76 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // API: Get App Version & Changelog Info
+  if (pathname === "/api/version") {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({
+      version: "1.2.1",
+      name: "TugasKu",
+      releaseDate: "2026-09-25",
+      features: [
+        "Auto-scan otomatis seketika saat membuka menu Rangkuman Pribadi",
+        "Sakelar toggle opsi untuk menyembunyikan nomor HP (@628...) di draf WhatsApp",
+        "Sakelar toggle opsi untuk mengubah format nomor urut (1, 2, 3) menjadi tanda bullet",
+        "Auto-scan seketika saat berpindah mata kuliah di draf WhatsApp",
+        "Ekspor CSV dengan nama file dan sheet Excel dinamis sesuai kelas"
+      ]
+    }));
+    return;
+  }
+
+  // API: Logout & Clear Session
+  if (pathname === "/api/logout" && req.method === "POST") {
+    try {
+      sessionManager.clearSession();
+      serverSessionValid = false;
+      console.log("🔒 Sesi MENTARI telah di-logout dan dibersihkan.");
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: true, message: "Sesi berhasil dihapus. Silakan login kembali." }));
+    } catch (err) {
+      res.writeHead(500, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ success: false, error: err.message }));
+    }
+    return;
+  }
+
   // API: Reconnect Interactive
   if (pathname === "/api/reconnect" && req.method === "POST") {
     try {
       console.log("🌐 Memicu pembaruan sesi MENTARI...");
       const updatedSession = await ensureActiveSession(true);
+
+      // Otomatis sinkronkan mata kuliah dari akun MENTARI yang baru login
+      let syncedCourses = [];
+      let detectedClass = null;
+      try {
+        const browserClient = new BrowserMentariClient({ browserSession: sessionManager, headless: true });
+        const resCourses = await browserClient.getUserCourses();
+        if (resCourses && resCourses.data && Array.isArray(resCourses.data) && resCourses.data.length > 0) {
+          syncedCourses = resCourses.data;
+          const coursesPath = path.join(CONFIG_DIR, "courses.json");
+          fs.writeFileSync(coursesPath, JSON.stringify(syncedCourses, null, 2), "utf-8");
+          console.log(`✅ Berhasil menyinkronkan ${syncedCourses.length} mata kuliah akun baru ke config/courses.json!`);
+
+          detectedClass = syncedCourses[0]?.id_kelas;
+          if (detectedClass) {
+            const classSettings = getClassSettings();
+            classSettings.class_name = detectedClass;
+            saveClassSettings(classSettings);
+            console.log(`✅ Kelas berhasil diperbarui otomatis ke: ${detectedClass}`);
+          }
+        }
+      } catch (courseErr) {
+        console.warn("Catatan: Gagal menyinkronkan mata kuliah otomatis:", courseErr.message);
+      }
+
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({
         success: true,
         token: !!(updatedSession && updatedSession.token),
-        user: updatedSession?.user || null
+        user: updatedSession?.user || null,
+        courses: syncedCourses,
+        detectedClass
       }));
     } catch (err) {
       console.error("Gagal menyambungkan:", err.message);
@@ -817,7 +983,7 @@ const server = http.createServer(async (req, res) => {
     req.on("end", () => {
       try {
         const json = JSON.parse(body || "{}");
-        const { kode_course, day, time, reset } = json;
+        const { kode_course, day, time, sks, kelompok, reset } = json;
         if (!kode_course) {
           res.writeHead(400, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ error: "kode_course wajib diisi." }));
@@ -827,12 +993,21 @@ const server = http.createServer(async (req, res) => {
         const current = getClassSettings();
         const deadlines = { ...(current.course_deadlines || {}) };
 
-        if (reset || !day) {
-          delete deadlines[kode_course];
+        if (reset) {
+          if (deadlines[kode_course]) {
+            delete deadlines[kode_course].day;
+            delete deadlines[kode_course].time;
+            if (deadlines[kode_course].sks === undefined && deadlines[kode_course].kelompok === undefined) {
+              delete deadlines[kode_course];
+            }
+          }
         } else {
+          const prev = deadlines[kode_course] || {};
           deadlines[kode_course] = {
-            day: day.trim(),
-            time: (time || current.deadline_time || "23:59 WIB").trim()
+            day: day ? day.trim() : (prev.day || current.deadline_day || "Jumat"),
+            time: time ? time.trim() : (prev.time || current.deadline_time || "23:59 WIB"),
+            sks: sks !== undefined ? parseInt(sks, 10) : (prev.sks || 2),
+            kelompok: kelompok !== undefined && kelompok !== "" ? String(kelompok).trim() : (prev.kelompok || "1")
           };
         }
 
@@ -859,8 +1034,21 @@ const server = http.createServer(async (req, res) => {
     req.on("end", () => {
       try {
         const json = JSON.parse(body || "{}");
-        const course_deadlines = json.course_deadlines || {};
-        const saved = saveClassSettings({ course_deadlines });
+        const incoming = json.course_deadlines || {};
+        const current = getClassSettings();
+        const deadlines = { ...(current.course_deadlines || {}) };
+
+        for (const [code, data] of Object.entries(incoming)) {
+          const prev = deadlines[code] || {};
+          deadlines[code] = {
+            day: data.day ? data.day.trim() : (prev.day || current.deadline_day || "Jumat"),
+            time: data.time ? data.time.trim() : (prev.time || current.deadline_time || "23:59 WIB"),
+            sks: data.sks !== undefined ? parseInt(data.sks, 10) : (prev.sks || 2),
+            kelompok: data.kelompok !== undefined ? String(data.kelompok) : (prev.kelompok || "1")
+          };
+        }
+
+        const saved = saveClassSettings({ course_deadlines: deadlines });
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ success: true, course_deadlines: saved.course_deadlines }));
       } catch (err) {
@@ -1037,11 +1225,12 @@ const server = http.createServer(async (req, res) => {
   if (pathname === "/api/telegram/config" && req.method === "GET") {
     const cfg = telegramNotifier.getConfig();
     const maskedToken = cfg.bot_token ? `${cfg.bot_token.slice(0, 6)}...${cfg.bot_token.slice(-4)}` : "";
+    const { bot_token, ...safeCfg } = cfg;
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({
-      ...cfg,
+      ...safeCfg,
       bot_token_masked: maskedToken,
-      has_token: !!cfg.bot_token
+      has_token: !!bot_token
     }));
     return;
   }
@@ -1052,9 +1241,17 @@ const server = http.createServer(async (req, res) => {
     req.on("end", () => {
       try {
         const json = JSON.parse(body || "{}");
-        const saved = telegramNotifier.saveConfig(json);
+        const prev = telegramNotifier.getConfig();
+        const incomingToken = (json.bot_token || "").trim();
+        // If incoming token is masked (contains "...") or omitted, preserve existing token
+        const newBotToken = (incomingToken.includes("...") || !incomingToken)
+          ? (incomingToken === "" ? "" : prev.bot_token)
+          : incomingToken;
+        const saved = telegramNotifier.saveConfig({ ...json, bot_token: newBotToken });
+        const maskedToken = saved.bot_token ? `${saved.bot_token.slice(0, 6)}...${saved.bot_token.slice(-4)}` : "";
+        const { bot_token, ...safeSaved } = saved;
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ success: true, config: saved }));
+        res.end(JSON.stringify({ success: true, config: { ...safeSaved, bot_token_masked: maskedToken } }));
       } catch (err) {
         res.writeHead(500, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ error: err.message }));
@@ -1232,11 +1429,11 @@ server.on("error", (err) => {
   process.exit(1);
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, HOST, () => {
   console.log("\n" + "=".repeat(70));
   console.log("             🌐 TUGASKU WEB DASHBOARD BERJALAN!");
   console.log("=".repeat(70));
-  console.log(` Buka di browser Anda: http://localhost:${PORT}`);
+  console.log(` Buka di browser Anda: http://${HOST === "0.0.0.0" ? "localhost" : HOST}:${PORT}`);
   console.log(" Tekan Ctrl + C untuk menghentikan server.");
   console.log("=".repeat(70) + "\n");
 
